@@ -6,3 +6,5 @@ build/
 *.jks
 .env
 tests/fixtures/_pipeline/
+__pycache__/
+*.pyc
