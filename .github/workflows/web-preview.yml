@@ -51,6 +51,7 @@ jobs:
           godot --headless --script res://tests/test_repairs.gd
           godot --headless --script res://tests/test_adventure.gd
           godot --headless --script res://tests/test_sprites.gd
+          godot --headless --script res://tests/test_hero_sprites.gd
 
       - name: Sprite pipeline tests
         run: |

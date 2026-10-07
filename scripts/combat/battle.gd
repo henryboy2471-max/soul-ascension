@@ -77,7 +77,7 @@ func _ready() -> void:
  hero.defense=s.defense
  hero.body=Profile.data.body
  hero.speed=s.speed
- hero.load_sprite_set("res://assets/characters/hero/frames.tres")
+ hero.load_sprite_set("res://assets/characters/hero/frames.tres",170.0,Color("4aa3ff"))
  hero.run_speed_threshold=1.0
  hero.position=Vector2(400,450)
  arena.add_child(hero)

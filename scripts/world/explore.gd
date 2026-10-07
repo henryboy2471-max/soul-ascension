@@ -84,7 +84,7 @@ func _ready() -> void:
  player=Fighter.new()
  player.body=Profile.data.body
  player.scale=Vector2(1.2,1.2)
- player.load_sprite_set("res://assets/characters/hero/frames.tres")
+ player.load_sprite_set("res://assets/characters/hero/frames.tres",170.0,Color("4aa3ff"))
  add_child(player)
  fore=WorldArt.new()
  fore.kind="fore"

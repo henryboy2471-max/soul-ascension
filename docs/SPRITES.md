@@ -25,3 +25,24 @@ Combat mapping: attacks cycle attack1-3 per swing; Pulse/Rift/Ultimate/Mend play
 
 ## Tests
 `python3 tools/test_slice_sheet.py`, `tools/test_pipeline.sh`, `tests/test_sprites.gd` (all synthetic fixtures, no game art).
+
+## Hero import report (hero_approved_curly_sprite_sheet.png)
+
+The board is a 1536x1024 presentation sheet (opaque dark background, labelled panels, reference art, effects, an in-game mock-up), not a frame grid. Every panel was inspected at 2-3x before cutting. Reproduce with `tools/import_hero.sh` (panel rectangles are in the script).
+
+| Animation | Status | Notes |
+| --- | --- | --- |
+| idle | exported, 6 frames | Clean cut. The sheet's "side view" idles face the camera (front/three-quarter); the game flips them for left/right. |
+| walk | exported, 8 frames | Cut at the emptiest column between figures (capes overlap, so an even grid slices bodies). Small dark shadow remnants at the feet in some frames. Scale-normalized (x1.29). |
+| hurt | exported, 4 frames | Clean. Scale-normalized (x1.13). |
+| defeat | exported, 6 frames | Good poses; a faint floor line remains on the last frame. Uses hurt's scale factor. |
+| run | FLAGGED | 6 clean poses + 2 lightning frames against a label of 8; neighbouring frames overlap through the cape and every cut leaves slivers of the next figure. Game falls back to walk. |
+| dash | FLAGGED | Label says 6, the panel holds 2 full-bleed lightning frames. Game shows code-drawn speed streaks over walk. |
+| jump, land | FLAGGED | Effect streaks/dust split into fragments or overlap neighbours; not used by Episode 1. |
+| block | FLAGGED | Frames cut by neighbours/shield effect; Episode 1 uses a code-drawn shield arc instead. |
+| attack1, attack2, attack3 | FLAGGED | Labels promise 6/8/8 frames but 4 are present; attack1 cell 3 is a mis-scaled effect cell, attack3 cell 3 has no character, attack2 cells overlap their neighbours. Game shows code-drawn slash arcs over the idle/walk frames. |
+| skill, finisher | FLAGGED | Full-bleed lightning scenes; the character cannot be separated from the effect background. Skill shows a code-drawn ring. |
+
+How the cut was made: the dark armour is nearly the same colour as the dark navy background, so a plain colour key punched holes in legs and armour. The matte therefore removes only background connected to the panel edge (with a morphological opening that blocks leaks into armour), softens a 2 px edge band while un-mixing the navy fringe, and clears only enclosed pockets that are almost exactly the background colour. Each panel was normalized uniformly to the idle head width (no stretching), aligned on one canvas by its foot point.
+
+Known limits: source frames are small (about 75-110 px tall) and are scaled about 1.6x in game, so the Hero is softer than a native-resolution sprite. Fully usable run/dash/attack/skill/jump animations need cleaner source cells (one animation per row with gaps, or transparent PNG strips). Until then the flagged states use the fallbacks above, which are code-drawn effects and never invented character frames.

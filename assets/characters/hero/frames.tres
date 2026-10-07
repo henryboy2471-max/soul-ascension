@@ -1,0 +1,121 @@
+[gd_resource type="SpriteFrames" load_steps=25 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/defeat_00.png" id="1_jvle8"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/defeat_01.png" id="2_16ove"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/defeat_02.png" id="3_deawr"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/defeat_03.png" id="4_i5702"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/defeat_04.png" id="5_id0yg"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/defeat_05.png" id="6_muffx"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/hurt_00.png" id="7_h3p2w"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/hurt_01.png" id="8_l0ue7"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/hurt_02.png" id="9_1r0g8"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/hurt_03.png" id="10_tlnqc"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/idle_00.png" id="11_wn8tv"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/idle_01.png" id="12_njaoe"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/idle_02.png" id="13_la2yh"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/idle_03.png" id="14_txjbc"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/idle_04.png" id="15_15460"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/idle_05.png" id="16_g841u"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/walk_00.png" id="17_7yw5h"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/walk_01.png" id="18_do2rr"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/walk_02.png" id="19_68wo5"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/walk_03.png" id="20_gh7ei"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/walk_04.png" id="21_exjar"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/walk_05.png" id="22_rroa2"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/walk_06.png" id="23_jmmbl"]
+[ext_resource type="Texture2D" path="res://assets/characters/hero/frames/walk_07.png" id="24_ogpwx"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_jvle8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_16ove")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_deawr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_i5702")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_id0yg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_muffx")
+}],
+"loop": false,
+"name": &"defeat",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_h3p2w")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_l0ue7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_1r0g8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_tlnqc")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("11_wn8tv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_njaoe")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_la2yh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_txjbc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_15460")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_g841u")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("17_7yw5h")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_do2rr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_68wo5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_gh7ei")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_exjar")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_rroa2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_jmmbl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_ogpwx")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 10.0
+}]

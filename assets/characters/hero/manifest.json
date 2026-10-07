@@ -1,0 +1,418 @@
+{
+ "animations": {
+  "attack1": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "hero_approved_curly_sprite_sheet.png",
+   "warnings": [
+    "Label says 6 frames, 4 present; cell 3 is a slash-effect cell with the character at a different scale."
+   ]
+  },
+  "attack2": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "hero_approved_curly_sprite_sheet.png",
+   "warnings": [
+    "Label says 8 frames, 4 present; slash arcs and neighbouring figures overlap every cell."
+   ]
+  },
+  "attack3": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "hero_approved_curly_sprite_sheet.png",
+   "warnings": [
+    "Label says 8 frames, 4 present; cell 3 is a pure effect swoosh with no character."
+   ]
+  },
+  "block": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "hero_approved_curly_sprite_sheet.png",
+   "warnings": [
+    "Frames are cut by neighbours/shield effect; not used by Episode 1 (block uses an overlay)."
+   ]
+  },
+  "dash": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "hero_approved_curly_sprite_sheet.png",
+   "warnings": [
+    "Label says 6 frames but the panel holds 2 full-bleed lightning frames; no separable character frames."
+   ]
+  },
+  "defeat": {
+   "background": "matte",
+   "flagged": false,
+   "fps": 8.0,
+   "frames": [
+    {
+     "bottom": 76,
+     "file": "defeat_00.png",
+     "foot_x": 36.0,
+     "h": 76,
+     "head_w": 22,
+     "w": 52
+    },
+    {
+     "bottom": 57,
+     "file": "defeat_01.png",
+     "foot_x": 12.0,
+     "h": 57,
+     "head_w": 50,
+     "w": 58
+    },
+    {
+     "bottom": 54,
+     "file": "defeat_02.png",
+     "foot_x": 12.0,
+     "h": 54,
+     "head_w": 49,
+     "w": 57
+    },
+    {
+     "bottom": 55,
+     "file": "defeat_03.png",
+     "foot_x": 4.611111111111111,
+     "h": 55,
+     "head_w": 51,
+     "w": 59
+    },
+    {
+     "bottom": 52,
+     "file": "defeat_04.png",
+     "foot_x": 45.63636363636363,
+     "h": 52,
+     "head_w": 4,
+     "w": 59
+    },
+    {
+     "bottom": 47,
+     "file": "defeat_05.png",
+     "foot_x": 31.5,
+     "h": 47,
+     "head_w": 35,
+     "w": 63
+    }
+   ],
+   "frames_out": [
+    "defeat_00.png",
+    "defeat_01.png",
+    "defeat_02.png",
+    "defeat_03.png",
+    "defeat_04.png",
+    "defeat_05.png"
+   ],
+   "ground": "frame",
+   "loop": false,
+   "scale": 1.125,
+   "scale_like": "hurt",
+   "source": "hero_approved_curly_sprite_sheet.png",
+   "warnings": []
+  },
+  "finisher": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "hero_approved_curly_sprite_sheet.png",
+   "warnings": [
+    "Full-bleed lightning scenes; the character cannot be separated from the effect background."
+   ]
+  },
+  "hurt": {
+   "background": "matte",
+   "flagged": false,
+   "fps": 12.0,
+   "frames": [
+    {
+     "bottom": 73,
+     "file": "hurt_00.png",
+     "foot_x": 34.56896551724138,
+     "h": 73,
+     "head_w": 17,
+     "w": 59
+    },
+    {
+     "bottom": 70,
+     "file": "hurt_01.png",
+     "foot_x": 29.321428571428573,
+     "h": 70,
+     "head_w": 16,
+     "w": 55
+    },
+    {
+     "bottom": 71,
+     "file": "hurt_02.png",
+     "foot_x": 30.423076923076923,
+     "h": 71,
+     "head_w": 16,
+     "w": 57
+    },
+    {
+     "bottom": 72,
+     "file": "hurt_03.png",
+     "foot_x": 27.574074074074073,
+     "h": 72,
+     "head_w": 16,
+     "w": 53
+    }
+   ],
+   "frames_out": [
+    "hurt_00.png",
+    "hurt_01.png",
+    "hurt_02.png",
+    "hurt_03.png"
+   ],
+   "ground": "frame",
+   "loop": false,
+   "scale": 1.125,
+   "scale_like": null,
+   "source": "hero_approved_curly_sprite_sheet.png",
+   "warnings": []
+  },
+  "idle": {
+   "background": "matte",
+   "flagged": false,
+   "fps": 6.0,
+   "frames": [
+    {
+     "bottom": 94,
+     "file": "idle_00.png",
+     "foot_x": 47.294117647058826,
+     "h": 94,
+     "head_w": 18,
+     "w": 87
+    },
+    {
+     "bottom": 94,
+     "file": "idle_01.png",
+     "foot_x": 44.13333333333333,
+     "h": 94,
+     "head_w": 18,
+     "w": 74
+    },
+    {
+     "bottom": 94,
+     "file": "idle_02.png",
+     "foot_x": 40.37096774193548,
+     "h": 94,
+     "head_w": 19,
+     "w": 75
+    },
+    {
+     "bottom": 95,
+     "file": "idle_03.png",
+     "foot_x": 41.91935483870968,
+     "h": 95,
+     "head_w": 19,
+     "w": 81
+    },
+    {
+     "bottom": 94,
+     "file": "idle_04.png",
+     "foot_x": 45.46666666666667,
+     "h": 94,
+     "head_w": 18,
+     "w": 84
+    },
+    {
+     "bottom": 94,
+     "file": "idle_05.png",
+     "foot_x": 37.57142857142857,
+     "h": 94,
+     "head_w": 18,
+     "w": 81
+    }
+   ],
+   "frames_out": [
+    "idle_00.png",
+    "idle_01.png",
+    "idle_02.png",
+    "idle_03.png",
+    "idle_04.png",
+    "idle_05.png"
+   ],
+   "ground": "frame",
+   "loop": true,
+   "scale": 1.0,
+   "scale_like": null,
+   "source": "hero_approved_curly_sprite_sheet.png",
+   "warnings": []
+  },
+  "jump": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "hero_approved_curly_sprite_sheet.png",
+   "warnings": [
+    "Effect streaks split into detached fragments; background does not matte cleanly."
+   ]
+  },
+  "land": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "hero_approved_curly_sprite_sheet.png",
+   "warnings": [
+    "Dust clouds overlap neighbouring frames; frames are cut by the cell boundaries."
+   ]
+  },
+  "run": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "hero_approved_curly_sprite_sheet.png",
+   "warnings": [
+    "Run panel (6 clean poses + 2 lightning frames, label says 8): neighbouring frames overlap through the cape, grid/valley cuts leave slivers of the next figure."
+   ]
+  },
+  "skill": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "hero_approved_curly_sprite_sheet.png",
+   "warnings": [
+    "Full-bleed lightning scenes; the character cannot be separated from the effect background."
+   ]
+  },
+  "walk": {
+   "background": "matte",
+   "flagged": false,
+   "fps": 10.0,
+   "frames": [
+    {
+     "bottom": 74,
+     "file": "walk_00.png",
+     "foot_x": 25.0,
+     "h": 74,
+     "head_w": 13,
+     "w": 50
+    },
+    {
+     "bottom": 71,
+     "file": "walk_01.png",
+     "foot_x": 19.370967741935484,
+     "h": 71,
+     "head_w": 14,
+     "w": 46
+    },
+    {
+     "bottom": 72,
+     "file": "walk_02.png",
+     "foot_x": 21.2,
+     "h": 72,
+     "head_w": 13,
+     "w": 42
+    },
+    {
+     "bottom": 71,
+     "file": "walk_03.png",
+     "foot_x": 23.0,
+     "h": 71,
+     "head_w": 14,
+     "w": 46
+    },
+    {
+     "bottom": 69,
+     "file": "walk_04.png",
+     "foot_x": 23.9,
+     "h": 69,
+     "head_w": 14,
+     "w": 41
+    },
+    {
+     "bottom": 71,
+     "file": "walk_05.png",
+     "foot_x": 22.0,
+     "h": 71,
+     "head_w": 14,
+     "w": 44
+    },
+    {
+     "bottom": 71,
+     "file": "walk_06.png",
+     "foot_x": 23.0,
+     "h": 71,
+     "head_w": 14,
+     "w": 46
+    },
+    {
+     "bottom": 71,
+     "file": "walk_07.png",
+     "foot_x": 24.5,
+     "h": 71,
+     "head_w": 14,
+     "w": 49
+    }
+   ],
+   "frames_out": [
+    "walk_00.png",
+    "walk_01.png",
+    "walk_02.png",
+    "walk_03.png",
+    "walk_04.png",
+    "walk_05.png",
+    "walk_06.png",
+    "walk_07.png"
+   ],
+   "ground": "frame",
+   "loop": true,
+   "scale": 1.2857,
+   "scale_like": null,
+   "source": "hero_approved_curly_sprite_sheet.png",
+   "warnings": []
+  }
+ },
+ "canvas": [
+  136,
+  108
+ ],
+ "character": "hero",
+ "ground_row": 102,
+ "pad": 6,
+ "ref_anim": "idle"
+}

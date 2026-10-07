@@ -32,6 +32,11 @@ def has_real_alpha(arr):
 
 def guess_background(arr):
     h, w = arr.shape[:2]
+    # robust: median colour of a 2px border ring (panel interior is usually a flat plate)
+    ring = np.concatenate([arr[:2, :, :3].reshape(-1, 3), arr[-2:, :, :3].reshape(-1, 3),
+                           arr[:, :2, :3].reshape(-1, 3), arr[:, -2:, :3].reshape(-1, 3)])
+    if h > 8 and w > 8:
+        return np.median(ring, axis=0).astype(int)
     corners = np.array([arr[0, 0, :3], arr[0, w - 1, :3], arr[h - 1, 0, :3], arr[h - 1, w - 1, :3]], dtype=int)
     # most common corner colour (corners usually agree on a solid background)
     vals, counts = np.unique(corners, axis=0, return_counts=True)
@@ -50,6 +55,56 @@ def _propagate(reach, near, axis):
     hit = np.bincount(gid, weights=r.ravel().astype(float), minlength=gid[-1] + 1) > 0
     out = (hit[gid] & flat_n).reshape(n.shape) | r
     return out if axis == 1 else out.T
+
+
+def _dilate(mask, r):
+    out = mask.copy()
+    for _ in range(r):
+        p = np.pad(out, 1)
+        out = out | p[:-2, 1:-1] | p[2:, 1:-1] | p[1:-1, :-2] | p[1:-1, 2:]
+    return out
+
+
+def _erode(mask, r):
+    return ~_dilate(~mask, r)
+
+
+def matte_background(arr, bg, lo, hi, band, opening=2, enclosed=0.0):
+    """Safe matte for dark art on a dark flat background.
+    1) Background core = pixels within `lo` of the background colour that are connected to the border.
+    2) Only a thin `band` (px) around that core gets a soft alpha ramp between `lo` and `hi`, and the
+       background colour is un-mixed from those edge pixels. Everything deeper inside stays fully opaque,
+       so dark armour/pants that resemble the background are never punched out.
+    """
+    rgb = arr[..., :3].astype(float)
+    dist = np.sqrt(((rgb - np.array(bg, dtype=float)) ** 2).sum(axis=2))
+    near = dist <= lo
+    if opening > 0:
+        # opening removes hairline channels so the background cannot leak into dark armour of a similar colour
+        near = _dilate(_erode(near, opening), opening)
+    reach = np.zeros_like(near)
+    reach[0, :], reach[-1, :], reach[:, 0], reach[:, -1] = near[0, :], near[-1, :], near[:, 0], near[:, -1]
+    for _ in range(400):
+        new = _propagate(_propagate(reach, near, 1), near, 0)
+        if (new == reach).all():
+            break
+        reach = new
+    core = reach
+    edge = _dilate(core, band) & ~core
+    alpha = np.ones(dist.shape)
+    ramp = np.clip((dist - lo) / max(1e-6, hi - lo), 0.0, 1.0)
+    alpha[edge] = ramp[edge]
+    alpha[core] = 0.0
+    out = arr.copy().astype(float)
+    a = np.clip(alpha, 0.05, 1.0)[..., None]
+    fix = edge & (alpha > 0.0) & (alpha < 1.0)
+    unmixed = (rgb - (1 - a) * np.array(bg, dtype=float)) / a
+    out[..., :3] = np.where(fix[..., None], np.clip(unmixed, 0, 255), rgb)
+    if enclosed > 0:
+        # pixels almost exactly the background colour that the opening protected (enclosed pockets between legs/cape)
+        alpha = np.where(dist <= enclosed, 0.0, alpha)
+    out[..., 3] = alpha * 255.0
+    return out.round().astype(np.uint8), "matte"
 
 
 def remove_background(arr, bg, tol, mode):
@@ -133,6 +188,78 @@ def merge_to_count(boxes, target):
     return [tuple(b) for b in boxes]
 
 
+def keep_main_components(mask, min_ratio):
+    """8-connected components; keep those with area >= min_ratio * largest. Returns keep-mask."""
+    h, w = mask.shape
+    label = np.zeros((h, w), dtype=np.int32)
+    sizes = []
+    cur = 0
+    for sy, sx in zip(*np.nonzero(mask)):
+        if label[sy, sx]:
+            continue
+        cur += 1
+        stack = [(sy, sx)]
+        label[sy, sx] = cur
+        n = 0
+        while stack:
+            y, x = stack.pop()
+            n += 1
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    yy, xx = y + dy, x + dx
+                    if 0 <= yy < h and 0 <= xx < w and mask[yy, xx] and not label[yy, xx]:
+                        label[yy, xx] = cur
+                        stack.append((yy, xx))
+        sizes.append(n)
+    if not sizes:
+        return mask
+    big = max(sizes)
+    keep_ids = [i + 1 for i, n in enumerate(sizes) if n >= big * min_ratio]
+    return np.isin(label, keep_ids)
+
+
+def valley_cuts(alpha, n, search=0.38):
+    """Cut positions for n equal-ish cells, nudged to the emptiest column near each expected boundary."""
+    h, w = alpha.shape
+    profile = (alpha > ALPHA_THRESHOLD).sum(axis=0).astype(float)
+    k = np.ones(5) / 5.0
+    smooth = np.convolve(profile, k, mode="same")
+    cuts = [0]
+    cell = w / n
+    for i in range(1, n):
+        centre = int(round(i * cell))
+        lo, hi = max(cuts[-1] + 8, int(centre - cell * search)), min(w - 8, int(centre + cell * search))
+        cuts.append(int(lo + np.argmin(smooth[lo:hi + 1])) if hi > lo else centre)
+    cuts.append(w)
+    return cuts
+
+
+def strip_floor_line(crop, max_rows=4):
+    """Remove a thin dark panel-floor line stuck to the bottom of a frame."""
+    alpha = crop[..., 3] > ALPHA_THRESHOLD
+    h, w = alpha.shape
+    removed = 0
+    for y in range(h - 1, max(h - 1 - max_rows, 0), -1):
+        row = alpha[y]
+        lum = crop[y, :, :3].astype(float).mean(axis=1)
+        if row.sum() >= 0.5 * w and lum[row].mean() < 85:
+            crop[y, :, 3] = 0
+            removed += 1
+        else:
+            break
+    return crop
+
+
+def head_width(frame_alpha):
+    """Width of the top slice of the silhouette (the head for upright/leaning poses): a scale reference."""
+    mask = frame_alpha > ALPHA_THRESHOLD
+    ys = np.flatnonzero(mask.any(axis=1))
+    top, bottom = ys[0], ys[-1] + 1
+    band = mask[top: top + max(3, int((bottom - top) * 0.12))]
+    xs = np.flatnonzero(band.any(axis=0))
+    return int(xs[-1] - xs[0] + 1) if xs.size else 0
+
+
 def foot_point(frame_alpha):
     h, w = frame_alpha.shape
     mask = frame_alpha > ALPHA_THRESHOLD
@@ -160,6 +287,9 @@ def save_manifest(out, data):
 
 def cmd_slice(args):
     arr = load_rgba(args.sheet)
+    if args.region:
+        x0, y0, x1, y1 = [int(v) for v in args.region.split(",")]
+        arr = arr[y0:y1, x0:x1].copy()
     warnings = []
     if has_real_alpha(arr):
         bg_note = "alpha"
@@ -169,15 +299,19 @@ def cmd_slice(args):
             bg = guess_background(arr)
         elif args.bg != "none":
             bg = [int(args.bg[i:i + 2], 16) for i in (1, 3, 5)]
-        arr, bg_note = remove_background(arr, bg, args.tol, args.bg_mode)
+        if args.bg_mode == "matte" and bg is not None:
+            arr, bg_note = matte_background(arr, bg, args.tol, args.tol_hi, args.band, args.opening, args.enclosed)
+        else:
+            arr, bg_note = remove_background(arr, bg, args.tol, args.bg_mode)
     boxes = detect_frames(arr[..., 3], args.gap, args.min_area_ratio)
     if args.grid:
         rows, cols = [int(v) for v in args.grid.lower().split("x")]
         h, w = arr.shape[:2]
         boxes = []
+        xcuts = valley_cuts(arr[..., 3], cols) if (args.valley and rows == 1) else [c * w // cols for c in range(cols + 1)]
         for r in range(rows):
             for c in range(cols):
-                x0, y0, x1, y1 = c * w // cols, r * h // rows, (c + 1) * w // cols, (r + 1) * h // rows
+                x0, y0, x1, y1 = xcuts[c], r * h // rows, xcuts[c + 1], (r + 1) * h // rows
                 sub = arr[y0:y1, x0:x1, 3] > ALPHA_THRESHOLD
                 if sub.any():
                     ys, xs = np.flatnonzero(sub.any(axis=1)), np.flatnonzero(sub.any(axis=0))
@@ -205,22 +339,43 @@ def cmd_slice(args):
             os.remove(os.path.join(trimmed, old))
     manifest = load_manifest(args.out)
     entry = {"fps": args.fps, "loop": args.loop == "true", "ground": args.ground, "source": os.path.basename(args.sheet),
-             "background": bg_note, "warnings": warnings, "flagged": bool(flagged), "frames": []}
+             "background": bg_note, "warnings": warnings, "flagged": bool(flagged), "frames": [], "scale_like": args.scale_like}
     if flagged:
         entry["warnings"].append("FLAGGED: not used in the game until fixed or --force is given")
     else:
         for n, (x0, y0, x1, y1, _) in enumerate(boxes):
             crop = arr[y0:y1, x0:x1].copy()
+            if args.floor_strip:
+                crop = strip_floor_line(crop)
+            if args.speck > 0:
+                keep = keep_main_components(crop[..., 3] > ALPHA_THRESHOLD, args.speck)
+                crop[~keep, 3] = 0
+                ys, xs = np.flatnonzero(keep.any(axis=1)), np.flatnonzero(keep.any(axis=0))
+                crop = crop[ys[0]:ys[-1] + 1, xs[0]:xs[-1] + 1]
+                x1, y1 = x0 + xs[-1] + 1, y0 + ys[-1] + 1
+                x0, y0 = x0 + xs[0], y0 + ys[0]
             fx, fy = foot_point(crop[..., 3])
             name = f"{args.anim}_{n:02d}.png"
             Image.fromarray(crop).save(os.path.join(trimmed, name))
-            entry["frames"].append({"file": name, "foot_x": float(fx), "bottom": int(fy), "w": int(x1 - x0), "h": int(y1 - y0)})
+            entry["frames"].append({"file": name, "foot_x": float(fx), "bottom": int(fy), "w": int(x1 - x0), "h": int(y1 - y0),
+                                    "head_w": head_width(crop[..., 3])})
     manifest["animations"][args.anim] = entry
     os.makedirs(args.out, exist_ok=True)
     save_manifest(args.out, manifest)
     print(f"{args.anim}: {len(entry['frames'])} frames" + (" FLAGGED" if flagged else ""))
     for w in entry["warnings"]:
         print("  warning:", w)
+    return 0
+
+
+def cmd_flag(args):
+    manifest = load_manifest(args.out)
+    manifest["animations"][args.anim] = {"fps": 10.0, "loop": True, "ground": "frame", "source": args.source or "",
+                                         "background": "n/a", "warnings": [args.reason], "flagged": True, "frames": [],
+                                         "scale_like": None}
+    os.makedirs(args.out, exist_ok=True)
+    save_manifest(args.out, manifest)
+    print(f"{args.anim}: FLAGGED - {args.reason}")
     return 0
 
 
@@ -232,26 +387,40 @@ def cmd_finalize(args):
         print("nothing to finalize")
         return 1
     pad = args.pad
+    # --- scale normalisation: every animation is brought to the reference animation's head width (uniform resize) ---
+    factors = {}
+    ref = None
+    if args.ref_anim and args.ref_anim in anims:
+        ref = float(np.median([f["head_w"] for f in anims[args.ref_anim]["frames"] if f.get("head_w")]))
+    for name, entry in anims.items():
+        widths = [f["head_w"] for f in entry["frames"] if f.get("head_w")]
+        factors[name] = 1.0
+        if ref and widths and not entry.get("scale_like"):
+            factors[name] = float(np.clip(ref / float(np.median(widths)), 0.5, 2.5))
+    for name, entry in anims.items():
+        like = entry.get("scale_like")
+        if like and like in factors:
+            factors[name] = factors[like]
+        entry["scale"] = round(factors[name], 4)
     placed = {}
     half, above, below = 0.0, 0.0, 0.0
     for name, entry in anims.items():
-        bottoms = [f["bottom"] for f in entry["frames"]]
+        k = factors[name]
+        bottoms = [f["bottom"] * k for f in entry["frames"]]
         baseline = float(max(bottoms)) if entry["ground"] == "row" else None
         placed[name] = []
         for f in entry["frames"]:
-            ground_y = f["bottom"] if baseline is None else baseline
-            up = ground_y  # pixels above the ground line within the trimmed frame (frame top is y=0)
-            down = f["h"] - ground_y
-            left, right = f["foot_x"], f["w"] - f["foot_x"]
-            half = max(half, left, right)
-            above = max(above, up)
-            below = max(below, down)
-            placed[name].append((f, ground_y))
+            fx, bot, h, w = f["foot_x"] * k, f["bottom"] * k, f["h"] * k, f["w"] * k
+            ground_y = bot if baseline is None else baseline
+            half = max(half, fx, w - fx)
+            above = max(above, ground_y)
+            below = max(below, h - ground_y)
+            placed[name].append((f, ground_y, k, fx))
     width = int(np.ceil(half * 2)) + pad * 2
     if width % 2:
         width += 1
     height = int(np.ceil(above + max(below, 0))) + pad * 2
-    ground_row = int(np.ceil(above)) + pad  # canvas row index of the ground line (feet end here)
+    ground_row = int(np.ceil(above)) + pad
     out_frames = os.path.join(args.out, "frames")
     os.makedirs(out_frames, exist_ok=True)
     for old in os.listdir(out_frames):
@@ -259,10 +428,12 @@ def cmd_finalize(args):
             os.remove(os.path.join(out_frames, old))
     for name, items in placed.items():
         manifest["animations"][name]["frames_out"] = []
-        for n, (f, ground_y) in enumerate(items):
+        for n, (f, ground_y, k, fx) in enumerate(items):
             img = Image.open(os.path.join(trimmed, f["file"])).convert("RGBA")
+            if abs(k - 1.0) > 1e-3:
+                img = img.resize((max(1, round(img.width * k)), max(1, round(img.height * k))), Image.LANCZOS)
             canvas = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-            x = int(round(width / 2 - f["foot_x"]))
+            x = int(round(width / 2 - fx))
             y = int(round(ground_row - ground_y))
             canvas.paste(img, (x, y), img)
             fname = f"{name}_{n:02d}.png"
@@ -271,9 +442,11 @@ def cmd_finalize(args):
     manifest["canvas"] = [width, height]
     manifest["ground_row"] = ground_row
     manifest["pad"] = pad
+    manifest["ref_anim"] = args.ref_anim
     save_manifest(args.out, manifest)
     flagged = [k for k, v in manifest["animations"].items() if v["flagged"] or not v["frames"]]
     print(f"canvas {width}x{height}, ground row {ground_row}, animations: {', '.join(anims)}")
+    print("scale factors:", {k: round(v, 3) for k, v in factors.items()})
     if flagged:
         print("flagged (not exported):", ", ".join(flagged))
     return 0
@@ -287,20 +460,36 @@ def main():
     s.add_argument("--out", required=True)
     s.add_argument("--anim", required=True)
     s.add_argument("--frames", type=int, default=0, help="expected frame count (warns if different)")
+    s.add_argument("--region", help="x0,y0,x1,y1 sub-rectangle of the sheet to use (one animation panel)")
+    s.add_argument("--valley", action="store_true", help="1xN grid: cut at the emptiest column near each boundary")
+    s.add_argument("--floor-strip", action="store_true", help="remove a thin dark floor line under each frame")
     s.add_argument("--grid", help="force a ROWSxCOLS grid instead of gap detection, e.g. 2x4")
     s.add_argument("--bg", default="auto", help="auto, none, or #rrggbb (ignored if the sheet already has alpha)")
-    s.add_argument("--bg-mode", default="border", choices=["border", "all"])
+    s.add_argument("--bg-mode", default="border", choices=["border", "all", "matte"])
+    s.add_argument("--tol-hi", type=float, default=26.0, help="matte: full-opacity distance")
+    s.add_argument("--opening", type=int, default=2, help="matte: background opening radius (blocks leaks into dark art)")
+    s.add_argument("--enclosed", type=float, default=0.0, help="matte: also clear enclosed pixels this close to the background colour")
+    s.add_argument("--band", type=int, default=2, help="matte: soft edge width in pixels")
     s.add_argument("--tol", type=float, default=28.0)
     s.add_argument("--gap", type=int, default=3, help="empty pixels that separate two frames")
+    s.add_argument("--speck", type=float, default=0.04, help="drop disconnected pieces smaller than this fraction of the largest piece (0 = keep all)")
     s.add_argument("--min-area-ratio", type=float, default=0.08)
     s.add_argument("--ground", default="frame", choices=["frame", "row"], help="row keeps vertical offsets (jump/air)")
     s.add_argument("--fps", type=float, default=10.0)
     s.add_argument("--loop", default="true", choices=["true", "false"])
+    s.add_argument("--scale-like", help="use another animation's normalization factor (for poses where the head is not on top)")
     s.add_argument("--force", action="store_true")
     s.set_defaults(fn=cmd_slice)
+    g = sub.add_parser("flag", help="record an animation as not reliably extractable (not exported)")
+    g.add_argument("--out", required=True)
+    g.add_argument("--anim", required=True)
+    g.add_argument("--reason", required=True)
+    g.add_argument("--source")
+    g.set_defaults(fn=cmd_flag)
     f = sub.add_parser("finalize")
     f.add_argument("--out", required=True)
     f.add_argument("--pad", type=int, default=6)
+    f.add_argument("--ref-anim", default="", help="normalise every animation to this animation's head width (uniform resize)")
     f.set_defaults(fn=cmd_finalize)
     args = p.parse_args()
     sys.exit(args.fn(args))

@@ -43,14 +43,17 @@ const ANIM_FALLBACKS = {
  "run":["walk"],"walk":["run"],"dash":["run","walk"],
  "land":["idle"],"jump":["idle"],"hurt":["idle"],"defeat":["hurt","idle"],"idle":[]
 }
-func load_sprite_set(path:String, world_height:float=170.0) -> bool:
+func load_sprite_set(path:String, world_height:float=170.0, overlay:Color=Color(0,0,0,0)) -> bool:
  # Returns false (and keeps the procedural rig) when no SpriteFrames resource exists at `path`.
  if not ResourceLoader.exists(path):
   return false
  var frames=load(path)
  if not frames is SpriteFrames:
   return false
- return attach_frames(frames,world_height)
+ var ok=attach_frames(frames,world_height)
+ if ok and overlay.a>0:
+  accent=overlay
+ return ok
 func attach_frames(frames:SpriteFrames, world_height:float=170.0) -> bool:
  if not frames.has_animation("idle") or frames.get_frame_count("idle")==0:
   return false
@@ -246,6 +249,18 @@ func _draw() -> void:
 func draw_sprite_overlays(color:Color) -> void:
  if dead:
   return
+ # Code-drawn effects stand in for animations the art pack could not supply (they are VFX, not character frames).
+ if swing>0.0 and not has_animation("attack1"):
+  var t=clampf(swing/0.3,0.0,1.0)
+  draw_arc(Vector2(20,-78),86,-1.6,1.0,28,Color(color,0.18*t),22)
+  draw_arc(Vector2(20,-78),86,-1.6,1.0,28,Color(color,0.55*t),8)
+  draw_arc(Vector2(20,-78),86,-1.4+(1.0-t)*0.8,1.0,28,Color(1,1,1,0.85*t),3)
+ if casting>0.0 and not has_animation("skill"):
+  var u=clampf(casting/0.45,0.0,1.0)
+  draw_arc(Vector2(0,-70),60+(1.0-u)*50,0,TAU,40,Color(color,0.7*u),4)
+ if trailing and not has_animation("dash"):
+  for i in range(4):
+   draw_line(Vector2(-40-i*14,-30-i*22),Vector2(-95-i*10,-30-i*22),Color(color,0.5-i*0.1),3)
  if aura:
   var glow=0.5+0.5*sin(Time.get_ticks_msec()/160.0)
   draw_arc(Vector2(0,-65),88+glow*6,0,TAU,48,Color(aura_color,0.35+0.3*glow),3)

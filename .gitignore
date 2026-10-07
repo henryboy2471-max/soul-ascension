@@ -8,3 +8,5 @@ build/
 tests/fixtures/_pipeline/
 __pycache__/
 *.pyc
+assets/characters/*/_trimmed/
+assets/enemies/*/_trimmed/
