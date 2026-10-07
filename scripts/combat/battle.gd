@@ -77,6 +77,8 @@ func _ready() -> void:
  hero.defense=s.defense
  hero.body=Profile.data.body
  hero.speed=s.speed
+ hero.load_sprite_set("res://assets/characters/hero/frames.tres")
+ hero.run_speed_threshold=1.0
  hero.position=Vector2(400,450)
  arena.add_child(hero)
  waves=wave_defs()
@@ -423,11 +425,14 @@ func act(kind:String) -> void:
   Sound.play("special")
   return
  if kind=="mend":
+  hero.casting=0.45
   hero.health=minf(hero.max_health,hero.health+70)
   status.text="MEND  /  restored health"
   Sound.play("special")
   return
  hero.swing=0.30
+ if kind in ["pulse","rift","ultimate"]:
+  hero.casting=0.45
  var reach={"attack":135,"heavy":155,"pulse":230,"rift":520,"ultimate":1500}.get(kind,135)
  var multiplier={"attack":1.0,"heavy":2.2,"pulse":2.5,"rift":3.1,"ultimate":7.5}.get(kind,1.0)
  Sound.play("hit" if kind in ["attack","heavy"] else "special")

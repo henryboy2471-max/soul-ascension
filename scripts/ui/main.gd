@@ -239,6 +239,7 @@ func show_hero() -> void:
  var node=new_modal("THE UNBOUND","OWNED  /  COMMON  /  ECHO STRIKER")
  var rig=Fighter.new()
  rig.body=Profile.data.body
+ rig.load_sprite_set("res://assets/characters/hero/frames.tres")
  rig.position=Vector2(401,414)
  rig.scale=Vector2(1.3,1.3)
  node.add_child(rig)

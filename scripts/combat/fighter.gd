@@ -28,6 +28,97 @@ var coat_color=Color("111625")
 var armed=true
 var look="hero"
 var trailing=false
+# Optional sprite art. When `sprite` exists it replaces the procedural body; all gameplay state stays on this node.
+var sprite:AnimatedSprite2D
+var sprite_frames:SpriteFrames
+var casting=0.0
+var combo_step=0
+var combo_idle=0.0
+var last_swing=0.0
+var current_anim=""
+var run_speed_threshold=0.0
+const ANIM_FALLBACKS = {
+ "attack3":["attack2","attack1","skill"],"attack2":["attack1","skill"],"attack1":["skill"],
+ "skill":["attack1"],"finisher":["skill","attack3","attack1"],
+ "run":["walk"],"walk":["run"],"dash":["run","walk"],
+ "land":["idle"],"jump":["idle"],"hurt":["idle"],"defeat":["hurt","idle"],"idle":[]
+}
+func load_sprite_set(path:String, world_height:float=170.0) -> bool:
+ # Returns false (and keeps the procedural rig) when no SpriteFrames resource exists at `path`.
+ if not ResourceLoader.exists(path):
+  return false
+ var frames=load(path)
+ if not frames is SpriteFrames:
+  return false
+ return attach_frames(frames,world_height)
+func attach_frames(frames:SpriteFrames, world_height:float=170.0) -> bool:
+ if not frames.has_animation("idle") or frames.get_frame_count("idle")==0:
+  return false
+ sprite_frames=frames
+ if is_instance_valid(sprite):
+  sprite.queue_free()
+ sprite=AnimatedSprite2D.new()
+ sprite.sprite_frames=frames
+ sprite.centered=true
+ var tex=frames.get_frame_texture("idle",0)
+ var h=float(tex.get_height())
+ # Frames are normalized so the feet sit on the bottom-centre of the canvas: bottom-centre = this node's origin.
+ sprite.offset=Vector2(0,-h/2.0)
+ var factor=world_height/h
+ sprite.scale=Vector2(factor,factor)
+ add_child(sprite)
+ current_anim=""
+ play_animation("idle")
+ return true
+func has_animation(name:String) -> bool:
+ return sprite_frames!=null and sprite_frames.has_animation(name) and sprite_frames.get_frame_count(name)>0
+# Resolves an animation name to one the loaded art actually has (never invents frames); "" means nothing suitable.
+func resolve_animation(name:String) -> String:
+ if has_animation(name):
+  return name
+ for alt in ANIM_FALLBACKS.get(name,[]):
+  if has_animation(alt):
+   return alt
+ return "idle" if has_animation("idle") else ""
+func desired_animation() -> String:
+ if dead:
+  return "defeat"
+ if flash>0.0:
+  return "hurt"
+ if casting>0.0:
+  return "skill"
+ if swing>0.0:
+  return "attack"+str(clampi(combo_step,1,3))
+ if trailing:
+  return "dash"
+ if moving:
+  return "run" if run_speed_threshold>0.0 else "walk"
+ return "idle"
+func play_animation(name:String) -> void:
+ var resolved=resolve_animation(name)
+ if resolved=="" or resolved==current_anim:
+  return
+ current_anim=resolved
+ sprite.play(resolved)
+func update_sprite(delta:float) -> void:
+ if swing>0.0 and last_swing<=0.0:
+  combo_step=(combo_step%3)+1
+  combo_idle=1.2
+ elif combo_idle>0.0:
+  combo_idle-=delta
+  if combo_idle<=0.0:
+   combo_step=0
+ last_swing=swing
+ casting=maxf(0.0,casting-delta)
+ sprite.flip_h=facing<0
+ sprite.self_modulate=Color(2.2,2.2,2.2) if flash>0.0 else Color.WHITE
+ var wanted=resolve_animation(desired_animation())
+ if wanted==current_anim:
+  return
+ # Interrupt one-shot animations only for higher-priority states
+ if current_anim in ["defeat"] and not dead:
+  current_anim=""
+ play_animation(wanted)
 var ghosts:Array=[]
 var ghost_timer=0.0
 func _process(delta:float) -> void:
@@ -36,6 +127,8 @@ func _process(delta:float) -> void:
  flash=maxf(0,flash-delta)
  swing=maxf(0,swing-delta)
  step+=delta*(12 if moving else 2)
+ if sprite!=null:
+  update_sprite(delta)
  if trailing:
   ghost_timer-=delta
   if ghost_timer<=0:
@@ -65,7 +158,7 @@ func _draw() -> void:
  var ink=Color("151c30") if enemy else coat_color
  if flash>0:
   ink=Color("e9dbff")
- for g in ghosts:
+ for g in (ghosts if sprite==null else []):
   draw_set_transform(to_local(g.pos),0,Vector2(facing,1))
   var fade=g.life/0.24*0.4
   draw_colored_polygon(PackedVector2Array([Vector2(-21,-107),Vector2(23,-102),Vector2(35,-20),Vector2(2,-42),Vector2(-36,-22)]),Color(color,fade))
@@ -74,6 +167,9 @@ func _draw() -> void:
  draw_circle(Vector2.ZERO,44,Color(0,0,0,0.45))
  draw_arc(Vector2.ZERO,44,0,TAU,48,Color(color,0.4),2)
  draw_set_transform(Vector2.ZERO,0,Vector2(facing,1))
+ if sprite!=null:
+  draw_sprite_overlays(color)
+  return
  if dead:
   draw_line(Vector2(-35,-12),Vector2(35,-12),color,9)
   return
@@ -145,5 +241,16 @@ func _draw() -> void:
   var glow=0.5+0.5*sin(Time.get_ticks_msec()/160.0)
   draw_arc(Vector2(0,-65),88+glow*6,0,TAU,48,Color(aura_color,0.35+0.3*glow),3)
   draw_arc(Vector2(0,-65),100+glow*8,0,TAU,48,Color(aura_color,0.12+0.12*glow),2)
+ if invincible>0:
+  draw_arc(Vector2(0,-65),83,0,TAU,40,Color(color,0.5),2)
+func draw_sprite_overlays(color:Color) -> void:
+ if dead:
+  return
+ if aura:
+  var glow=0.5+0.5*sin(Time.get_ticks_msec()/160.0)
+  draw_arc(Vector2(0,-65),88+glow*6,0,TAU,48,Color(aura_color,0.35+0.3*glow),3)
+  draw_arc(Vector2(0,-65),100+glow*8,0,TAU,48,Color(aura_color,0.12+0.12*glow),2)
+ if blocking:
+  draw_arc(Vector2(8,-66),65,-1.5,1.5,30,Color(0.4,0.8,1,0.7),5)
  if invincible>0:
   draw_arc(Vector2(0,-65),83,0,TAU,40,Color(color,0.5),2)

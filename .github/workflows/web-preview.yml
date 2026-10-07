@@ -50,6 +50,14 @@ jobs:
           godot --headless --script res://tests/test_phase1.gd
           godot --headless --script res://tests/test_repairs.gd
           godot --headless --script res://tests/test_adventure.gd
+          godot --headless --script res://tests/test_sprites.gd
+
+      - name: Sprite pipeline tests
+        run: |
+          pip install numpy pillow
+          python3 tools/test_slice_sheet.py
+          GODOT=godot tools/test_pipeline.sh
+          rm -rf tests/fixtures/_pipeline
 
       - name: Export web build
         run: |
