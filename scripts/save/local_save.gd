@@ -63,5 +63,9 @@ func valid(d:Dictionary) -> bool:
   if not d.settings.get(key) is bool: return false
  for id in d.completed:
   if not id is String: return false
+ if d.has("codex"):
+  if not d.codex is Array: return false
+  for id in d.codex:
+   if not id is String: return false
  return true
 

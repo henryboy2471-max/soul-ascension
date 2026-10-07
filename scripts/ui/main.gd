@@ -4,6 +4,34 @@ var modal:Control
 var currency_label:Label
 var notice:Label
 var scene_name="home"
+var rotate_overlay:Control
+var orientation_timer=0.0
+func _process(delta:float) -> void:
+ orientation_timer-=delta
+ if orientation_timer<=0.0:
+  orientation_timer=0.4
+  var size=get_window().size
+  set_portrait_hint(size.y>size.x)
+# Phones held upright get a rotate prompt (the game is landscape-only).
+func set_portrait_hint(portrait:bool) -> void:
+ if portrait and rotate_overlay==null:
+  rotate_overlay=Control.new()
+  rotate_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+  rotate_overlay.mouse_filter=Control.MOUSE_FILTER_STOP
+  rotate_overlay.z_index=100
+  var dim=ColorRect.new()
+  dim.color=Color(0.012,0.016,0.04,0.97)
+  dim.size=Vector2(1280,720)
+  dim.mouse_filter=Control.MOUSE_FILTER_IGNORE
+  rotate_overlay.add_child(dim)
+  var title=UI.label(rotate_overlay,"ROTATE YOUR DEVICE",Vector2(140,290),54,Color.WHITE,1000)
+  title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+  var sub=UI.label(rotate_overlay,"Soul Ascension plays in landscape",Vector2(140,370),24,UI.GOLD,1000)
+  sub.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+  add_child(rotate_overlay)
+ elif not portrait and rotate_overlay!=null:
+  rotate_overlay.queue_free()
+  rotate_overlay=null
 func _ready() -> void:
  Profile.changed.connect(refresh_profile)
  show_home()
@@ -218,8 +246,20 @@ Speed      "+str(stats.speed)+"
 Critical   12% / 160%",Vector2(530,250),22,Color("cbd0e2"))
  UI.label(node,"A quiet Aether signature with limitless evolutionary potential.",Vector2(294,464),19,UI.MUTED,680)
  UI.label(node,"Placeholder rig · Gear, stars and transformations arrive in later phases.",Vector2(294,520),14,UI.MUTED,680)
- UI.button(node,"TURN",Rect2(294,568,155,58),func(): rig.facing*=-1)
- UI.button(node,"AETHER POSE PREVIEW",Rect2(466,568,343,58),func(): rig.swing=1.0;rig.invincible=1.0;Sound.play("special"))
+ UI.button(node,"TURN",Rect2(294,568,110,58),func(): rig.facing*=-1)
+ UI.button(node,"AETHER POSE",Rect2(416,568,210,58),func(): rig.swing=1.0;rig.invincible=1.0;Sound.play("special"))
+ UI.button(node,"CODEX",Rect2(638,568,170,58),show_codex)
+func show_codex() -> void:
+ var node=new_modal("CODEX","STORY AND WORLD ENTRIES  /  "+str(Profile.data.codex.size())+" OF "+str(EpisodeData.CODEX.size())+" FOUND")
+ for i in range(EpisodeData.CODEX.size()):
+  var entry=EpisodeData.CODEX[i]
+  var found=Profile.data.codex.has(entry.id)
+  var col=i/3
+  var row=i%3
+  var x=294+col*350
+  var y=200+row*118
+  UI.label(node,entry.title if found else "UNDISCOVERED",Vector2(x,y),17,UI.GOLD if found else Color("68738c"),330)
+  UI.label(node,entry.text if found else "Explore Episode 1 to uncover this entry.",Vector2(x,y+26),13,Color("cbd0e2") if found else Color("68738c"),330)
 func show_upgrade() -> void:
  var node=new_modal("GROW YOUR AETHER","LEVELS INCREASE YOUR COMBAT STATS")
  UI.label(node,"Level "+str(Profile.data.level)+"   →   "+str(mini(100,Profile.data.level+1)),Vector2(294,221),37,UI.GOLD)

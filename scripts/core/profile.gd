@@ -6,7 +6,7 @@ var save_ok=true
 var active_run=""
 var clock=0.0
 func defaults() -> Dictionary:
- return {"name":"Ascendant","body":"male","onboarded":false,"level":1,"xp":0,"gold":500,"crystals":0,"energy":60,"energy_at":int(Time.get_unix_time_from_system()),"completed":[],"heroes":{"echo":{"level":1,"stars":1}},"inventory":[],"equipment":{},"achievements":[],"purchases":[],"vip_xp":0,"battle_pass_xp":0,"settings":{"sound":true,"shake":true,"reduced_motion":false}}
+ return {"name":"Ascendant","body":"male","onboarded":false,"level":1,"xp":0,"gold":500,"crystals":0,"energy":60,"energy_at":int(Time.get_unix_time_from_system()),"completed":[],"codex":[],"heroes":{"echo":{"level":1,"stars":1}},"inventory":[],"equipment":{},"achievements":[],"purchases":[],"vip_xp":0,"battle_pass_xp":0,"settings":{"sound":true,"shake":true,"reduced_motion":false}}
 func _ready() -> void:
  data=defaults()
  var loaded=backend.read_data()
@@ -28,6 +28,12 @@ func persist() -> bool:
  save_ok=backend.write_data(data)
  changed.emit()
  return save_ok
+func unlock_codex(id:String) -> bool:
+ if data.codex.has(id):
+  return false
+ data.codex.append(id)
+ persist()
+ return true
 func begin_run(id:String) -> bool:
  if active_run!="" or id!="1-1":
   return false

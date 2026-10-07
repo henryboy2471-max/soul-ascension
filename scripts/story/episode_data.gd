@@ -56,3 +56,12 @@ const MURAL = [
  {"who":"NARRATOR","text":"A hand-painted mural: a ring of lanterns around a sleeping city. Beneath it, in careful letters: 'WHEN THE SKY GOES DARK, WE KEEP THE LIGHT.'"},
  {"who":"PLAYER","text":"Lantern Circuit. Mira's people. Hidden in plain sight, just like the rest of us."}
 ]
+# Codex entries unlocked by exploring. Order is display order.
+const CODEX = [
+ {"id":"mira","title":"MIRA VEY","text":"Tram mechanic and Volt Vanguard. Keeps an illegal power line alive for displaced families in Neon District and is part of the Lantern Circuit."},
+ {"id":"board","title":"MERIDIAN NOTICE","text":"The Directorate suppresses unregistered Aether activity on sight. Public safety rules double as a leash on every Ascendant in the city."},
+ {"id":"mural","title":"LANTERN CIRCUIT","text":"A mutual-aid network that hides awakened civilians inside ordinary city services. Their motto: when the sky goes dark, we keep the light."},
+ {"id":"terminal","title":"ECHO SIGNAL","text":"An Aether signature so quiet it is almost unreadable. Unlike conventional Aether, Echo learns from the resonance of others without taking their power."},
+ {"id":"breach","title":"SOUL REALM","text":"A resonance space torn open by the Echo signal. Memories and fears take shape inside it as constructs. Entering costs energy to hold the channel open."},
+ {"id":"enforcer","title":"SOUL-WARPED ENFORCER","text":"A Meridian suppression unit twisted by the Echo resonance. Its last words: Not harmless. Not harmless."}
+]

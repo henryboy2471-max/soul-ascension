@@ -30,6 +30,7 @@ var act_edge=false
 var walkers:Array=[]
 var step_timer=0.0
 var act_block=0.0
+var toast_label:Label
 var channel_t=0.0
 var active_spot:Dictionary={}
 var objective_text=""
@@ -123,6 +124,9 @@ func build_hud() -> void:
  act_button.tint=UI.GOLD
  add_child(act_button)
  act_button.activated.connect(func(): act_edge=true)
+ toast_label=UI.label(self,"",Vector2(340,112),16,UI.GOLD,600)
+ toast_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+ toast_label.modulate.a=0.0
  UI.label(self,"MOVE  /  WASD",Vector2(61,698),12,UI.MUTED)
  UI.label(self,"ACT  /  E",Vector2(1110,696),12,UI.MUTED)
 func set_objective(text:String, x:float) -> void:
@@ -133,6 +137,12 @@ func set_objective(text:String, x:float) -> void:
  var tween=create_tween()
  obj_panel.modulate=Color(2.2,1.9,1.2)
  tween.tween_property(obj_panel,"modulate",Color.WHITE,0.8)
+func toast(text:String) -> void:
+ toast_label.text=text
+ toast_label.modulate.a=1.0
+ var tween=create_tween()
+ tween.tween_interval(1.6)
+ tween.tween_property(toast_label,"modulate:a",0.0,0.6)
 func open_breach() -> void:
  props.breach_open=true
  enabled.breach=true

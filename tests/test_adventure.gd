@@ -147,6 +147,19 @@ func run() -> void:
  ep.explore.request_exit()
  await process_frame
  check(main.scene_name=="home","Second EXIT tap returns home")
+ # Codex persistence and display
+ check(profile.data.codex.has("mira") and profile.data.codex.has("terminal") and profile.data.codex.has("breach") and profile.data.codex.has("enforcer") and profile.data.codex.has("mural"),"Exploration and story events unlock Codex entries")
+ check(profile.backend.read_data().get("codex",[]).has("enforcer"),"Codex unlocks are saved")
+ main.show_codex()
+ await process_frame
+ check(is_instance_valid(main.modal),"Codex screen opens")
+ main.close_modal()
+ # Portrait phones get a rotate prompt, landscape does not
+ main.set_portrait_hint(true)
+ check(main.rotate_overlay!=null,"Portrait orientation shows the rotate prompt")
+ main.set_portrait_hint(false)
+ await process_frame
+ check(main.rotate_overlay==null,"Landscape orientation hides the rotate prompt")
  # Battle-only path still works without spending the episode
  check(main.start_battle(false) and main.scene_name=="battle","Battle-only mode is still available")
  main.queue_free()

@@ -16,6 +16,11 @@ func _ready() -> void:
   run_ending()
  else:
   run_intro()
+func unlock(id:String) -> void:
+ if Profile.unlock_codex(id) and is_instance_valid(explore):
+  for entry in EpisodeData.CODEX:
+   if entry.id==id:
+    explore.toast("CODEX UPDATED  /  "+entry.title)
 func hero_name() -> String:
  return str(Profile.data.name)
 func say(lines:Array) -> void:
@@ -74,23 +79,28 @@ func on_interact(id:String) -> void:
   "mira":
    if step==0:
     await say(EpisodeData.MIRA_TALK)
+    unlock("mira")
     set_step(1)
    else:
     await say(EpisodeData.MIRA_REPEAT)
   "board":
    await say(EpisodeData.BOARD)
+   unlock("board")
   "mural":
    await say(EpisodeData.MURAL)
+   unlock("mural")
   "terminal":
    if step==1:
     explore.set_terminal_done()
     explore.pulse_flash(Color(0.6,0.5,1.0))
     await get_tree().create_timer(0.5).timeout
     await say(EpisodeData.TERMINAL)
+    unlock("terminal")
     set_step(2)
   "breach":
    if step==2:
     await say(EpisodeData.BREACH)
+    unlock("breach")
     await card("SOUL REALM  /  MISSION ZONE 01","THE RESONANT BRIDGE","SURVIVE THE SUPPRESSION CONSTRUCT",false,2.0)
     var ok=false
     if request_battle.is_valid():
@@ -102,6 +112,7 @@ func on_interact(id:String) -> void:
   explore.act_block=0.45
   explore.locked=false
 func run_ending() -> void:
+ Profile.unlock_codex("enforcer")
  var backdrop=make_backdrop()
  await say(EpisodeData.OUTRO)
  backdrop.queue_free()
