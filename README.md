@@ -96,3 +96,7 @@ Check `com.newroots.soulascension` before first publication. Store publication, 
 - `docs/` — story bible, phased roadmap, asset provenance, validation and rendered screenshots.
 
 No services were purchased, no real-money transactions were made, and no secrets are stored in the project.
+
+## Browser preview
+
+Every push to `main` builds the web export (`.github/workflows/web-preview.yml`) and publishes it to GitHub Pages. In the repo: Settings -> Pages -> Source: GitHub Actions. The preview is at `https://henryboy2471-max.github.io/soul-ascension/` after the first successful run. Keyboard: WASD / J / K / Space / L / Q / E / R / F. Touch controls appear on-screen.
