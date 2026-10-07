@@ -1,0 +1,37 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+PASS: XP levels and carries remainder
+PASS: Multiple levels in one grant
+PASS: Reject negative spend
+PASS: Reject overdraft
+PASS: Energy offline regeneration keeps remainder
+PASS: Energy regeneration cap
+PASS: Backward clock does not grant energy
+PASS: Atomic local save
+PASS: Save/load round trip
+PASS: Corrupt primary recovers backup
+PASS: Mission entry spends energy once
+PASS: Reject concurrent mission
+PASS: First clear rewards and level up
+PASS: Cannot duplicate settlement
+PASS: Replay uses repeat rewards
+PASS: Loss awards no rewards
+PASS: Mission rejects insufficient energy
+PASS: Screen opens: show_hero
+PASS: Screen opens: show_upgrade
+PASS: Screen opens: show_missions
+PASS: Screen opens: show_settings
+PASS: Screen opens: show_mission
+PASS: Basic attack deals damage and starts combo
+PASS: Attack cooldown prevents immediate repeat
+PASS: Block reduces incoming damage
+PASS: Dodge grants invulnerability
+PASS: Special uses energy and staggers
+PASS: Mend restores health
+PASS: Ultimate consumes charge and animates
+PASS: Multitouch movement and attack
+PASS: Release attack preserves movement touch
+PASS: Victory reaches result and settles mission
+PASS: Defeat reaches result and settles mission
+PASS: Progression survives save reload
+RESULT: 34 passed / 0 failed

@@ -1,0 +1,44 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
+[application]
+
+config/name="SOUL ASCENSION"
+config/version="0.1.0"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.4", "GL Compatibility")
+config/icon="res://assets/icon.svg"
+
+[autoload]
+
+Profile="*res://scripts/core/profile.gd"
+Sound="*res://scripts/audio/sound.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/size/window_width_override=1280
+window/size/window_height_override=720
+window/stretch/mode="canvas_items"
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.025, 0.035, 0.07, 1)
