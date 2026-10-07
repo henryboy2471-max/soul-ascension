@@ -79,6 +79,8 @@ func _ready() -> void:
  npc.coat_color=Color("2b3350")
  npc.armed=false
  npc.facing=-1
+ # World height 155 puts Mira's standing figure about 5% shorter than the Hero's (measured, see tests/test_mira_sprites.gd).
+ npc.load_sprite_set("res://assets/characters/mira/frames.tres",155.0,Color("c27bff"))
  npc.scale=Vector2(1.2,1.2)
  add_child(npc)
  player=Fighter.new()

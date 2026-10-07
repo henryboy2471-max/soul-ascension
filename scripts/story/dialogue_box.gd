@@ -121,6 +121,10 @@ func set_portrait(kind:String) -> void:
    rig.skin_color=Color("9a6a52")
    rig.coat_color=Color("2b3350")
    rig.armed=false
+   if rig.load_sprite_set("res://assets/characters/mira/frames.tres",155.0,Color("c27bff")):
+    # sprite art is a full-body figure: enlarge and lower it so the frame shows face and shoulders
+    rig.scale=Vector2(3.1,3.1)
+    rig.position=Vector2(86,452)
   elif kind=="enforcer":
    rig.enemy=true
   portrait_frame.add_child(rig)

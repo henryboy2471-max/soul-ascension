@@ -1,0 +1,523 @@
+{
+ "animations": {
+  "attack1": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "mira_sprite_sheet.png",
+   "warnings": [
+    "Rows 4/7: slash arcs extend across neighbouring frames and fuse them into one blob; frame boundaries are not recoverable."
+   ]
+  },
+  "attack2": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "mira_sprite_sheet.png",
+   "warnings": [
+    "Rows 4/7: same as attack1."
+   ]
+  },
+  "attack3": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "mira_sprite_sheet.png",
+   "warnings": [
+    "Rows 4/7: same as attack1."
+   ]
+  },
+  "dash": {
+   "background": "none",
+   "flagged": false,
+   "fps": 14.0,
+   "frames": [
+    {
+     "bottom": 110,
+     "file": "dash_00.png",
+     "foot_x": 15.0,
+     "h": 110,
+     "head_w": 104,
+     "w": 137
+    },
+    {
+     "bottom": 107,
+     "file": "dash_01.png",
+     "foot_x": 7.5,
+     "h": 107,
+     "head_w": 97,
+     "w": 130
+    },
+    {
+     "bottom": 106,
+     "file": "dash_02.png",
+     "foot_x": 4.5,
+     "h": 106,
+     "head_w": 95,
+     "w": 122
+    },
+    {
+     "bottom": 108,
+     "file": "dash_03.png",
+     "foot_x": 9.5,
+     "h": 108,
+     "head_w": 56,
+     "w": 123
+    },
+    {
+     "bottom": 102,
+     "file": "dash_04.png",
+     "foot_x": 12.5,
+     "h": 102,
+     "head_w": 95,
+     "w": 131
+    },
+    {
+     "bottom": 93,
+     "file": "dash_05.png",
+     "foot_x": 28.13157894736842,
+     "h": 93,
+     "head_w": 75,
+     "w": 110
+    }
+   ],
+   "frames_out": [
+    "dash_00.png",
+    "dash_01.png",
+    "dash_02.png",
+    "dash_03.png",
+    "dash_04.png",
+    "dash_05.png"
+   ],
+   "ground": "frame",
+   "loop": false,
+   "scale": 1.0,
+   "scale_fixed": 1.0,
+   "scale_like": null,
+   "source": "mira_sprite_sheet.png",
+   "warnings": []
+  },
+  "defeat": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "mira_sprite_sheet.png",
+   "warnings": [
+    "Row 6: prone frames overlap each other and pick up spill from the row above."
+   ]
+  },
+  "finisher": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "mira_sprite_sheet.png",
+   "warnings": [
+    "Rows 6/7: full-bleed energy scene; the character cannot be separated from the effect."
+   ]
+  },
+  "hurt": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "mira_sprite_sheet.png",
+   "warnings": [
+    "Row 6: frame 4 merges with neighbours and the row above spills into the cells."
+   ]
+  },
+  "idle": {
+   "background": "none",
+   "flagged": false,
+   "fps": 8.0,
+   "frames": [
+    {
+     "bottom": 139,
+     "file": "idle_00.png",
+     "foot_x": 44.34375,
+     "h": 139,
+     "head_w": 33,
+     "w": 86
+    },
+    {
+     "bottom": 139,
+     "file": "idle_01.png",
+     "foot_x": 40.875,
+     "h": 139,
+     "head_w": 30,
+     "w": 86
+    },
+    {
+     "bottom": 138,
+     "file": "idle_02.png",
+     "foot_x": 40.0,
+     "h": 138,
+     "head_w": 30,
+     "w": 82
+    },
+    {
+     "bottom": 139,
+     "file": "idle_03.png",
+     "foot_x": 41.5,
+     "h": 139,
+     "head_w": 29,
+     "w": 83
+    },
+    {
+     "bottom": 139,
+     "file": "idle_04.png",
+     "foot_x": 40.0,
+     "h": 139,
+     "head_w": 30,
+     "w": 80
+    },
+    {
+     "bottom": 139,
+     "file": "idle_05.png",
+     "foot_x": 44.625,
+     "h": 139,
+     "head_w": 42,
+     "w": 90
+    },
+    {
+     "bottom": 139,
+     "file": "idle_06.png",
+     "foot_x": 51.984848484848484,
+     "h": 139,
+     "head_w": 37,
+     "w": 102
+    },
+    {
+     "bottom": 140,
+     "file": "idle_07.png",
+     "foot_x": 45.5,
+     "h": 140,
+     "head_w": 35,
+     "w": 93
+    },
+    {
+     "bottom": 139,
+     "file": "idle_08.png",
+     "foot_x": 46.35294117647059,
+     "h": 139,
+     "head_w": 32,
+     "w": 103
+    },
+    {
+     "bottom": 138,
+     "file": "idle_09.png",
+     "foot_x": 14.071428571428571,
+     "h": 138,
+     "head_w": 40,
+     "w": 99
+    },
+    {
+     "bottom": 140,
+     "file": "idle_10.png",
+     "foot_x": 37.125,
+     "h": 140,
+     "head_w": 37,
+     "w": 98
+    },
+    {
+     "bottom": 139,
+     "file": "idle_11.png",
+     "foot_x": 41.02173913043478,
+     "h": 139,
+     "head_w": 41,
+     "w": 97
+    },
+    {
+     "bottom": 141,
+     "file": "idle_12.png",
+     "foot_x": 43.0,
+     "h": 141,
+     "head_w": 38,
+     "w": 95
+    },
+    {
+     "bottom": 140,
+     "file": "idle_13.png",
+     "foot_x": 33.4,
+     "h": 140,
+     "head_w": 37,
+     "w": 93
+    },
+    {
+     "bottom": 141,
+     "file": "idle_14.png",
+     "foot_x": 40.0,
+     "h": 141,
+     "head_w": 36,
+     "w": 95
+    },
+    {
+     "bottom": 140,
+     "file": "idle_15.png",
+     "foot_x": 42.435483870967744,
+     "h": 140,
+     "head_w": 30,
+     "w": 86
+    }
+   ],
+   "frames_out": [
+    "idle_00.png",
+    "idle_01.png",
+    "idle_02.png",
+    "idle_03.png",
+    "idle_04.png",
+    "idle_05.png",
+    "idle_06.png",
+    "idle_07.png",
+    "idle_08.png",
+    "idle_09.png",
+    "idle_10.png",
+    "idle_11.png",
+    "idle_12.png",
+    "idle_13.png",
+    "idle_14.png",
+    "idle_15.png"
+   ],
+   "ground": "frame",
+   "loop": true,
+   "scale": 1.0,
+   "scale_fixed": 1.0,
+   "scale_like": null,
+   "source": "mira_sprite_sheet.png",
+   "warnings": []
+  },
+  "jump": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "mira_sprite_sheet.png",
+   "warnings": [
+    "Row 3 holds an unlabeled 8-pose jump/crouch strip after the dash; the jump/land boundary cannot be determined reliably."
+   ]
+  },
+  "land": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "mira_sprite_sheet.png",
+   "warnings": [
+    "See jump: unlabeled strip, boundary between jump and land is a guess."
+   ]
+  },
+  "run": {
+   "background": "none",
+   "flagged": false,
+   "fps": 14.0,
+   "frames": [
+    {
+     "bottom": 122,
+     "file": "run_00.png",
+     "foot_x": 75.98387096774194,
+     "h": 122,
+     "head_w": 46,
+     "w": 112
+    },
+    {
+     "bottom": 121,
+     "file": "run_01.png",
+     "foot_x": 64.4090909090909,
+     "h": 121,
+     "head_w": 60,
+     "w": 101
+    },
+    {
+     "bottom": 120,
+     "file": "run_02.png",
+     "foot_x": 64.75,
+     "h": 120,
+     "head_w": 54,
+     "w": 98
+    },
+    {
+     "bottom": 121,
+     "file": "run_03.png",
+     "foot_x": 23.5,
+     "h": 121,
+     "head_w": 53,
+     "w": 92
+    },
+    {
+     "bottom": 121,
+     "file": "run_04.png",
+     "foot_x": 17.0,
+     "h": 121,
+     "head_w": 58,
+     "w": 94
+    },
+    {
+     "bottom": 121,
+     "file": "run_05.png",
+     "foot_x": 21.5,
+     "h": 121,
+     "head_w": 58,
+     "w": 105
+    },
+    {
+     "bottom": 121,
+     "file": "run_06.png",
+     "foot_x": 25.5,
+     "h": 121,
+     "head_w": 64,
+     "w": 115
+    },
+    {
+     "bottom": 121,
+     "file": "run_07.png",
+     "foot_x": 15.0,
+     "h": 121,
+     "head_w": 58,
+     "w": 120
+    },
+    {
+     "bottom": 120,
+     "file": "run_08.png",
+     "foot_x": 12.0,
+     "h": 120,
+     "head_w": 71,
+     "w": 124
+    },
+    {
+     "bottom": 118,
+     "file": "run_09.png",
+     "foot_x": 9.0,
+     "h": 118,
+     "head_w": 75,
+     "w": 118
+    },
+    {
+     "bottom": 120,
+     "file": "run_10.png",
+     "foot_x": 118.5,
+     "h": 120,
+     "head_w": 61,
+     "w": 128
+    },
+    {
+     "bottom": 122,
+     "file": "run_11.png",
+     "foot_x": 53.0,
+     "h": 122,
+     "head_w": 54,
+     "w": 100
+    },
+    {
+     "bottom": 122,
+     "file": "run_12.png",
+     "foot_x": 48.3,
+     "h": 122,
+     "head_w": 50,
+     "w": 94
+    },
+    {
+     "bottom": 122,
+     "file": "run_13.png",
+     "foot_x": 39.5,
+     "h": 122,
+     "head_w": 57,
+     "w": 95
+    },
+    {
+     "bottom": 123,
+     "file": "run_14.png",
+     "foot_x": 65.375,
+     "h": 123,
+     "head_w": 67,
+     "w": 105
+    }
+   ],
+   "frames_out": [
+    "run_00.png",
+    "run_01.png",
+    "run_02.png",
+    "run_03.png",
+    "run_04.png",
+    "run_05.png",
+    "run_06.png",
+    "run_07.png",
+    "run_08.png",
+    "run_09.png",
+    "run_10.png",
+    "run_11.png",
+    "run_12.png",
+    "run_13.png",
+    "run_14.png"
+   ],
+   "ground": "frame",
+   "loop": true,
+   "scale": 1.0,
+   "scale_fixed": 1.0,
+   "scale_like": null,
+   "source": "mira_sprite_sheet.png",
+   "warnings": []
+  },
+  "skill": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "mira_sprite_sheet.png",
+   "warnings": [
+    "Row 5: orbs and shock rings extend across neighbouring frames; heights and widths vary wildly."
+   ]
+  },
+  "walk": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "mira_sprite_sheet.png",
+   "warnings": [
+    "No separate walk row exists; run (side view) is used as the walk fallback."
+   ]
+  }
+ },
+ "canvas": [
+  258,
+  153
+ ],
+ "character": "mira",
+ "ground_row": 147,
+ "pad": 6,
+ "ref_anim": ""
+}

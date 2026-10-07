@@ -286,10 +286,15 @@ def save_manifest(out, data):
 
 
 def cmd_slice(args):
+    global ALPHA_THRESHOLD
+    ALPHA_THRESHOLD = args.alpha_min
     arr = load_rgba(args.sheet)
     if args.region:
         x0, y0, x1, y1 = [int(v) for v in args.region.split(",")]
         arr = arr[y0:y1, x0:x1].copy()
+    if args.alpha_floor > 0:
+        # clear the faint low-alpha haze some exports leave around figures (keeps real glow above the floor)
+        arr[arr[..., 3] < args.alpha_floor, 3] = 0
     warnings = []
     if has_real_alpha(arr):
         bg_note = "alpha"
@@ -331,6 +336,23 @@ def cmd_slice(args):
     # reading order: group by row, then left to right
     row_height = max(1.0, float(np.median([bb[3] - bb[1] for bb in boxes]))) if boxes else 1.0
     boxes.sort(key=lambda b: (round((b[1] + b[3]) / 2 / row_height), b[0]))
+    if args.crop_pad > 0 and boxes:
+        # include faint glow falloff around each frame, but never reach past the midpoint to a neighbour in the same row
+        padded = []
+        for i, b in enumerate(boxes):
+            x0, y0, x1, y1, area = b
+            lim_l, lim_r = 0, arr.shape[1]
+            for j in (i - 1, i + 1):
+                if 0 <= j < len(boxes):
+                    o = boxes[j]
+                    if min(y1, o[3]) - max(y0, o[1]) > 0:
+                        if j < i:
+                            lim_l = max(lim_l, (o[2] + x0) // 2)
+                        else:
+                            lim_r = min(lim_r, (x1 + o[0]) // 2)
+            padded.append((max(lim_l, x0 - args.crop_pad), max(0, y0 - args.crop_pad),
+                           min(lim_r, x1 + args.crop_pad), min(arr.shape[0], y1 + args.crop_pad), area))
+        boxes = padded
     flagged = (not boxes) or (args.frames and len(boxes) != args.frames and not args.force)
     trimmed = os.path.join(args.out, "_trimmed")
     os.makedirs(trimmed, exist_ok=True)
@@ -339,7 +361,7 @@ def cmd_slice(args):
             os.remove(os.path.join(trimmed, old))
     manifest = load_manifest(args.out)
     entry = {"fps": args.fps, "loop": args.loop == "true", "ground": args.ground, "source": os.path.basename(args.sheet),
-             "background": bg_note, "warnings": warnings, "flagged": bool(flagged), "frames": [], "scale_like": args.scale_like}
+             "background": bg_note, "warnings": warnings, "flagged": bool(flagged), "frames": [], "scale_like": args.scale_like, "scale_fixed": args.scale_fixed}
     if flagged:
         entry["warnings"].append("FLAGGED: not used in the game until fixed or --force is given")
     else:
@@ -395,7 +417,9 @@ def cmd_finalize(args):
     for name, entry in anims.items():
         widths = [f["head_w"] for f in entry["frames"] if f.get("head_w")]
         factors[name] = 1.0
-        if ref and widths and not entry.get("scale_like"):
+        if entry.get("scale_fixed"):
+            factors[name] = float(entry["scale_fixed"])
+        elif ref and widths and not entry.get("scale_like"):
             factors[name] = float(np.clip(ref / float(np.median(widths)), 0.5, 2.5))
     for name, entry in anims.items():
         like = entry.get("scale_like")
@@ -473,10 +497,14 @@ def main():
     s.add_argument("--tol", type=float, default=28.0)
     s.add_argument("--gap", type=int, default=3, help="empty pixels that separate two frames")
     s.add_argument("--speck", type=float, default=0.04, help="drop disconnected pieces smaller than this fraction of the largest piece (0 = keep all)")
+    s.add_argument("--alpha-min", type=int, default=8, help="alpha above which a pixel counts as part of a frame (raise for sheets with a faint haze)")
+    s.add_argument("--alpha-floor", type=int, default=0, help="zero out alpha below this value in the exported frames")
+    s.add_argument("--crop-pad", type=int, default=0, help="include this many px of faint glow around each frame (clamped between neighbours)")
     s.add_argument("--min-area-ratio", type=float, default=0.08)
     s.add_argument("--ground", default="frame", choices=["frame", "row"], help="row keeps vertical offsets (jump/air)")
     s.add_argument("--fps", type=float, default=10.0)
     s.add_argument("--loop", default="true", choices=["true", "false"])
+    s.add_argument("--scale-fixed", type=float, default=None, help="fixed resize factor for this animation (use 1.0 when all rows of a sheet share one source scale)")
     s.add_argument("--scale-like", help="use another animation's normalization factor (for poses where the head is not on top)")
     s.add_argument("--force", action="store_true")
     s.set_defaults(fn=cmd_slice)

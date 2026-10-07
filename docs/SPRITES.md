@@ -46,3 +46,21 @@ The board is a 1536x1024 presentation sheet (opaque dark background, labelled pa
 How the cut was made: the dark armour is nearly the same colour as the dark navy background, so a plain colour key punched holes in legs and armour. The matte therefore removes only background connected to the panel edge (with a morphological opening that blocks leaks into armour), softens a 2 px edge band while un-mixing the navy fringe, and clears only enclosed pockets that are almost exactly the background colour. Each panel was normalized uniformly to the idle head width (no stretching), aligned on one canvas by its foot point.
 
 Known limits: source frames are small (about 75-110 px tall) and are scaled about 1.6x in game, so the Hero is softer than a native-resolution sprite. Fully usable run/dash/attack/skill/jump animations need cleaner source cells (one animation per row with gaps, or transparent PNG strips). Until then the flagged states use the fallbacks above, which are code-drawn effects and never invented character frames.
+
+## Mira import report (mira_sprite_sheet.png)
+
+A 1774x887 production-style sheet with real transparency: seven rows of frames, all at one source scale (so no per-animation rescaling, `--scale-fixed 1.0`). The alpha has a faint low-alpha haze, so frames are detected on solid pixels (alpha > 150), haze below alpha 24 is cleared, and each crop keeps 5 px of glow falloff clamped away from neighbours. Reproduce with `tools/import_mira.sh`.
+
+| Animation | Status | Notes |
+| --- | --- | --- |
+| idle | exported, 16 frames | Row 1, front-facing, clean gaps. |
+| run | exported, 15 frames | Row 2, side view, valley cuts, no neighbour bleed. Also serves as the `walk` fallback (no separate walk row). |
+| dash | exported, 6 frames | Row 3 frames 1-6 (side view with speed streaks), cleanly gap-separated. |
+| walk | FLAGGED | No separate row; run is used. |
+| jump, land | FLAGGED | Row 3 continues with an unlabeled 8-pose jump/crouch strip; the jump/land boundary would be a guess. |
+| hurt, defeat | FLAGGED | Row 6: frame 4 merges with neighbours, prone frames overlap, and the row above spills into the cells. |
+| attack1-3 | FLAGGED | Rows 4/7: slash arcs extend across neighbouring frames and fuse them into one blob. |
+| skill | FLAGGED | Row 5: orbs and shock rings extend across neighbours; sizes vary wildly. |
+| finisher | FLAGGED | Full-bleed energy scene; the character cannot be separated. |
+
+In Episode 1 Mira only stands in the district and speaks in dialogue, so idle is what she uses; run/dash are ready for later episodes. Scale: world height 155 (set by measurement) makes her standing figure about 5% shorter than the Hero (167.8 px vs 177.6 px in the district). Her dialogue portrait is the idle sprite enlarged to face and shoulders.
