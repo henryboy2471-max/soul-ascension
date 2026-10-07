@@ -23,18 +23,24 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: barichello/godot-ci:4.4.1
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install export templates
+      - name: Install Godot and web export templates
         run: |
-          mkdir -p "$HOME/.local/share/godot/export_templates"
-          if [ ! -d "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable" ]; then
-            cp -r "/root/.local/share/godot/export_templates/${GODOT_VERSION}.stable" "$HOME/.local/share/godot/export_templates/"
-          fi
-          ls "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable" | head -3
+          BASE="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          curl -fsSL --retry 3 -o godot.zip "$BASE/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fsSL --retry 3 -o templates.tpz "$BASE/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          unzip -q godot.zip
+          mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" /usr/local/bin/godot 2>/dev/null || sudo mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" /usr/local/bin/godot
+          chmod +x /usr/local/bin/godot 2>/dev/null || sudo chmod +x /usr/local/bin/godot
+          TEMPLATES="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p "$TEMPLATES"
+          unzip -q -j templates.tpz 'templates/web_*' 'templates/version.txt' -d "$TEMPLATES"
+          rm -f godot.zip templates.tpz
+          godot --version
+          ls "$TEMPLATES"
 
       - name: Import project
         run: godot --headless --editor --import --quit
