@@ -136,7 +136,7 @@ func _draw() -> void:
   draw_circle(Vector2(10,-78+bob),4,Color.WHITE)
   draw_colored_polygon(PackedVector2Array([Vector2(-28,-104+bob),Vector2(-44,-134+bob),Vector2(-18,-110+bob)]),Color(color,0.9))
   draw_colored_polygon(PackedVector2Array([Vector2(34,-100+bob),Vector2(52,-128+bob),Vector2(24,-108+bob)]),Color(color,0.9))
- if look=="hero":
+ if look=="hero" and not enemy:
   draw_line(Vector2(21,-90+bob),Vector2(33,-72+bob),Color("b48bff"),2)
   draw_line(Vector2(26,-82+bob),Vector2(36,-70+bob),Color("dfc8ff"),1)
  if blocking:

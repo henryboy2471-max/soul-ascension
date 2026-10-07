@@ -4,6 +4,10 @@ signal finished(won:bool)
 signal retreat
 var hero:Fighter
 var foe:Fighter
+var waves:Array=[]
+var wave=0
+var foe_name_label:Label
+var foe_sub_label:Label
 var arena:Node2D
 var telegraph_art:Node2D
 var sparks:Node2D
@@ -75,28 +79,15 @@ func _ready() -> void:
  hero.speed=s.speed
  hero.position=Vector2(400,450)
  arena.add_child(hero)
- foe=Fighter.new()
- foe.enemy=true
- foe.health=820 if boss_mode else 650
- foe.max_health=820 if boss_mode else 650
- if boss_mode:
-  foe.look="warped"
-  foe.accent=Color("c27bff")
-  foe.scale=Vector2(1.2,1.2)
- foe.attack=28
- foe.defense=6
- foe.position=Vector2(850,450)
- foe.facing=-1
- arena.add_child(foe)
+ waves=wave_defs()
+ spawn_foe(waves[0])
  telegraph_art=load("res://scripts/combat/telegraph.gd").new()
  telegraph_art.battle=self
  add_child(telegraph_art)
  sparks=load("res://scripts/combat/impact.gd").new()
  add_child(sparks)
  hero.struck.connect(func(amount,critical): damage_number(hero.position,amount,critical,Color("ff8597")); Sound.play("hurt"))
- foe.struck.connect(func(amount,critical): damage_number(foe.position,amount,critical,UI.GOLD))
  hero.defeated.connect(func(): end(false))
- foe.defeated.connect(func(): end(true))
  UI.panel(self,Rect2(24,22,390,104))
  UI.label(self,Profile.data.name.to_upper()+"  /  LV. "+str(Profile.data.level),Vector2(42,34),20)
  hp=UI.bar(self,Rect2(42,66,352,14),Color("b48bff"),hero.max_health)
@@ -108,11 +99,11 @@ func _ready() -> void:
  ult_text=UI.label(self,"",Vector2(200,106),11,UI.GOLD,194)
  ult_text.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
  UI.panel(self,Rect2(866,22,390,104))
- UI.label(self,"MERIDIAN ENFORCER",Vector2(884,34),20)
+ foe_name_label=UI.label(self,waves[0].name,Vector2(884,34),20)
  enemy_hp=UI.bar(self,Rect2(884,66,352,14),Color("ec708e"),foe.max_health)
  foe_text=UI.label(self,"",Vector2(884,64),12,Color.WHITE,346)
  foe_text.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
- UI.label(self,"SOUL-WARPED CONSTRUCT  /  SUPPRESSION" if boss_mode else "SUPPRESSION CLASS  /  NEUTRAL",Vector2(884,95),12,UI.MUTED)
+ foe_sub_label=UI.label(self,waves[0].sub,Vector2(884,95),12,UI.MUTED)
  UI.label(self,"SOUL REALM  /  RESONANT BRIDGE" if boss_mode else "01—01  /  SKYBRIDGE 09",Vector2(455 if boss_mode else 475,28),16,UI.GOLD)
  retreat_button=UI.button(self,"RETREAT",Rect2(572,66,136,46),request_retreat)
  retreat_button.add_theme_font_size_override("font_size",15)
@@ -158,9 +149,9 @@ func _ready() -> void:
  ultimate_title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  ultimate_sub=UI.label(self,"",Vector2(235,368),20,UI.GOLD,850)
  ultimate_sub.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
- intro_card=UI.label(self,"SOUL-WARPED ENFORCER" if boss_mode else "MERIDIAN ENFORCER",Vector2(190,196),52,Color.WHITE,900)
+ intro_card=UI.label(self,waves[0].card,Vector2(190,196),52,Color.WHITE,900)
  intro_card.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
- intro_sub=UI.label(self,"A MERIDIAN CONSTRUCT TWISTED BY YOUR ECHO  /  SURVIVE IT" if boss_mode else "SUPPRESSION CLASS  /  SKYBRIDGE 09  /  SURVIVE THE SCAN",Vector2(190,262),18,UI.GOLD,900)
+ intro_sub=UI.label(self,waves[0].card_sub,Vector2(190,262),18,UI.GOLD,900)
  intro_sub.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  flash_rect=ColorRect.new()
  flash_rect.color=Color(1,1,1,0)
@@ -188,7 +179,10 @@ func _ready() -> void:
  else:
   Sound.stop_loop()
  boss_intro()
-func boss_intro() -> void:
+func boss_intro(card_text:String="", card_sub:String="") -> void:
+ if card_text!="":
+  intro_card.text=card_text
+  intro_sub.text=card_sub
  intro_card.modulate.a=0
  intro_sub.modulate.a=0
  cinematic_bars(1.5)
@@ -206,6 +200,61 @@ func cinematic_bars(hold:float) -> void:
  tween.chain().tween_interval(hold)
  tween.chain().tween_property(bar_top,"position:y",-40.0,0.3)
  tween.parallel().tween_property(bar_bottom,"position:y",720.0,0.3)
+func wave_defs() -> Array:
+ if boss_mode:
+  return [
+   {"name":"RESONANCE SHADE","sub":"SOUL REALM ECHO  /  UNSTABLE","hp":240.0,"atk":20.0,"def":3.0,"look":"shade","accent":Color("6fd7e4"),"scale":1.0,"boss":false,"card":"RESONANCE SHADE","card_sub":"AN ECHO OF THE SUPPRESSION SCAN  /  CLEAR IT"},
+   {"name":"MERIDIAN ENFORCER","sub":"SOUL-WARPED CONSTRUCT  /  SUPPRESSION","hp":820.0,"atk":28.0,"def":6.0,"look":"warped","accent":Color("c27bff"),"scale":1.2,"boss":true,"card":"SOUL-WARPED ENFORCER","card_sub":"A MERIDIAN CONSTRUCT TWISTED BY YOUR ECHO  /  SURVIVE IT"}
+  ]
+ return [{"name":"MERIDIAN ENFORCER","sub":"SUPPRESSION CLASS  /  NEUTRAL","hp":650.0,"atk":28.0,"def":6.0,"look":"enforcer","accent":Color(0,0,0,0),"scale":1.0,"boss":false,"card":"MERIDIAN ENFORCER","card_sub":"SUPPRESSION CLASS  /  SKYBRIDGE 09  /  SURVIVE THE SCAN"}]
+func spawn_foe(def:Dictionary) -> void:
+ foe=Fighter.new()
+ foe.enemy=true
+ foe.health=def.hp
+ foe.max_health=def.hp
+ foe.attack=def.atk
+ foe.defense=def.def
+ foe.look=def.look
+ foe.accent=def.accent
+ foe.scale=Vector2(def.scale,def.scale)
+ foe.position=Vector2(850,450)
+ foe.facing=-1
+ arena.add_child(foe)
+ var current=foe
+ current.struck.connect(func(amount,critical): damage_number(current.position,amount,critical,UI.GOLD))
+ current.defeated.connect(on_foe_defeated.bind(current))
+ phase=1
+ telegraph=-1.0
+ telegraph_len=0.8
+ recovery=1.0
+ enemy_wait=1.5
+ if is_instance_valid(foe_name_label):
+  foe_name_label.text=def.name
+  foe_sub_label.text=def.sub
+  enemy_hp.max_value=def.hp
+func on_foe_defeated(defeated_foe:Fighter) -> void:
+ if defeated_foe!=foe or ended:
+  return
+ if wave+1<waves.size():
+  next_wave()
+ else:
+  end(true)
+func next_wave() -> void:
+ wave+=1
+ var old=foe
+ var fade=create_tween()
+ fade.tween_property(old,"modulate:a",0.0,0.5)
+ fade.tween_callback(old.queue_free)
+ hero.health=minf(hero.max_health,hero.health+60.0)
+ energy=minf(100.0,energy+40.0)
+ spawn_foe(waves[wave])
+ foe.modulate.a=0.0
+ create_tween().tween_property(foe,"modulate:a",1.0,0.5)
+ intro=0.5
+ sparks.burst(old.position-Vector2(0,75),false)
+ status.text="WAVE CLEARED  /  +60 HEALTH"
+ Sound.play("win")
+ boss_intro(waves[wave].card,waves[wave].card_sub)
 func enter_phase_two() -> void:
  phase=2
  foe.attack=36
@@ -258,7 +307,7 @@ func _process(delta:float) -> void:
  hp.value=hero.health
  ep.value=energy
  ult_bar.value=ultimate
- if phase==1 and not ended and foe.health>0 and foe.health<=foe.max_health*0.5:
+ if phase==1 and waves[wave].boss and not ended and foe.health>0 and foe.health<=foe.max_health*0.5:
   enter_phase_two()
  enemy_hp.value=foe.health
  hp_text.text=str(int(ceil(hero.health)))+" / "+str(int(hero.max_health))
@@ -421,11 +470,30 @@ func damage_number(point:Vector2, amount:int, critical:bool, color:Color) -> voi
  tween.tween_property(label,"position:y",label.position.y-60,0.7)
  tween.tween_property(label,"modulate:a",0.0,0.7)
  tween.chain().tween_callback(label.queue_free)
+func finisher() -> void:
+ ultimate_title.text="FINISH"
+ ultimate_sub.text="THE UNBOUND  /  RESONANCE STRIKE"
+ ultimate_title.modulate.a=1
+ ultimate_sub.modulate.a=1
+ flash_rect.color=Color(1,1,1,0.9)
+ var tween=create_tween().set_parallel(true)
+ tween.tween_property(flash_rect,"color:a",0.0,0.7)
+ tween.tween_property(ultimate_title,"modulate:a",0.0,1.3)
+ tween.tween_property(ultimate_sub,"modulate:a",0.0,1.3)
+ # Push in on the fallen foe
+ tween.tween_property(arena,"scale",Vector2(1.14,1.14),0.9)
+ tween.tween_property(arena,"position",foe.position*-0.14,0.9)
+ cinematic_bars(1.0)
+ sparks.burst(foe.position-Vector2(0,75),true)
 func end(won:bool) -> void:
  if ended: return
  ended=true
  hp.value=hero.health
  enemy_hp.value=foe.health
  Sound.play("win" if won else "hurt")
- await get_tree().create_timer(0.7).timeout
+ var wait=0.7
+ if won and boss_mode:
+  wait=1.5
+  finisher()
+ await get_tree().create_timer(wait).timeout
  finished.emit(won)

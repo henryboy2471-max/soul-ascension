@@ -118,6 +118,12 @@ func run() -> void:
  var battle=main.screen.get_child(0)
  check(battle.boss_mode,"Episode battle runs in boss mode")
  battle.intro=0
+ # Two waves: a Resonance Shade, then the boss
+ check(battle.waves.size()==2 and battle.wave==0 and battle.foe.look=="shade" and not battle.waves[0].boss,"Soul Realm opens with a Resonance Shade wave")
+ battle.foe.receive(100000)
+ await create_timer(0.3).timeout
+ check(battle.wave==1 and battle.foe.max_health==820 and battle.foe.look=="warped" and not battle.ended,"Clearing the shade brings in the Soul-Warped boss")
+ battle.intro=0
  # Boss phase two
  battle.foe.health=battle.foe.max_health*0.45
  await process_frame
@@ -125,7 +131,7 @@ func run() -> void:
  check(battle.phase==2 and battle.foe.attack>28 and battle.telegraph_len<0.8,"Boss escalates at 50% health")
  # Win -> ending scene -> result
  battle.foe.receive(100000)
- await create_timer(1.0).timeout
+ await create_timer(2.0).timeout
  check(main.scene_name=="ending","Winning the boss fight plays the ending scene")
  var ending=main.screen.get_child(0)
  await skip_scenes(ending,func(): return main.scene_name=="result",900)

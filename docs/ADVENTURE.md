@@ -8,8 +8,8 @@ Soul Ascension is moving from a single arena fight to an episodic anime action-a
 2. Opening scene (narration + the hero) over dimmed key art.
 3. **Explore** Skybridge 09 (2500 px wide, parallax neon district, rain, wet street, stalled tram).
 4. **Objective 1** find Mira Vey (NPC dialogue with portrait) -> **Objective 2** hold the relay terminal to reboot it (hold-to-channel, not a tap) -> the terminal opens a **Soul Realm breach** -> **Objective 3** enter it.
-5. Mission-zone card, then the **boss battle** (costs 6 energy; if short, the player stays in the district).
-6. Boss escalates at 50% HP (Phase 2: faster telegraphs, harder hits, red aura, banner, letterbox).
+5. Mission-zone card, then the **Soul Realm battle** (costs 6 energy; if short, the player stays in the district): wave 1 a Resonance Shade (240 HP), then the Soul-Warped Enforcer boss (820 HP). Clearing a wave heals 60 HP and refills 40 Aether.
+6. Boss escalates at 50% HP (Phase 2: faster telegraphs, harder hits, red aura, banner, letterbox). The killing blow plays a cinematic finisher (flash, push-in, letterbox).
 7. Ending scene, "Next Episode" teaser card, then the reward screen (first clear 120 XP / 250 Gold).
 
 "BATTLE ONLY" on the mission screen and "REPLAY BATTLE" on the result screen keep the original fight available.
