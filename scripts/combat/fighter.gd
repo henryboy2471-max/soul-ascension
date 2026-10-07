@@ -93,6 +93,8 @@ func _draw() -> void:
  draw_colored_polygon(PackedVector2Array([Vector2(-24,-106+bob),Vector2(0,-99+bob),Vector2(-14,-81+bob),Vector2(-30,-88+bob)]),Color("69718d"))
  draw_line(Vector2(18,-92+bob),Vector2(39,-64+bob),ink,15)
  draw_line(Vector2(-17,-92+bob),Vector2(-33,-64+bob),ink,13)
+ draw_colored_polygon(PackedVector2Array([Vector2(-16,-113+bob),Vector2(25,-108+bob),Vector2(32,-94+bob),Vector2(-22,-99+bob)]),ink.lightened(0.08))
+ draw_line(Vector2(-16,-113+bob),Vector2(25,-108+bob),Color(color,0.7),2)
  draw_circle(Vector2(5,-120+bob),17,skin_color if not enemy else Color("252d40"))
  if enemy:
   draw_line(Vector2(-9,-122+bob),Vector2(20,-122+bob),color,4)
@@ -100,12 +102,20 @@ func _draw() -> void:
  else:
   var hair=PackedVector2Array([Vector2(-13,-117+bob),Vector2(-16,-139+bob),Vector2(-5,-148+bob),Vector2(0,-141+bob),Vector2(9,-151+bob),Vector2(16,-139+bob),Vector2(27,-141+bob),Vector2(21,-125+bob),Vector2(8,-132+bob)])
   draw_colored_polygon(hair,hair_color)
+  draw_colored_polygon(PackedVector2Array([Vector2(-8,-142+bob),Vector2(-12,-159+bob),Vector2(-1,-146+bob)]),hair_color)
+  draw_colored_polygon(PackedVector2Array([Vector2(18,-138+bob),Vector2(32,-151+bob),Vector2(25,-130+bob)]),hair_color)
+  draw_line(Vector2(-4,-146+bob),Vector2(6,-139+bob),hair_color.lightened(0.4),2)
+  draw_line(Vector2(10,-148+bob),Vector2(17,-140+bob),hair_color.lightened(0.4),2)
+  draw_line(Vector2(-12,-132+bob),Vector2(-6,-122+bob),hair_color.darkened(0.25),3)
   if body=="female":
    draw_colored_polygon(PackedVector2Array([Vector2(-13,-136+bob),Vector2(-31,-90+bob),Vector2(-12,-103+bob)]),hair_color)
   if look=="mira":
    draw_line(Vector2(-16,-136+bob),Vector2(-36-sway,-96+bob),hair_color,7)
    draw_line(Vector2(-4,-132+bob),Vector2(22,-132+bob),Color("f9d991"),3)
-  draw_line(Vector2(11,-121+bob),Vector2(19,-123+bob),Color("f9d991"),2)
+  draw_line(Vector2(9,-128+bob),Vector2(21,-126+bob),Color("1b1626"),2)
+  draw_circle(Vector2(16,-122+bob),5,Color("f9d991",0.22))
+  draw_colored_polygon(PackedVector2Array([Vector2(10,-123+bob),Vector2(15,-125+bob),Vector2(21,-122+bob),Vector2(15,-120+bob)]),Color("f9d991"))
+  draw_circle(Vector2(16,-122+bob),1.4,Color("3a2a10"))
  if not armed:
   draw_circle(Vector2(38,-66+bob),6,Color(color,0.9))
   draw_arc(Vector2(38,-66+bob),11+sin(step)*2,0,TAU,16,Color(color,0.5),2)

@@ -7,7 +7,31 @@ var time=0.0
 var breach_open=false
 var breach_scale=0.0
 var terminal_done=false
+var bake=true
 const GROUND_TOP = 470.0
+const STATIC_KINDS = ["sky","far","mid","near","ground"]
+const ROWS = {"sky":Vector2(0,520),"far":Vector2(40,520),"mid":Vector2(110,520),"near":Vector2(60,520),"ground":Vector2(470,720)}
+func _ready() -> void:
+ # Static layers are drawn once into a texture; the parallax then moves one cheap sprite instead of re-rasterizing hundreds of shapes.
+ if bake and kind in STATIC_KINDS:
+  var rows=ROWS[kind]
+  var vp=SubViewport.new()
+  vp.size=Vector2i(int(ceil(width)),int(rows.y-rows.x))
+  vp.transparent_bg=kind!="sky"
+  vp.disable_3d=true
+  vp.render_target_update_mode=SubViewport.UPDATE_ONCE
+  var painter=WorldArt.new()
+  painter.kind=kind
+  painter.width=width
+  painter.bake=false
+  painter.position.y=-rows.x
+  vp.add_child(painter)
+  add_child(vp)
+  var sprite=Sprite2D.new()
+  sprite.centered=false
+  sprite.position.y=rows.x
+  sprite.texture=vp.get_texture()
+  add_child(sprite)
 func _process(delta:float) -> void:
  if kind=="props" or kind=="fore":
   if not Profile.data.settings.get("reduced_motion",false):
@@ -16,6 +40,8 @@ func _process(delta:float) -> void:
    breach_scale=minf(1.0,breach_scale+delta*0.9)
   queue_redraw()
 func _draw() -> void:
+ if bake and kind in STATIC_KINDS:
+  return
  match kind:
   "sky": draw_sky()
   "far": draw_far()
@@ -174,6 +200,16 @@ func draw_props() -> void:
   draw_circle(Vector2(cx,GROUND_TOP-58),50-g*14,Color(screen_color,0.04+0.02*pulse))
  draw_line(Vector2(cx,GROUND_TOP-86),Vector2(cx,GROUND_TOP-190),Color(0.5,0.5,0.8,0.6),3)
  draw_line(Vector2(cx,GROUND_TOP-190),Vector2(cx+760,GROUND_TOP-170),Color(0.5,0.5,0.8,0.35),2)
+ # Lantern Circuit mural
+ var mx=1860.0
+ draw_rect(Rect2(mx-70,GROUND_TOP-110,140,100),Color(0.05,0.06,0.13))
+ draw_rect(Rect2(mx-70,GROUND_TOP-110,140,100),Color(1.0,0.78,0.4,0.5),false,2)
+ for i in range(7):
+  var a=i*TAU/7.0+time*0.1
+  var lp=Vector2(mx,GROUND_TOP-62)+Vector2(cos(a)*34,sin(a)*24)
+  draw_circle(lp,9,Color(1.0,0.8,0.4,0.18))
+  draw_circle(lp,3.5,Color(1.0,0.82,0.45,0.9))
+ draw_arc(Vector2(mx,GROUND_TOP-62),46,0,TAU,40,Color(1.0,0.8,0.4,0.25),2)
  # Soul Realm breach
  if breach_open:
   var bc=Vector2(2200,GROUND_TOP-30)

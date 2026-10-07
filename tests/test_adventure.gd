@@ -62,6 +62,16 @@ func run() -> void:
  await create_timer(0.5).timeout
  ex.stick.direction=Vector2.ZERO
  check(ex.px-x0>110,"Walking covers ground at exploration speed")
+ # Optional lore spot does not disturb the main objective
+ ex.px=1860.0
+ await process_frame
+ ex.act_edge=true
+ await process_frame
+ await process_frame
+ check(ep.busy and ep.step==0,"Optional Lantern mural opens a lore scene without advancing the story")
+ await skip_scenes(ep,func(): return not ep.busy)
+ var snd=root.get_node("Sound")
+ check(snd.loops.has("city") and snd.loops.has("realm") and snd.loops.city.data.size()==22050*4*2 and snd.clips.has("step"),"Ambience loops and footstep clip are generated")
  # Talk to Mira
  ex.px=540.0
  await process_frame

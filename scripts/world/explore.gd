@@ -21,12 +21,14 @@ var hud_node:Hud
 var spots=[
  {"id":"mira","x":560.0,"label":"TALK  /  MIRA VEY","kind":"talk","range":130.0},
  {"id":"board","x":1050.0,"label":"READ  /  TRAM BOARD","kind":"talk","range":110.0},
+ {"id":"mural","x":1860.0,"label":"READ  /  LANTERN MURAL","kind":"talk","range":120.0},
  {"id":"terminal","x":1560.0,"label":"HOLD  /  REBOOT RELAY","kind":"channel","range":120.0},
  {"id":"breach","x":2200.0,"label":"ENTER  /  SOUL REALM BREACH","kind":"talk","range":150.0}
 ]
-var enabled={"mira":false,"board":true,"terminal":false,"breach":false}
+var enabled={"mira":false,"board":true,"mural":true,"terminal":false,"breach":false}
 var act_edge=false
 var walkers:Array=[]
+var step_timer=0.0
 var channel_t=0.0
 var active_spot:Dictionary={}
 var objective_text=""
@@ -89,6 +91,7 @@ func _ready() -> void:
  add_child(hud_node)
  build_hud()
  update_positions(1.0)
+ Sound.loop("city")
  flash_rect=ColorRect.new()
  flash_rect.color=Color(1,1,1,0)
  flash_rect.size=Vector2(1280,720)
@@ -183,6 +186,11 @@ func _process(delta:float) -> void:
   if absf(move.x)>0.1:
    player.facing=1 if move.x>0 else -1
  player.moving=move.length()>0.1
+ if player.moving:
+  step_timer-=delta
+  if step_timer<=0:
+   Sound.play("step")
+   step_timer=0.28
  npc.facing=1 if px>560.0 else -1
  update_positions(1.0-exp(-delta*9.0))
  # nearest enabled interaction spot

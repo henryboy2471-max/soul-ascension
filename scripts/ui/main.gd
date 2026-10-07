@@ -61,6 +61,7 @@ func backdrop() -> void:
  screen.add_child(load("res://scripts/ui/atmosphere.gd").new())
 func show_home() -> void:
  scene_name="home"
+ Sound.stop_loop()
  clear_screen()
  backdrop()
  UI.panel(screen,Rect2(0,0,1280,104),Color(0.025,0.035,0.07,0.90),Color("242b41"))
@@ -179,6 +180,7 @@ func start_battle(from_episode:bool=false) -> bool:
  battle.retreat.connect(func(): show_result(false))
  return true
 func show_result(won:bool) -> void:
+ Sound.stop_loop()
  var reward=Profile.finish_run(won)
  if reward.is_empty(): return
  clear_screen()

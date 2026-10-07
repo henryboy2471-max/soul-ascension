@@ -79,6 +79,8 @@ func on_interact(id:String) -> void:
     await say(EpisodeData.MIRA_REPEAT)
   "board":
    await say(EpisodeData.BOARD)
+  "mural":
+   await say(EpisodeData.MURAL)
   "terminal":
    if step==1:
     explore.set_terminal_done()

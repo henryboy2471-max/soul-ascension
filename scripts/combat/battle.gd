@@ -183,6 +183,10 @@ func _ready() -> void:
  for child in get_children():
   if child is Button:
    child.focus_mode=Control.FOCUS_NONE
+ if boss_mode:
+  Sound.loop("realm")
+ else:
+  Sound.stop_loop()
  boss_intro()
 func boss_intro() -> void:
  intro_card.modulate.a=0

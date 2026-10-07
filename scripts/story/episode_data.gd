@@ -52,3 +52,7 @@ const OUTRO = [
 ]
 const NEXT_TITLE = "UNDER THE VIOLET RAIN"
 const NEXT_NUMBER = "EPISODE 2"
+const MURAL = [
+ {"who":"NARRATOR","text":"A hand-painted mural: a ring of lanterns around a sleeping city. Beneath it, in careful letters: 'WHEN THE SKY GOES DARK, WE KEEP THE LIGHT.'"},
+ {"who":"PLAYER","text":"Lantern Circuit. Mira's people. Hidden in plain sight, just like the rest of us."}
+]
