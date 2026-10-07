@@ -137,23 +137,47 @@ func planned(title:String, copy:String) -> void:
 func show_mission() -> void:
  var node=new_modal("A SPARK IN THE STATIC","STORY 01—01  /  NEON DISTRICT")
  UI.label(node,MissionData.STORY[0].description,Vector2(294,208),23,Color("cbd0e2"),677)
- UI.label(node,"Defeat the Meridian enforcer.",Vector2(294,334),23,UI.GOLD)
- UI.label(node,"Move: WASD / left stick
+ UI.label(node,"Explore, investigate the relay, and survive the Soul Realm.",Vector2(294,334),23,UI.GOLD)
+ UI.label(node,"Explore: WASD / arrows / left stick, E to act
 Strike: J   Heavy: K   Dodge: Space   Block: hold L
 Pulse: Q   Rift: E   Mend: R   Ultimate: F
 On a phone, use the matching touch buttons.",Vector2(294,383),17,UI.MUTED,690)
- UI.button(node,"ENTER  /  6 ENERGY",Rect2(294,551,348,75),start_battle,true)
-func start_battle() -> void:
+ UI.button(node,"BEGIN EPISODE 1",Rect2(294,551,348,75),start_episode,true)
+ UI.button(node,"BATTLE ONLY",Rect2(656,568,170,58),func(): start_battle(false))
+func start_episode() -> void:
+ close_modal()
+ clear_screen()
+ scene_name="episode"
+ var episode=Episode.new()
+ episode.request_battle=func(): return start_battle(true)
+ episode.exit_requested.connect(show_home)
+ screen.add_child(episode)
+func on_battle_finished(won:bool, from_episode:bool) -> void:
+ if won and from_episode:
+  show_ending()
+ else:
+  show_result(won)
+func show_ending() -> void:
+ clear_screen()
+ scene_name="ending"
+ var episode=Episode.new()
+ episode.phase="ending"
+ episode.completed.connect(func(): show_result(true))
+ screen.add_child(episode)
+func start_battle(from_episode:bool=false) -> bool:
  if not Profile.begin_run("1-1"):
-  planned("ENERGY RECHARGING","Missions require 6 energy. One energy regenerates every five minutes, including while the game is closed. Paid refills are not available in Phase 1.")
-  return
+  if not from_episode:
+   planned("ENERGY RECHARGING","Missions require 6 energy. One energy regenerates every five minutes, including while the game is closed. Paid refills are not available in Phase 1.")
+  return false
  close_modal()
  clear_screen()
  scene_name="battle"
  var battle=Battle.new()
+ battle.boss_mode=from_episode
  screen.add_child(battle)
- battle.finished.connect(show_result)
+ battle.finished.connect(on_battle_finished.bind(from_episode))
  battle.retreat.connect(func(): show_result(false))
+ return true
 func show_result(won:bool) -> void:
  var reward=Profile.finish_run(won)
  if reward.is_empty(): return
@@ -171,7 +195,7 @@ func show_result(won:bool) -> void:
  UI.label(screen,str(Profile.data.xp)+" / "+str(Progression.required(int(Profile.data.level)))+" XP to next level",Vector2(326,448),15,UI.MUTED)
  UI.label(screen,"Progress saved locally" if Profile.save_ok else "Save failed — check device storage",Vector2(326,485),15,UI.MUTED if Profile.save_ok else Color("ff7188"))
  UI.button(screen,"HOME",Rect2(325,535,280,65),show_home)
- UI.button(screen,"REPLAY  /  6 ENERGY",Rect2(630,535,316,65),start_battle,true)
+ UI.button(screen,"REPLAY BATTLE  /  6 ENERGY",Rect2(630,535,316,65),func(): start_battle(false),true)
 func show_hero() -> void:
  var node=new_modal("THE UNBOUND","OWNED  /  COMMON  /  ECHO STRIKER")
  var rig=Fighter.new()

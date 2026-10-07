@@ -49,6 +49,7 @@ jobs:
         run: |
           godot --headless --script res://tests/test_phase1.gd
           godot --headless --script res://tests/test_repairs.gd
+          godot --headless --script res://tests/test_adventure.gd
 
       - name: Export web build
         run: |

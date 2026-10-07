@@ -65,7 +65,10 @@ godot --headless --editor --import --quit
 godot --headless --script res://tests/test_phase1.gd
 godot --headless --script res://tests/test_live_combat.gd
 godot --headless --script res://tests/test_repairs.gd
+godot --headless --script res://tests/test_adventure.gd
 ```
+
+The game now has an explorable Episode 1 (story, NPC, objectives, Soul Realm boss). See `docs/ADVENTURE.md`.
 
 See `docs/REPAIR_LOG.md` for the takeover repair pass and a list of what is still placeholder.
 

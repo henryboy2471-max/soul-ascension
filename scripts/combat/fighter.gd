@@ -20,6 +20,13 @@ var moving=false
 var dead=false
 var charge=0.0
 var aura=false
+var aura_color=Color("efce8e")
+var accent=Color(0,0,0,0)
+var hair_color=Color("dfdbef")
+var skin_color=Color("b8866b")
+var coat_color=Color("111625")
+var armed=true
+var look="hero"
 func _process(delta:float) -> void:
  invincible=maxf(0,invincible-delta)
  stun=maxf(0,stun-delta)
@@ -42,7 +49,9 @@ func receive(raw:float, critical:bool=false) -> int:
  return damage
 func _draw() -> void:
  var color=Color("fa6f82") if enemy else Color("bc92ff")
- var ink=Color("151c30") if enemy else Color("111625")
+ if accent.a>0:
+  color=accent
+ var ink=Color("151c30") if enemy else coat_color
  if flash>0:
   ink=Color("e9dbff")
  draw_set_transform(Vector2.ZERO,0,Vector2(1,0.32))
@@ -53,6 +62,9 @@ func _draw() -> void:
   draw_line(Vector2(-35,-12),Vector2(35,-12),color,9)
   return
  var bob=sin(step)*2
+ var sway=sin(step*0.5)*(5 if moving else 2)
+ draw_colored_polygon(PackedVector2Array([Vector2(-14,-92+bob),Vector2(-34-sway,-48),Vector2(-44-sway*1.6,-14),Vector2(-8,-30)]),ink.darkened(0.25))
+ draw_line(Vector2(-34-sway,-48),Vector2(-44-sway*1.6,-14),Color(color,0.55),2)
  var stride=sin(step)*8 if moving else 0.0
  # Original procedural placeholder rig: boots, coat, armor, face, hair and energy blade.
  draw_line(Vector2(-12,-46),Vector2(-16+stride,-8),Color("222a42"),14)
@@ -65,16 +77,23 @@ func _draw() -> void:
  draw_colored_polygon(PackedVector2Array([Vector2(-24,-106+bob),Vector2(0,-99+bob),Vector2(-14,-81+bob),Vector2(-30,-88+bob)]),Color("69718d"))
  draw_line(Vector2(18,-92+bob),Vector2(39,-64+bob),ink,15)
  draw_line(Vector2(-17,-92+bob),Vector2(-33,-64+bob),ink,13)
- draw_circle(Vector2(5,-120+bob),17,Color("b8866b") if not enemy else Color("252d40"))
+ draw_circle(Vector2(5,-120+bob),17,skin_color if not enemy else Color("252d40"))
  if enemy:
   draw_line(Vector2(-9,-122+bob),Vector2(20,-122+bob),color,4)
   draw_line(Vector2(4,-136+bob),Vector2(6,-105+bob),Color("69718d"),3)
  else:
   var hair=PackedVector2Array([Vector2(-13,-117+bob),Vector2(-16,-139+bob),Vector2(-5,-148+bob),Vector2(0,-141+bob),Vector2(9,-151+bob),Vector2(16,-139+bob),Vector2(27,-141+bob),Vector2(21,-125+bob),Vector2(8,-132+bob)])
-  draw_colored_polygon(hair,Color("dfdbef"))
+  draw_colored_polygon(hair,hair_color)
   if body=="female":
-   draw_colored_polygon(PackedVector2Array([Vector2(-13,-136+bob),Vector2(-31,-90+bob),Vector2(-12,-103+bob)]),Color("dfdbef"))
+   draw_colored_polygon(PackedVector2Array([Vector2(-13,-136+bob),Vector2(-31,-90+bob),Vector2(-12,-103+bob)]),hair_color)
+  if look=="mira":
+   draw_line(Vector2(-16,-136+bob),Vector2(-36-sway,-96+bob),hair_color,7)
+   draw_line(Vector2(-4,-132+bob),Vector2(22,-132+bob),Color("f9d991"),3)
   draw_line(Vector2(11,-121+bob),Vector2(19,-123+bob),Color("f9d991"),2)
+ if not armed:
+  draw_circle(Vector2(38,-66+bob),6,Color(color,0.9))
+  draw_arc(Vector2(38,-66+bob),11+sin(step)*2,0,TAU,16,Color(color,0.5),2)
+  return
  var hand=Vector2(38,-66+bob)
  var tip=Vector2(69,-129+bob) if swing>0 else Vector2(77,-10+bob)
  draw_line(hand,tip,Color(color,0.12),18)
@@ -87,7 +106,7 @@ func _draw() -> void:
   draw_arc(Vector2(8,-66),65,-1.5,1.5,30,Color(0.4,0.8,1,0.7),5)
  if aura:
   var glow=0.5+0.5*sin(Time.get_ticks_msec()/160.0)
-  draw_arc(Vector2(0,-65),88+glow*6,0,TAU,48,Color(UI.GOLD,0.35+0.3*glow),3)
-  draw_arc(Vector2(0,-65),100+glow*8,0,TAU,48,Color(UI.GOLD,0.12+0.12*glow),2)
+  draw_arc(Vector2(0,-65),88+glow*6,0,TAU,48,Color(aura_color,0.35+0.3*glow),3)
+  draw_arc(Vector2(0,-65),100+glow*8,0,TAU,48,Color(aura_color,0.12+0.12*glow),2)
  if invincible>0:
   draw_arc(Vector2(0,-65),83,0,TAU,40,Color(color,0.5),2)

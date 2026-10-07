@@ -17,6 +17,10 @@ var cooldowns={"attack":0.0,"heavy":0.0,"dodge":0.0,"pulse":0.0,"rift":0.0,"mend
 var maxima={"attack":0.36,"heavy":1.3,"dodge":1.2,"pulse":4.0,"rift":7.0,"mend":10.0,"ultimate":1.0}
 var enemy_wait=1.5
 var telegraph=-1.0
+var telegraph_len=0.8
+var recovery=1.0
+var phase=1
+var boss_mode=false
 var target=Vector2.ZERO
 var ended=false
 var intro=0.8
@@ -191,6 +195,27 @@ func cinematic_bars(hold:float) -> void:
  tween.chain().tween_interval(hold)
  tween.chain().tween_property(bar_top,"position:y",-40.0,0.3)
  tween.parallel().tween_property(bar_bottom,"position:y",720.0,0.3)
+func enter_phase_two() -> void:
+ phase=2
+ foe.attack=36
+ telegraph_len=0.62
+ recovery=0.65
+ foe.aura=true
+ foe.aura_color=Color("ff4f72")
+ intro_card.text="PHASE 2"
+ intro_sub.text="SUPPRESSION PROTOCOL ESCALATED  /  ATTACKS FASTER AND HIT HARDER"
+ intro_card.modulate.a=1
+ intro_sub.modulate.a=1
+ var tween=create_tween()
+ tween.tween_interval(1.1)
+ tween.tween_property(intro_card,"modulate:a",0.0,0.4)
+ tween.parallel().tween_property(intro_sub,"modulate:a",0.0,0.4)
+ flash_rect.color=Color(1,0.3,0.4,0.5)
+ create_tween().tween_property(flash_rect,"color:a",0.0,0.5)
+ cinematic_bars(0.9)
+ shake=12
+ status.text="PHASE 2  /  the enforcer escalates"
+ Sound.play("hurt")
 func request_retreat() -> void:
  if ended:
   return
@@ -222,6 +247,8 @@ func _process(delta:float) -> void:
  hp.value=hero.health
  ep.value=energy
  ult_bar.value=ultimate
+ if phase==1 and not ended and foe.health>0 and foe.health<=foe.max_health*0.5:
+  enter_phase_two()
  enemy_hp.value=foe.health
  hp_text.text=str(int(ceil(hero.health)))+" / "+str(int(hero.max_health))
  foe_text.text=str(int(ceil(foe.health)))+" / "+str(int(foe.max_health))
@@ -295,7 +322,7 @@ func _process(delta:float) -> void:
    foe.swing=0.4
    if hero.position.distance_to(target)<100:
     hero.receive(foe.attack)
-   enemy_wait=1.0
+   enemy_wait=recovery
    telegraph=-1
  elif enemy_wait>0:
   enemy_wait-=delta
@@ -305,7 +332,7 @@ func _process(delta:float) -> void:
    foe.moving=true
    foe.position+=foe.position.direction_to(hero.position)*170*delta
   else:
-   telegraph=0.8
+   telegraph=telegraph_len
    target=hero.position
  telegraph_art.queue_redraw()
 func act(kind:String) -> void:
