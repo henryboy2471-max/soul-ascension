@@ -73,6 +73,7 @@ func run() -> void:
  var snd=root.get_node("Sound")
  check(snd.loops.has("city") and snd.loops.has("realm") and snd.loops.city.data.size()==22050*4*2 and snd.clips.has("step"),"Ambience loops and footstep clip are generated")
  # Talk to Mira
+ await create_timer(0.55).timeout
  ex.px=540.0
  await process_frame
  ex.act_edge=true
@@ -81,6 +82,12 @@ func run() -> void:
  check(ep.busy and ex.locked,"Talking to Mira starts dialogue and locks movement")
  await skip_scenes(ep,func(): return not ep.busy)
  check(ep.step==1 and ex.enabled.terminal and not ex.locked,"Dialogue advances the objective to the relay terminal")
+ # Pressing act right as a conversation closes must not immediately restart it
+ ex.act_edge=true
+ await process_frame
+ await process_frame
+ check(not ep.busy and ex.act_block>0.0,"Input guard stops a conversation from instantly re-triggering"
+)
  # Hold-to-channel terminal
  ex.px=1560.0
  await process_frame
@@ -94,6 +101,7 @@ func run() -> void:
  await skip_scenes(ep,func(): return not ep.busy)
  check(ep.step==2 and ex.props.breach_open and ex.enabled.breach,"Terminal reboot opens the Soul Realm breach")
  # Not enough energy: stays in the world, no battle
+ await create_timer(0.55).timeout
  profile.data.energy=0
  ex.px=2200.0
  await process_frame
@@ -102,7 +110,7 @@ func run() -> void:
  check(main.scene_name=="episode" and profile.active_run=="","Breach without energy keeps the player in the district")
  profile.data.energy=energy_before
  # Enter the breach for real
- await process_frame
+ await create_timer(0.55).timeout
  ex.act_edge=true
  await skip_scenes(ep,func(): return main.scene_name=="battle",900)
  check(main.scene_name=="battle" and profile.active_run=="1-1","Breach transitions into the Soul Realm battle")

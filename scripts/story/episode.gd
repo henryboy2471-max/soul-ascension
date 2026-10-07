@@ -99,6 +99,7 @@ func on_interact(id:String) -> void:
      await say(EpisodeData.NO_ENERGY)
  busy=false
  if is_instance_valid(explore):
+  explore.act_block=0.45
   explore.locked=false
 func run_ending() -> void:
  var backdrop=make_backdrop()

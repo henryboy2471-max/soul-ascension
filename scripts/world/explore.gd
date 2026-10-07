@@ -29,6 +29,7 @@ var enabled={"mira":false,"board":true,"mural":true,"terminal":false,"breach":fa
 var act_edge=false
 var walkers:Array=[]
 var step_timer=0.0
+var act_block=0.0
 var channel_t=0.0
 var active_spot:Dictionary={}
 var objective_text=""
@@ -147,7 +148,7 @@ func request_exit() -> void:
  exit_armed=2.0
  exit_button.text="SURE?"
 func _unhandled_key_input(event:InputEvent) -> void:
- if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode in [KEY_E,KEY_ENTER,KEY_KP_ENTER]:
+ if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode in [KEY_E,KEY_ENTER,KEY_KP_ENTER] and act_block<=0.0:
   act_edge=true
 func move_input() -> Vector2:
  var move=stick.direction
@@ -168,6 +169,7 @@ func update_positions(blend:float) -> void:
  player.position=Vector2(px-cam,py)
 func _process(delta:float) -> void:
  time+=delta
+ act_block=maxf(0.0,act_block-delta)
  for w in walkers:
   w.x+=w.dir*w.speed*delta
   if w.x<150.0 or w.x>WORLD_W-150.0:
@@ -202,8 +204,8 @@ func _process(delta:float) -> void:
    if d<spot.range and d<best:
     best=d
     active_spot=spot
- if locked or active_spot.is_empty():
-  prompt_label.text=""
+ if locked or active_spot.is_empty() or act_block>0.0:
+  prompt_label.text="" if (locked or active_spot.is_empty()) else active_spot.label
   channel_t=0.0
   act_edge=false
  else:
