@@ -27,12 +27,23 @@ var skin_color=Color("b8866b")
 var coat_color=Color("111625")
 var armed=true
 var look="hero"
+var trailing=false
+var ghosts:Array=[]
+var ghost_timer=0.0
 func _process(delta:float) -> void:
  invincible=maxf(0,invincible-delta)
  stun=maxf(0,stun-delta)
  flash=maxf(0,flash-delta)
  swing=maxf(0,swing-delta)
  step+=delta*(12 if moving else 2)
+ if trailing:
+  ghost_timer-=delta
+  if ghost_timer<=0:
+   ghosts.append({"pos":global_position,"life":0.24})
+   ghost_timer=0.025
+ for g in ghosts:
+  g.life-=delta
+ ghosts=ghosts.filter(func(g): return g.life>0)
  queue_redraw()
 func receive(raw:float, critical:bool=false) -> int:
  if dead or invincible>0:
@@ -54,6 +65,11 @@ func _draw() -> void:
  var ink=Color("151c30") if enemy else coat_color
  if flash>0:
   ink=Color("e9dbff")
+ for g in ghosts:
+  draw_set_transform(to_local(g.pos),0,Vector2(facing,1))
+  var fade=g.life/0.24*0.4
+  draw_colored_polygon(PackedVector2Array([Vector2(-21,-107),Vector2(23,-102),Vector2(35,-20),Vector2(2,-42),Vector2(-36,-22)]),Color(color,fade))
+  draw_circle(Vector2(5,-120),17,Color(color,fade))
  draw_set_transform(Vector2.ZERO,0,Vector2(1,0.32))
  draw_circle(Vector2.ZERO,44,Color(0,0,0,0.45))
  draw_arc(Vector2.ZERO,44,0,TAU,48,Color(color,0.4),2)
@@ -102,6 +118,17 @@ func _draw() -> void:
  draw_line(hand,tip,Color.WHITE,1)
  if swing>0:
   draw_arc(Vector2(15,-64),76,-1.7,1.1,24,Color(color,swing*2),8)
+ if look=="warped":
+  var pulse=0.5+0.5*sin(Time.get_ticks_msec()/260.0)
+  draw_arc(Vector2(6,-176+bob),24,0,TAU,32,Color(color,0.8),3)
+  draw_arc(Vector2(6,-176+bob),30+pulse*3,0,TAU,32,Color(color,0.3),2)
+  draw_circle(Vector2(10,-78+bob),9,Color(color,0.35+0.3*pulse))
+  draw_circle(Vector2(10,-78+bob),4,Color.WHITE)
+  draw_colored_polygon(PackedVector2Array([Vector2(-28,-104+bob),Vector2(-44,-134+bob),Vector2(-18,-110+bob)]),Color(color,0.9))
+  draw_colored_polygon(PackedVector2Array([Vector2(34,-100+bob),Vector2(52,-128+bob),Vector2(24,-108+bob)]),Color(color,0.9))
+ if look=="hero":
+  draw_line(Vector2(21,-90+bob),Vector2(33,-72+bob),Color("b48bff"),2)
+  draw_line(Vector2(26,-82+bob),Vector2(36,-70+bob),Color("dfc8ff"),1)
  if blocking:
   draw_arc(Vector2(8,-66),65,-1.5,1.5,30,Color(0.4,0.8,1,0.7),5)
  if aura:

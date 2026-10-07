@@ -26,6 +26,7 @@ var spots=[
 ]
 var enabled={"mira":false,"board":true,"terminal":false,"breach":false}
 var act_edge=false
+var walkers:Array=[]
 var channel_t=0.0
 var active_spot:Dictionary={}
 var objective_text=""
@@ -52,6 +53,20 @@ func _ready() -> void:
  props.kind="props"
  props.width=WORLD_W
  add_child(props)
+ var rng=RandomNumberGenerator.new()
+ rng.seed=9
+ for i in range(5):
+  var walker=Fighter.new()
+  walker.look="ped"
+  walker.armed=false
+  walker.coat_color=Color.from_hsv(rng.randf(),0.35,0.28)
+  walker.accent=Color.from_hsv(rng.randf(),0.5,0.8)
+  walker.hair_color=Color.from_hsv(rng.randf(),0.3,0.5)
+  walker.skin_color=Color("8a6a58")
+  walker.modulate=Color(0.55,0.55,0.7)
+  walker.scale=Vector2(0.9,0.9)
+  add_child(walker)
+  walkers.append({"node":walker,"x":rng.randf_range(250,2300),"dir":1 if rng.randf()<0.5 else -1,"speed":rng.randf_range(35,70)})
  npc=Fighter.new()
  npc.look="mira"
  npc.accent=Color("ffd86b")
@@ -145,9 +160,17 @@ func update_positions(blend:float) -> void:
   layer.position.x=-cam*layer.get_meta("factor")
  props.position.x=-cam
  npc.position=Vector2(560.0-cam,548.0)
+ for w in walkers:
+  w.node.position=Vector2(w.x-cam,516.0)
  player.position=Vector2(px-cam,py)
 func _process(delta:float) -> void:
  time+=delta
+ for w in walkers:
+  w.x+=w.dir*w.speed*delta
+  if w.x<150.0 or w.x>WORLD_W-150.0:
+   w.dir=-w.dir
+  w.node.facing=w.dir
+  w.node.moving=true
  if exit_armed>0:
   exit_armed-=delta
   if exit_armed<=0:

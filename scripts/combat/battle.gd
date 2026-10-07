@@ -56,7 +56,10 @@ func _ready() -> void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  arena=Node2D.new()
  add_child(arena)
- arena.add_child(ArenaArt.new())
+ if boss_mode:
+  arena.add_child(SoulRealmArt.new())
+ else:
+  arena.add_child(ArenaArt.new())
  dim_rect=ColorRect.new()
  dim_rect.color=Color(0.02,0.0,0.07,0.0)
  dim_rect.size=Vector2(1280,720)
@@ -74,8 +77,12 @@ func _ready() -> void:
  arena.add_child(hero)
  foe=Fighter.new()
  foe.enemy=true
- foe.health=650
- foe.max_health=650
+ foe.health=820 if boss_mode else 650
+ foe.max_health=820 if boss_mode else 650
+ if boss_mode:
+  foe.look="warped"
+  foe.accent=Color("c27bff")
+  foe.scale=Vector2(1.2,1.2)
  foe.attack=28
  foe.defense=6
  foe.position=Vector2(850,450)
@@ -102,11 +109,11 @@ func _ready() -> void:
  ult_text.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
  UI.panel(self,Rect2(866,22,390,104))
  UI.label(self,"MERIDIAN ENFORCER",Vector2(884,34),20)
- enemy_hp=UI.bar(self,Rect2(884,66,352,14),Color("ec708e"),650)
+ enemy_hp=UI.bar(self,Rect2(884,66,352,14),Color("ec708e"),foe.max_health)
  foe_text=UI.label(self,"",Vector2(884,64),12,Color.WHITE,346)
  foe_text.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
- UI.label(self,"SUPPRESSION CLASS  /  NEUTRAL",Vector2(884,95),12,UI.MUTED)
- UI.label(self,"01—01  /  SKYBRIDGE 09",Vector2(475,28),16,UI.GOLD)
+ UI.label(self,"SOUL-WARPED CONSTRUCT  /  SUPPRESSION" if boss_mode else "SUPPRESSION CLASS  /  NEUTRAL",Vector2(884,95),12,UI.MUTED)
+ UI.label(self,"SOUL REALM  /  RESONANT BRIDGE" if boss_mode else "01—01  /  SKYBRIDGE 09",Vector2(455 if boss_mode else 475,28),16,UI.GOLD)
  retreat_button=UI.button(self,"RETREAT",Rect2(572,66,136,46),request_retreat)
  retreat_button.add_theme_font_size_override("font_size",15)
  tip=UI.label(self,"",Vector2(295,155),25,UI.GOLD,720)
@@ -151,9 +158,9 @@ func _ready() -> void:
  ultimate_title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  ultimate_sub=UI.label(self,"",Vector2(235,368),20,UI.GOLD,850)
  ultimate_sub.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
- intro_card=UI.label(self,"MERIDIAN ENFORCER",Vector2(190,196),52,Color.WHITE,900)
+ intro_card=UI.label(self,"SOUL-WARPED ENFORCER" if boss_mode else "MERIDIAN ENFORCER",Vector2(190,196),52,Color.WHITE,900)
  intro_card.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
- intro_sub=UI.label(self,"SUPPRESSION CLASS  /  SKYBRIDGE 09  /  SURVIVE THE SCAN",Vector2(190,262),18,UI.GOLD,900)
+ intro_sub=UI.label(self,"A MERIDIAN CONSTRUCT TWISTED BY YOUR ECHO  /  SURVIVE IT" if boss_mode else "SUPPRESSION CLASS  /  SKYBRIDGE 09  /  SURVIVE THE SCAN",Vector2(190,262),18,UI.GOLD,900)
  intro_sub.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  flash_rect=ColorRect.new()
  flash_rect.color=Color(1,1,1,0)
@@ -308,6 +315,7 @@ func _process(delta:float) -> void:
   hero.position+=dash*delta
  hero.position.x=clampf(hero.position.x,75,1205)
  hero.position.y=clampf(hero.position.y,345,540)
+ hero.trailing=dash_time>0
  hero.moving=move.length()>0.1 or dash_time>0
  hero.facing=1 if foe.position.x>hero.position.x else -1
  foe.facing=1 if hero.position.x>foe.position.x else -1

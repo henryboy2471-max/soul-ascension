@@ -82,9 +82,9 @@ An entire world listening.",Vector2(32,282),17,Color("c2c5d8"))
  UI.panel(screen,Rect2(30,342,292,153))
  UI.label(screen,"STORY  /  CHAPTER 01",Vector2(47,358),12,UI.VIOLET)
  UI.label(screen,"NEON DISTRICT",Vector2(47,382),25)
- UI.label(screen,"01—01   A spark in the static",Vector2(47,422),15,UI.MUTED)
- UI.label(screen,"FIRST CLEAR  +120 XP  ·  +250 GOLD" if not Profile.data.completed.has("1-1") else "REPLAY  +55 XP  ·  +100 GOLD",Vector2(47,462),11,UI.GOLD)
- UI.button(screen,"PLAY   /   6 ENERGY   →",Rect2(30,510,292,79),show_mission,true)
+ UI.label(screen,"EPISODE 1   A spark in the static",Vector2(47,422),15,UI.MUTED)
+ UI.label(screen,"EXPLORE FREE  ·  6 ENERGY FOR THE BOSS" if not Profile.data.completed.has("1-1") else "CLEARED  ·  REPLAY +55 XP  ·  +100 GOLD",Vector2(47,462),11,UI.GOLD)
+ UI.button(screen,"PLAY EPISODE 1",Rect2(30,510,292,79),show_mission,true)
  UI.button(screen,"MISSIONS",Rect2(30,604,139,66),show_missions)
  UI.button(screen,"UPGRADE",Rect2(183,604,139,66),show_upgrade)
  UI.panel(screen,Rect2(996,132,260,93))
@@ -223,15 +223,15 @@ func show_upgrade() -> void:
  UI.label(node,str(Profile.data.xp)+" / "+str(Progression.required(int(Profile.data.level)))+" XP",Vector2(294,441),20)
  UI.label(node,"Gear and skill material upgrades are planned for Phase 2.",Vector2(294,500),17,UI.MUTED,674)
 func show_missions() -> void:
- var node=new_modal("NEON DISTRICT","CHAPTER 01  /  1 OF 10 MISSIONS PLAYABLE IN PHASE 1")
+ var node=new_modal("NEON DISTRICT","CHAPTER 01  /  EPISODE 1 PLAYABLE  /  EPISODE 2 NEXT")
  for i in range(10):
   var mission=MissionData.STORY[i]
   var col=i/5
   var row=i%5
   var title=mission.id+"  "+mission.title
   UI.label(node,title,Vector2(294+col*350,208+row*63),16,Color.WHITE if i==0 else UI.MUTED,320)
-  UI.label(node,("CLEARED · REPLAY AVAILABLE" if Profile.data.completed.has("1-1") else "PLAYABLE") if i==0 else "PHASE 2 · NOT BUILT",Vector2(294+col*350,233+row*63),11,UI.GOLD if i==0 else Color("68738c"))
- UI.button(node,"PLAY 01—01",Rect2(294,568,310,58),show_mission,true)
+  UI.label(node,("CLEARED · REPLAY AVAILABLE" if Profile.data.completed.has("1-1") else "EPISODE 1 · PLAYABLE") if i==0 else ("EPISODE 2 · UP NEXT" if i==1 else "PLANNED"),Vector2(294+col*350,233+row*63),11,UI.GOLD if i==0 else Color("68738c"))
+ UI.button(node,"PLAY EPISODE 1",Rect2(294,568,310,58),show_mission,true)
 func show_settings() -> void:
  var node=new_modal("SETTINGS","SAVED ON THIS DEVICE")
  var options=[["sound","Sound effects"],["shake","Screen shake"],["reduced_motion","Reduced background motion"]]
