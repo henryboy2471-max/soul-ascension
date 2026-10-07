@@ -68,13 +68,18 @@ func backdrop() -> void:
  texture.size=Vector2(1280,630)
  texture.position=Vector2(0,87)
  texture.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ texture.pivot_offset=Vector2(640,315)
  screen.add_child(texture)
+ if not Profile.data.settings.get("reduced_motion",false):
+  var drift=texture.create_tween().set_loops()
+  drift.tween_property(texture,"scale",Vector2(1.035,1.035),9.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+  drift.tween_property(texture,"scale",Vector2(1.0,1.0),9.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
  var shade=ColorRect.new()
  shade.size=Vector2(1280,720)
  shade.color=Color(0.015,0.022,0.065,0.25)
  shade.mouse_filter=Control.MOUSE_FILTER_IGNORE
  screen.add_child(shade)
- for edge in [[160.0,false],[955.0,true]]:
+ for edge in [[120.0,false],[930.0,true]]:
   var fade=TextureRect.new()
   var gradient=Gradient.new()
   gradient.colors=PackedColorArray([Color(0.025,0.035,0.07,0.0),Color(0.025,0.035,0.07,1.0)] if edge[1] else [Color(0.025,0.035,0.07,1.0),Color(0.025,0.035,0.07,0.0)])
@@ -85,7 +90,7 @@ func backdrop() -> void:
   fade.texture=gradient_texture
   fade.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
   fade.position=Vector2(edge[0],87)
-  fade.size=Vector2(160,630)
+  fade.size=Vector2(220,630)
   fade.mouse_filter=Control.MOUSE_FILTER_IGNORE
   screen.add_child(fade)
  screen.add_child(load("res://scripts/ui/atmosphere.gd").new())
@@ -120,7 +125,7 @@ An entire world listening.",Vector2(32,282),17,Color("c2c5d8"))
  UI.button(screen,"UPGRADE",Rect2(183,604,139,66),show_upgrade)
  UI.panel(screen,Rect2(996,132,260,93))
  UI.label(screen,"DEVELOPMENT BUILD",Vector2(1013,147),12,UI.GOLD)
- UI.label(screen,"PHASE 01  /  FIRST AWAKENING",Vector2(1013,173),13)
+ UI.label(screen,"EPISODE 1  /  FIRST AWAKENING",Vector2(1013,173),13)
  UI.label(screen,"Offline · no purchases",Vector2(1013,199),12,UI.MUTED)
  UI.button(screen,"HEROES    /    01",Rect2(996,244,260,65),show_hero)
  UI.button(screen,"SUMMON    /    PHASE 03",Rect2(996,320,260,65),func(): planned("SUMMON","Phase 3: hero banners, published odds, rarity guarantees, pity tracking, duplicate shards and summon history. No summons are available in this build."))
