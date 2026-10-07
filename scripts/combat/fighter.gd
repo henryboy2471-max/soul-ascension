@@ -37,6 +37,7 @@ var combo_idle=0.0
 var last_swing=0.0
 var current_anim=""
 var run_speed_threshold=0.0
+var death_t=0.0
 const ANIM_FALLBACKS = {
  "attack3":["attack2","attack1","skill"],"attack2":["attack1","skill"],"attack1":["skill"],
  "skill":["attack1"],"finisher":["skill","attack3","attack1"],
@@ -113,6 +114,11 @@ func update_sprite(delta:float) -> void:
    combo_step=0
  last_swing=swing
  casting=maxf(0.0,casting-delta)
+ if dead:
+  death_t+=delta
+  if not has_animation("defeat"):
+   sprite.pause()
+   return
  sprite.flip_h=facing<0
  sprite.self_modulate=Color(2.2,2.2,2.2) if flash>0.0 else Color.WHITE
  var wanted=resolve_animation(desired_animation())
@@ -248,6 +254,15 @@ func _draw() -> void:
   draw_arc(Vector2(0,-65),83,0,TAU,40,Color(color,0.5),2)
 func draw_sprite_overlays(color:Color) -> void:
  if dead:
+  # No reliable defeat frames: a code-drawn purple dissolve over the frozen sprite (the owner fades it out).
+  if not has_animation("defeat"):
+   var t=clampf(death_t/0.6,0.0,1.0)
+   draw_arc(Vector2(0,-70),30+t*120,0,TAU,48,Color(color,0.7*(1.0-t)),5)
+   draw_arc(Vector2(0,-70),20+t*80,0,TAU,40,Color(1,1,1,0.5*(1.0-t)),2)
+   for i in range(14):
+    var a=i*TAU/14.0+0.4
+    var rise=t*(60+i%4*22)
+    draw_circle(Vector2(cos(a)*(18+t*46),-70+sin(a)*30-rise),3.0*(1.0-t)+1.0,Color(color,0.8*(1.0-t)))
   return
  # Code-drawn effects stand in for animations the art pack could not supply (they are VFX, not character frames).
  if swing>0.0 and not has_animation("attack1"):

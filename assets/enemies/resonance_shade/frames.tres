@@ -1,0 +1,67 @@
+[gd_resource type="SpriteFrames" load_steps=14 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/enemies/resonance_shade/frames/idle_00.png" id="1_nx3x8"]
+[ext_resource type="Texture2D" path="res://assets/enemies/resonance_shade/frames/idle_01.png" id="2_a33vu"]
+[ext_resource type="Texture2D" path="res://assets/enemies/resonance_shade/frames/idle_02.png" id="3_0n13h"]
+[ext_resource type="Texture2D" path="res://assets/enemies/resonance_shade/frames/idle_03.png" id="4_vbdyg"]
+[ext_resource type="Texture2D" path="res://assets/enemies/resonance_shade/frames/idle_04.png" id="5_m0pb6"]
+[ext_resource type="Texture2D" path="res://assets/enemies/resonance_shade/frames/idle_05.png" id="6_qa0g0"]
+[ext_resource type="Texture2D" path="res://assets/enemies/resonance_shade/frames/idle_06.png" id="7_yyvir"]
+[ext_resource type="Texture2D" path="res://assets/enemies/resonance_shade/frames/idle_07.png" id="8_c4ctx"]
+[ext_resource type="Texture2D" path="res://assets/enemies/resonance_shade/frames/walk_00.png" id="9_a7ybq"]
+[ext_resource type="Texture2D" path="res://assets/enemies/resonance_shade/frames/walk_01.png" id="10_bbep1"]
+[ext_resource type="Texture2D" path="res://assets/enemies/resonance_shade/frames/walk_02.png" id="11_l7tfm"]
+[ext_resource type="Texture2D" path="res://assets/enemies/resonance_shade/frames/walk_03.png" id="12_rjwh0"]
+[ext_resource type="Texture2D" path="res://assets/enemies/resonance_shade/frames/walk_04.png" id="13_2llcp"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_nx3x8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_a33vu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_0n13h")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_vbdyg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_m0pb6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_qa0g0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_yyvir")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_c4ctx")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_a7ybq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_bbep1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_l7tfm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_rjwh0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_2llcp")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 9.0
+}]

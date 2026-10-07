@@ -1,0 +1,304 @@
+{
+ "animations": {
+  "attack1": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "resonance_shade_sprite_sheet.png",
+   "warnings": [
+    "Row 3: large crescent slashes fuse every frame into two blobs (390 px and 1349 px wide); frames cannot be separated."
+   ]
+  },
+  "attack2": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "resonance_shade_sprite_sheet.png",
+   "warnings": [
+    "Row 3: same as attack1."
+   ]
+  },
+  "attack3": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "resonance_shade_sprite_sheet.png",
+   "warnings": [
+    "Row 3: same as attack1."
+   ]
+  },
+  "dash": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "resonance_shade_sprite_sheet.png",
+   "warnings": [
+    "Row 2 frames 8-11 (lightning-flare variants of the run) fuse with their neighbours; not separable."
+   ]
+  },
+  "defeat": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "resonance_shade_sprite_sheet.png",
+   "warnings": [
+    "Rows 6-7 contain stagger, prone, collapse and dissolve frames, but prone frames overlap each other (one 413 px blob) and the rows mix an attack frame with a crescent. Game fades the idle sprite with a code-drawn purple dissolve."
+   ]
+  },
+  "finisher": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "resonance_shade_sprite_sheet.png",
+   "warnings": [
+    "Row 5-7 right: full-bleed rock/energy scenes with no separable character."
+   ]
+  },
+  "hurt": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "resonance_shade_sprite_sheet.png",
+   "warnings": [
+    "Rows 5-6 mix recoil, lunge, summon-beam and falling poses with no labels; assigning a hit-reaction would be a guess. Game uses a white hit flash over idle."
+   ]
+  },
+  "idle": {
+   "background": "none",
+   "flagged": false,
+   "fps": 8.0,
+   "frames": [
+    {
+     "bottom": 151,
+     "file": "idle_00.png",
+     "foot_x": 91.61111111111111,
+     "h": 151,
+     "head_w": 43,
+     "w": 135
+    },
+    {
+     "bottom": 158,
+     "file": "idle_01.png",
+     "foot_x": 80.1842105263158,
+     "h": 158,
+     "head_w": 43,
+     "w": 122
+    },
+    {
+     "bottom": 151,
+     "file": "idle_02.png",
+     "foot_x": 75.6891891891892,
+     "h": 151,
+     "head_w": 72,
+     "w": 118
+    },
+    {
+     "bottom": 150,
+     "file": "idle_03.png",
+     "foot_x": 72.44444444444444,
+     "h": 150,
+     "head_w": 58,
+     "w": 112
+    },
+    {
+     "bottom": 150,
+     "file": "idle_04.png",
+     "foot_x": 69.66666666666667,
+     "h": 150,
+     "head_w": 47,
+     "w": 107
+    },
+    {
+     "bottom": 156,
+     "file": "idle_05.png",
+     "foot_x": 65.77027027027027,
+     "h": 156,
+     "head_w": 29,
+     "w": 105
+    },
+    {
+     "bottom": 154,
+     "file": "idle_06.png",
+     "foot_x": 73.85135135135135,
+     "h": 154,
+     "head_w": 50,
+     "w": 111
+    },
+    {
+     "bottom": 145,
+     "file": "idle_07.png",
+     "foot_x": 68.27777777777777,
+     "h": 145,
+     "head_w": 54,
+     "w": 116
+    }
+   ],
+   "frames_out": [
+    "idle_00.png",
+    "idle_01.png",
+    "idle_02.png",
+    "idle_03.png",
+    "idle_04.png",
+    "idle_05.png",
+    "idle_06.png",
+    "idle_07.png"
+   ],
+   "ground": "frame",
+   "loop": true,
+   "scale": 1.0,
+   "scale_fixed": 1.0,
+   "scale_like": null,
+   "source": "resonance_shade_sprite_sheet.png",
+   "warnings": []
+  },
+  "jump": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "resonance_shade_sprite_sheet.png",
+   "warnings": [
+    "No jump/land frames identifiable on the sheet."
+   ]
+  },
+  "land": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "resonance_shade_sprite_sheet.png",
+   "warnings": [
+    "No jump/land frames identifiable on the sheet."
+   ]
+  },
+  "run": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "resonance_shade_sprite_sheet.png",
+   "warnings": [
+    "Row 2 (11 side-view frames): smoke trails chain neighbouring frames together; no empty column between frames 1-5, adaptive and even cuts both merge or slice figures. Walk is used instead."
+   ]
+  },
+  "skill": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "resonance_shade_sprite_sheet.png",
+   "warnings": [
+    "Row 4: orbs, staff beams and rings fuse into two blobs (538 px and 1205 px wide)."
+   ]
+  },
+  "walk": {
+   "background": "none",
+   "flagged": false,
+   "fps": 9.0,
+   "frames": [
+    {
+     "bottom": 141,
+     "file": "walk_00.png",
+     "foot_x": 91.375,
+     "h": 141,
+     "head_w": 28,
+     "w": 128
+    },
+    {
+     "bottom": 135,
+     "file": "walk_01.png",
+     "foot_x": 78.91379310344827,
+     "h": 135,
+     "head_w": 57,
+     "w": 126
+    },
+    {
+     "bottom": 128,
+     "file": "walk_02.png",
+     "foot_x": 29.5,
+     "h": 128,
+     "head_w": 68,
+     "w": 118
+    },
+    {
+     "bottom": 122,
+     "file": "walk_03.png",
+     "foot_x": 63.0,
+     "h": 122,
+     "head_w": 68,
+     "w": 107
+    },
+    {
+     "bottom": 122,
+     "file": "walk_04.png",
+     "foot_x": 61.82258064516129,
+     "h": 122,
+     "head_w": 65,
+     "w": 105
+    }
+   ],
+   "frames_out": [
+    "walk_00.png",
+    "walk_01.png",
+    "walk_02.png",
+    "walk_03.png",
+    "walk_04.png"
+   ],
+   "ground": "frame",
+   "loop": true,
+   "scale": 1.0,
+   "scale_fixed": 1.0,
+   "scale_like": null,
+   "source": "resonance_shade_sprite_sheet.png",
+   "warnings": []
+  }
+ },
+ "canvas": [
+  196,
+  170
+ ],
+ "character": "resonance_shade",
+ "ground_row": 164,
+ "pad": 6,
+ "ref_anim": ""
+}

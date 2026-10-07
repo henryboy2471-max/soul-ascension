@@ -234,6 +234,23 @@ def valley_cuts(alpha, n, search=0.38):
     return cuts
 
 
+def valley_cuts_auto(alpha, n, min_sep_ratio=0.55):
+    """Adaptive cuts for n frames of unequal width: the n-1 deepest local minima of the column profile that are
+    at least min_sep_ratio * (width / n) apart. Returns cut positions including 0 and width."""
+    h, w = alpha.shape
+    profile = (alpha > ALPHA_THRESHOLD).sum(axis=0).astype(float)
+    smooth = np.convolve(profile, np.ones(5) / 5.0, mode="same")
+    minima = [i for i in range(2, w - 2) if smooth[i] <= smooth[i - 1] and smooth[i] <= smooth[i + 1]]
+    min_sep = (w / n) * min_sep_ratio
+    chosen = []
+    for i in sorted(minima, key=lambda i: (smooth[i], i)):
+        if all(abs(i - c) >= min_sep for c in chosen):
+            chosen.append(i)
+        if len(chosen) == n - 1:
+            break
+    return [0] + sorted(chosen) + [w]
+
+
 def strip_floor_line(crop, max_rows=4):
     """Remove a thin dark panel-floor line stuck to the bottom of a frame."""
     alpha = crop[..., 3] > ALPHA_THRESHOLD
@@ -313,7 +330,12 @@ def cmd_slice(args):
         rows, cols = [int(v) for v in args.grid.lower().split("x")]
         h, w = arr.shape[:2]
         boxes = []
-        xcuts = valley_cuts(arr[..., 3], cols) if (args.valley and rows == 1) else [c * w // cols for c in range(cols + 1)]
+        if args.valley_auto and rows == 1:
+            xcuts = valley_cuts_auto(arr[..., 3], cols)
+        elif args.valley and rows == 1:
+            xcuts = valley_cuts(arr[..., 3], cols)
+        else:
+            xcuts = [c * w // cols for c in range(cols + 1)]
         for r in range(rows):
             for c in range(cols):
                 x0, y0, x1, y1 = xcuts[c], r * h // rows, xcuts[c + 1], (r + 1) * h // rows
@@ -485,6 +507,7 @@ def main():
     s.add_argument("--anim", required=True)
     s.add_argument("--frames", type=int, default=0, help="expected frame count (warns if different)")
     s.add_argument("--region", help="x0,y0,x1,y1 sub-rectangle of the sheet to use (one animation panel)")
+    s.add_argument("--valley-auto", action="store_true", help="1xN grid with unequal frame widths: cut at the deepest gaps")
     s.add_argument("--valley", action="store_true", help="1xN grid: cut at the emptiest column near each boundary")
     s.add_argument("--floor-strip", action="store_true", help="remove a thin dark floor line under each frame")
     s.add_argument("--grid", help="force a ROWSxCOLS grid instead of gap detection, e.g. 2x4")

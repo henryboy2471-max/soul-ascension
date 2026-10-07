@@ -64,3 +64,20 @@ A 1774x887 production-style sheet with real transparency: seven rows of frames, 
 | finisher | FLAGGED | Full-bleed energy scene; the character cannot be separated. |
 
 In Episode 1 Mira only stands in the district and speaks in dialogue, so idle is what she uses; run/dash are ready for later episodes. Scale: world height 155 (set by measurement) makes her standing figure about 5% shorter than the Hero (167.8 px vs 177.6 px in the district). Her dialogue portrait is the idle sprite enlarged to face and shoulders.
+
+## Resonance Shade import report (resonance_shade_sprite_sheet.png)
+
+A 1774x887 production-style alpha sheet (one source scale, `--scale-fixed 1.0`). Reproduce with `tools/import_shade.sh`.
+
+| Animation | Status | Notes |
+| --- | --- | --- |
+| idle | exported, 8 frames | Row 1 frames 1-8, front-facing, clean gaps. |
+| walk | exported, 5 frames | Row 1 frames 10-14. **Inferred label:** row 1 holds 14 cleanly separated frames; 1-8 are a front-facing idle, 9 is a three-quarter turn (excluded) and 10-14 are a stride that turns side-on (10-11 three-quarter, 12-14 side view). This is a reading of the poses, not a label on the sheet. |
+| run, dash | FLAGGED | Row 2: smoke trails chain neighbouring frames; no empty column between frames 1-5, and both even and adaptive cuts merge or slice figures. Walk is used instead. |
+| hurt | FLAGGED | Rows 5-6 mix recoil, lunge, summon-beam and falling poses without labels. The game plays a white hit flash over the idle sprite. |
+| defeat | FLAGGED | Rows 6-7 contain stagger/prone/collapse/dissolve frames, but prone frames overlap (a 413 px blob) and the same rows include an attack frame with a crescent. The game freezes the sprite and plays a code-drawn purple dissolve while the wave transition fades it. |
+| attack1-3 | FLAGGED | Row 3: huge crescent slashes fuse everything into two blobs (390 px and 1349 px wide). A code-drawn purple slash arc plays over the idle sprite. |
+| skill | FLAGGED | Row 4: orbs, staff beams and rings fuse into two blobs. |
+| finisher, jump, land | FLAGGED | Full-bleed scenes / nothing identifiable. |
+
+Scale: world height 185 makes the Shade's standing figure 163.2 px against the Hero's 148.0 px in battle (ratio 1.10): taller and heavier, not oversized. The old procedural Shade remains as the fallback if `frames.tres` is missing.

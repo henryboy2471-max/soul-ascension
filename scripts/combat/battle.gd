@@ -219,6 +219,9 @@ func spawn_foe(def:Dictionary) -> void:
  foe.look=def.look
  foe.accent=def.accent
  foe.scale=Vector2(def.scale,def.scale)
+ if def.look=="shade":
+  # Sprite art when present (world height 185 = about 10% taller than the Hero); the procedural rig stays as fallback.
+  foe.load_sprite_set("res://assets/enemies/resonance_shade/frames.tres",185.0,Color("b46bff"))
  foe.position=Vector2(850,450)
  foe.facing=-1
  arena.add_child(foe)
