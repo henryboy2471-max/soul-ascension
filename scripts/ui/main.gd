@@ -23,7 +23,9 @@ func capture(kind:String) -> void:
  get_tree().quit()
 func clear_screen() -> void:
  if is_instance_valid(screen):
-  remove_child(screen)
+  # Keep the old screen in the tree (hidden, inert) until it is freed at frame end; removing it early made running tweens complain.
+  screen.hide()
+  screen.process_mode=Node.PROCESS_MODE_DISABLED
   screen.queue_free()
  screen=Control.new()
  screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -128,7 +130,9 @@ func new_modal(title:String, subtitle:String="") -> Control:
  return modal
 func close_modal() -> void:
  if is_instance_valid(modal):
-  remove_child(modal)
+  # Closed from inside one of its own button callbacks, so keep it in the tree (hidden, inert) until frame end.
+  modal.hide()
+  modal.process_mode=Node.PROCESS_MODE_DISABLED
   modal.queue_free()
  modal=null
 func planned(title:String, copy:String) -> void:
