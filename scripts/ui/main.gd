@@ -176,10 +176,11 @@ func close_modal() -> void:
   modal.process_mode=Node.PROCESS_MODE_DISABLED
   modal.queue_free()
  modal=null
-func planned(title:String, copy:String) -> void:
- var node=new_modal(title,"PLANNED FEATURE  /  NOT PLAYABLE YET")
+func planned(title:String, copy:String, sub:String="COMING SOON", footer:String="Episode 1 is the playable story right now.") -> void:
+ var node=new_modal(title,sub)
  UI.label(node,copy,Vector2(294,232),24,UI.MUTED,674)
- UI.label(node,"The playable build focuses on Story 01—01, combat and progression.",Vector2(294,476),17,UI.GOLD,658)
+ if footer!="":
+  UI.label(node,footer,Vector2(294,476),17,UI.GOLD,658)
 func show_mission() -> void:
  var node=new_modal("A SPARK IN THE STATIC","STORY 01—01  /  NEON DISTRICT")
  UI.label(node,MissionData.STORY[0].description,Vector2(294,208),23,Color("cbd0e2"),677)
@@ -213,7 +214,7 @@ func show_ending() -> void:
 func start_battle(from_episode:bool=false) -> bool:
  if not Profile.begin_run("1-1"):
   if not from_episode:
-   planned("ENERGY RECHARGING","Missions require 6 energy. One energy regenerates every five minutes, including while the game is closed. Paid refills are not available.")
+   planned("ENERGY RECHARGING","Missions require 6 energy. One energy regenerates every five minutes, including while the game is closed. Paid refills are not available.","MISSIONS  /  6 ENERGY","")
   return false
  close_modal()
  clear_screen()

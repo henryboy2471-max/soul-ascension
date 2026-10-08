@@ -93,7 +93,29 @@ func run() -> void:
  for item in ["SUMMON","SHOP","EVENTS","BATTLE PASS","VIP"]:
   main.show_home()
   await process_frame
-  # the planned() modal text
+  var button=null
+  var nodes=[main]
+  while not nodes.is_empty():
+   var n=nodes.pop_back()
+   if n is Button and n.text.begins_with(item): button=n
+   nodes.append_array(n.get_children())
+  button.pressed.emit()
+  await process_frame
+  var planned_texts=[]
+  texts(main,planned_texts)
+  var bad_planned=banned(planned_texts,"|not playable|planned feature|in this build")
+  check(bad_planned.is_empty() and planned_texts.has("COMING SOON"),"'%s' coming-soon card has no prototype wording %s" % [item,str(bad_planned)])
+  main.close_modal()
+ profile.data.energy=0
+ main.show_home()
+ main.start_battle(false)
+ await process_frame
+ var energy_texts=[]
+ texts(main,energy_texts)
+ var bad_energy=banned(energy_texts,"|not playable|planned feature|in this build|playable build")
+ check(energy_texts.has("ENERGY RECHARGING") and bad_energy.is_empty() and not energy_texts.has("PLANNED FEATURE  /  NOT PLAYABLE YET"),"Out-of-energy card reads as a game message, not a roadmap note %s" % str(bad_energy))
+ main.close_modal()
+ profile.data.energy=60
  main.show_home()
  await process_frame
  var home_list=[]
