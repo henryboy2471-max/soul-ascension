@@ -73,10 +73,10 @@ static func defs() -> Dictionary:
     {"name":"RESONANCE SHADE","sub":"SLEEPER'S ECHO","hp":300.0,"atk":23.0,"def":4.0,"look":"shade","accent":Color("a9b4ff"),"scale":1.0,"boss":false,"card":"RESONANCE SHADE","card_sub":"AN ECHO OF THE SLEEPERS  /  CLEAR IT",
      "pace":{"move":205.0,"telegraph":0.7,"recovery":0.85,"wait":1.1}},
     {"name":"HOLLOW CANTOR","sub":"THE VOICE IN THE RAIN","hp":960.0,"atk":27.0,"def":6.0,"look":"cantor","accent":Color("d6c9ff"),"scale":1.45,"boss":true,"card":"HOLLOW CANTOR","card_sub":"THE CHORUS THAT TUNES THE RAIN  /  SURVIVE IT",
-     "frames":"res://assets/enemies/hollow_cantor/frames.tres","fallback_frames":"res://assets/enemies/resonance_shade/frames.tres","fallback_tint":Color(0.86,0.82,1.12),"height":185.0,
+     "frames":"res://assets/enemies/hollow_cantor/frames.tres","fallback_frames":"res://assets/enemies/resonance_shade/frames.tres","fallback_tint":Color(0.86,0.82,1.12),"height":185.0,"frames_height":207.77,
      "hud":Color("cdbfff"),"codex_on_defeat":"hollow_cantor",
      "pace":{"move":160.0,"telegraph":1.0,"recovery":1.05,"wait":1.4,"radius":150.0,"style":"bell"},
-     "phase2":{"banner":"THE CHORUS RISES","sub":"THE RAIN BREAKS  /  THE BELL TOLLS FASTER","hud_sub":"THE CHORUS RISES","accent":Color("e4d8ff"),"atk":35.0,"telegraph":0.7,"recovery":0.62,"radius":175.0,"rain":2.2,"scale":1.62,"dim":Color(0.05,0.0,0.14,0.0),"flash":Color(0.85,0.8,1.0,0.55),"tint":Color(0.78,0.72,1.25)}}
+     "phase2":{"frames":"res://assets/enemies/hollow_cantor/phase2/frames.tres","height":207.77,"banner":"THE CHORUS RISES","sub":"THE RAIN BREAKS  /  THE BELL TOLLS FASTER","hud_sub":"THE CHORUS RISES","accent":Color("e4d8ff"),"atk":35.0,"telegraph":0.7,"recovery":0.62,"radius":175.0,"rain":2.2,"scale":1.62,"dim":Color(0.05,0.0,0.14,0.0),"flash":Color(0.85,0.8,1.0,0.55),"tint":Color(0.78,0.72,1.25)}}
    ],
    "battle_only_waves":[],
    "story_flags":{"cantor_defeated":true,"ending_seen":true,"arrays_remaining":6,"amnesty_declared":true},

@@ -212,11 +212,18 @@ func run() -> void:
  skip_intro(battle)
  battle.intro=0.0
  var cantor=battle.foe
- check(cantor.cantor and cantor.temp_art and cantor.sprite_frames==shade_frames,"Cantor reuses the approved Resonance Shade sprite resource as temporary art")
- check(cantor.scale.x>=1.4 and cantor.scale.x>shade_scale and cantor.sprite.modulate!=Color.WHITE and cantor.sprite.modulate.b>cantor.sprite.modulate.g,"Cantor is larger and rain-white/violet tinted")
+ var cantor_frames=load("res://assets/enemies/hollow_cantor/frames.tres")
+ check(cantor.cantor and not cantor.temp_art and cantor.sprite_frames==cantor_frames and cantor.sprite_frames!=shade_frames,"Cantor uses its dedicated Hollow Cantor frames.tres (not the Shade sprite)")
+ check(cantor.scale.x>=1.4 and cantor.scale.x>shade_scale and cantor.sprite.modulate==Color.WHITE,"Cantor is larger and carries no tint workaround")
  check(cantor.max_health==960.0 and battle.foe_accent(battle.waves[1])==Color("cdbfff"),"Cantor stats and nameplate accent come from mission data")
  # future sprite hook
- check(not ResourceLoader.exists("res://assets/enemies/hollow_cantor/frames.tres") and battle.waves[1].frames=="res://assets/enemies/hollow_cantor/frames.tres","Future hook path assets/enemies/hollow_cantor/frames.tres is wired (no art exists yet)")
+ check(ResourceLoader.exists("res://assets/enemies/hollow_cantor/frames.tres") and battle.waves[1].frames=="res://assets/enemies/hollow_cantor/frames.tres","The hook path assets/enemies/hollow_cantor/frames.tres is wired and the art exists")
+ # the Shade fallback still works when the resource is missing: same wave data pointing at a missing path
+ var missing=battle.waves[1].duplicate()
+ missing.frames="res://assets/enemies/hollow_cantor/_missing.tres"
+ battle.spawn_foe(missing)
+ check(battle.foe.temp_art and battle.foe.sprite_frames==shade_frames and battle.foe.sprite.modulate!=Color.WHITE,"If the dedicated resource is missing the Cantor falls back to the tinted Shade sprite")
+ battle.foe.queue_free()
  var hook=BattleScript.resolve_enemy_frames(battle.waves[1],func(p): return true)
  check(hook.path=="res://assets/enemies/hollow_cantor/frames.tres" and not hook.temporary,"If hollow_cantor/frames.tres exists the boss resolves to it (not temporary)")
  var fb=BattleScript.resolve_enemy_frames(battle.waves[1],func(p): return p.contains("resonance_shade"))
@@ -261,7 +268,7 @@ func run() -> void:
  check(battle.telegraph_len==0.7 and battle.recovery==0.62 and battle.telegraph_radius==175.0 and battle.foe.attack==35.0,"Phase 2 telegraphs are faster and the bell reaches farther")
  check(battle.realm_art.live.rain_k>rain0 and battle.realm_art.rain_k==2.2,"Violet/white rain intensifies in Phase 2")
  await create_timer(1.3).timeout
- check(phase_foe.boss_form and phase_foe.form_color!=Color("ff4f72") and phase_foe.aura and phase_foe.sprite.modulate!=Color.WHITE,"Phase 2: halo/aura intensify with the violet treatment (not the Episode 1 red)")
+ check(phase_foe.boss_form and phase_foe.form_color!=Color("ff4f72") and phase_foe.aura and phase_foe.sprite_frames==load("res://assets/enemies/hollow_cantor/phase2/frames.tres") and phase_foe.sprite.modulate==Color.WHITE,"Phase 2: the same Cantor swaps to its intensified Phase 2 frames (violet aura, not the Episode 1 red)")
  # Mira's support
  var healed_to=battle.hero.health
  check(battle.support_fired.has("mira_lantern") and battle.support_cues.size()==1 and abs(healed_to-(battle.hero.max_health*0.75))<1.0,"Mira's lantern signal healed 25% of max health once")
