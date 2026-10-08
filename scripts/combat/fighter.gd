@@ -38,12 +38,30 @@ var last_swing=0.0
 var current_anim=""
 var run_speed_threshold=0.0
 var death_t=0.0
+var form_t=0.0
+var burst_t=0.0
+var boss_form=false
 const ANIM_FALLBACKS = {
  "attack3":["attack2","attack1","skill"],"attack2":["attack1","skill"],"attack1":["skill"],
  "skill":["attack1"],"finisher":["skill","attack3","attack1"],
  "run":["walk"],"walk":["run"],"dash":["run","walk"],
  "land":["idle"],"jump":["idle"],"hurt":["idle"],"defeat":["hurt","idle"],"idle":[]
 }
+func phase2_vfx_active() -> bool:
+ return boss_form or form_t>0.0
+func set_boss_form(path:String="res://assets/enemies/soul_realm_boss/frames.tres", world_height:float=180.0, tint:Color=Color(1.12,0.58,0.55)) -> bool:
+ # Phase 2 reveal: same Fighter (health, position, facing, AI state untouched), new look. Uses the Boss sprite set when
+ # its frames.tres exists; otherwise the current sprite stays and gets a red Soul Realm tint plus code-drawn halo/core.
+ boss_form=true
+ var swapped=false
+ if sprite!=null and ResourceLoader.exists(path):
+  var frames=load(path)
+  if frames is SpriteFrames and attach_frames(frames,world_height):
+   swapped=true
+   sprite.modulate=Color.WHITE
+ if sprite!=null and not swapped:
+  sprite.modulate=tint
+ return swapped
 func load_sprite_set(path:String, world_height:float=170.0, overlay:Color=Color(0,0,0,0)) -> bool:
  # Returns false (and keeps the procedural rig) when no SpriteFrames resource exists at `path`.
  if not ResourceLoader.exists(path):
@@ -267,19 +285,55 @@ func draw_sprite_overlays(color:Color) -> void:
  # Code-drawn effects stand in for animations the art pack could not supply (they are VFX, not character frames).
  if swing>0.0 and not has_animation("attack1"):
   var t=clampf(swing/0.3,0.0,1.0)
-  draw_arc(Vector2(20,-78),86,-1.6,1.0,28,Color(color,0.18*t),22)
-  draw_arc(Vector2(20,-78),86,-1.6,1.0,28,Color(color,0.55*t),8)
-  draw_arc(Vector2(20,-78),86,-1.4+(1.0-t)*0.8,1.0,28,Color(1,1,1,0.85*t),3)
+  var sc=color
+  var rad=86.0
+  if boss_form:
+   # Phase 2 upgrade: larger, red-hot slash with a second echo arc
+   sc=Color("ff4f72")
+   rad=112.0
+   draw_arc(Vector2(20,-78),rad+26,-1.7,1.1,28,Color(sc,0.25*t),10)
+  draw_arc(Vector2(20,-78),rad,-1.6,1.0,28,Color(sc,0.18*t),22)
+  draw_arc(Vector2(20,-78),rad,-1.6,1.0,28,Color(sc,0.55*t),8)
+  draw_arc(Vector2(20,-78),rad,-1.4+(1.0-t)*0.8,1.0,28,Color(1,1,1,0.85*t),3)
  if casting>0.0 and not has_animation("skill"):
   var u=clampf(casting/0.45,0.0,1.0)
-  draw_arc(Vector2(0,-70),60+(1.0-u)*50,0,TAU,40,Color(color,0.7*u),4)
+  var cc=Color("ff4f72") if boss_form else color
+  draw_arc(Vector2(0,-70),60+(1.0-u)*50,0,TAU,40,Color(cc,0.7*u),4)
+  if boss_form:
+   draw_arc(Vector2(0,-70),90+(1.0-u)*80,0,TAU,40,Color(cc,0.4*u),3)
+ if burst_t>0.0:
+  # Transformation energy burst: expanding red/black rings and radial rays
+  var e=1.0-burst_t
+  draw_arc(Vector2(0,-95),30+e*190,0,TAU,56,Color("ff4f72",0.8*burst_t),8)
+  draw_arc(Vector2(0,-95),18+e*120,0,TAU,48,Color(0.05,0.0,0.1,0.9*burst_t),10)
+  for i in range(16):
+   var ang=i*TAU/16.0
+   draw_line(Vector2(0,-95)+Vector2.from_angle(ang)*(40+e*60),Vector2(0,-95)+Vector2.from_angle(ang)*(70+e*210),Color("ff4f72",0.7*burst_t),3)
  if trailing and not has_animation("dash"):
   for i in range(4):
    draw_line(Vector2(-40-i*14,-30-i*22),Vector2(-95-i*10,-30-i*22),Color(color,0.5-i*0.1),3)
+ if form_t>0.0 or boss_form:
+  # Chest core, halo and shoulder spikes (code-drawn VFX): charge up during the transformation, stay lit afterwards.
+  var k=1.0 if boss_form else form_t
+  var pulse=0.5+0.5*sin(Time.get_ticks_msec()/140.0)
+  var red=Color("ff4f72")
+  draw_arc(Vector2(4,-178),22+k*8,0,TAU,32,Color(red,0.85*k),3)
+  draw_arc(Vector2(4,-178),30+k*10+pulse*3,0,TAU,32,Color(red,0.35*k),2)
+  draw_circle(Vector2(6,-108),(10+pulse*3)*k,Color(red,0.35+0.3*pulse))
+  draw_circle(Vector2(6,-108),4*k,Color.WHITE)
+  draw_colored_polygon(PackedVector2Array([Vector2(-34,-132),Vector2(-52,-168),Vector2(-20,-138)]),Color(red,0.85*k))
+  draw_colored_polygon(PackedVector2Array([Vector2(40,-128),Vector2(58,-162),Vector2(26,-136)]),Color(red,0.85*k))
+  draw_arc(Vector2(0,-80),104+pulse*8,0,TAU,48,Color(red,0.25*k),2)
  if aura:
   var glow=0.5+0.5*sin(Time.get_ticks_msec()/160.0)
   draw_arc(Vector2(0,-65),88+glow*6,0,TAU,48,Color(aura_color,0.35+0.3*glow),3)
   draw_arc(Vector2(0,-65),100+glow*8,0,TAU,48,Color(aura_color,0.12+0.12*glow),2)
+  if boss_form:
+   draw_arc(Vector2(0,-75),118+glow*10,0,TAU,56,Color(aura_color,0.4+0.3*glow),4)
+   draw_arc(Vector2(0,-75),134+glow*12,0,TAU,56,Color(0.05,0.0,0.1,0.35),6)
+   for i in range(10):
+    var ang=i*TAU/10.0+Time.get_ticks_msec()/900.0
+    draw_circle(Vector2(0,-75)+Vector2.from_angle(ang)*(122+glow*8),3.0,Color(aura_color,0.8))
  if blocking:
   draw_arc(Vector2(8,-66),65,-1.5,1.5,30,Color(0.4,0.8,1,0.7),5)
  if invincible>0:

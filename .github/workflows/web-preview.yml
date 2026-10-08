@@ -55,6 +55,7 @@ jobs:
           godot --headless --script res://tests/test_mira_sprites.gd
           godot --headless --script res://tests/test_shade_sprites.gd
           godot --headless --script res://tests/test_enforcer_sprites.gd
+          godot --headless --script res://tests/test_boss_transform.gd
 
       - name: Sprite pipeline tests
         run: |

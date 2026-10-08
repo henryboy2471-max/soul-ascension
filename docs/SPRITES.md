@@ -99,3 +99,15 @@ A 1774x887 alpha sheet with a heavy orange fire haze (alpha median 148), one sou
 | finisher, jump, land | FLAGGED | Full-bleed rock/fire scenes, nothing identifiable. The game's code-drawn cinematic finisher plays instead. |
 
 Scale: world height 180 x boss node scale 1.2 gives a 195.8 px standing figure vs the Hero's 148.0 px (1.32x) and the Shade's 163.2 px (1.20x). The procedural Enforcer remains as the fallback if `frames.tres` is missing, and the battle-only Enforcer (look "enforcer") stays procedural.
+
+## Soul Realm Boss / Phase 2 transformation (art pending)
+
+The Boss is **not** a third wave: it is the existing Soul-Warped Enforcer transforming when the existing Phase 2 trigger fires (foe health <= 50%). `Battle.transform_foe()` fires exactly once (`transform_count`) and `update_transform()` runs a ~0.9 s real-time state machine on the same `Fighter` (health, position, facing and AI state untouched; the foe stays hittable, so the win condition is unchanged; only its next attack is delayed 0.5 s):
+
+1. **Slow + darken:** `Engine.time_scale` drops to 0.25 (restored at the reveal, on battle end, on exit, and by a real-time safety timer). The arena darkens with a red/black pulse, a red flash, and a "PHASE 2 / SOUL ASCENDED" banner.
+2. **Charge:** chest core, halo and aura build (`Fighter.form_t` 0 -> 1, code-drawn).
+3. **Reveal:** `Fighter.set_boss_form(Battle.boss_frames_path)` swaps the art, an energy burst (`Fighter.burst_t`: expanding red/black rings and rays) fires with screen shake and a scale pop (node scale 1.2 -> 1.32, about 1.46x the Hero). Control is back by 0.9 s.
+
+Phase 2 look (Enforcer sprite, temporary): red tint, stronger multi-ring aura with orbiting motes, brighter core, red upgraded slash/cast VFX, and a more aggressive telegraph (same 100 px hit radius, so it stays honest: pulsing outer ring, dark core, warning spikes; telegraph 0.62 s, recovery 0.65 s, attack 36).
+
+**Future art hook:** `assets/enemies/soul_realm_boss/frames.tres`. If it exists, Phase 2 swaps to it automatically (no combat changes); drop the approved sheet in `assets/_incoming/soul_realm_boss/`, add `tools/import_soul_realm_boss.sh` and build `frames.tres` as for the other characters. **The Boss sheet has not been delivered**, so nothing is imported or flagged yet. Tests: `tests/test_boss_transform.gd` (27 checks), `tests/capture_boss_transform.gd`.

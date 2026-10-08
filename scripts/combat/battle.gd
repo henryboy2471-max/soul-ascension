@@ -20,6 +20,12 @@ var combo_timer=0.0
 var cooldowns={"attack":0.0,"heavy":0.0,"dodge":0.0,"pulse":0.0,"rift":0.0,"mend":0.0,"ultimate":0.0}
 var maxima={"attack":0.36,"heavy":1.3,"dodge":1.2,"pulse":4.0,"rift":7.0,"mend":10.0,"ultimate":1.0}
 var enemy_wait=1.5
+var boss_scale=1.32
+var boss_frames_path="res://assets/enemies/soul_realm_boss/frames.tres"
+var transform_count=0
+var transform_clock=-1.0
+var transform_revealed=false
+var transform_foe_ref:Fighter
 var telegraph=-1.0
 var telegraph_len=0.8
 var recovery=1.0
@@ -263,6 +269,60 @@ func next_wave() -> void:
  status.text="WAVE CLEARED  /  +60 HEALTH"
  Sound.play("win")
  boss_intro(waves[wave].card,waves[wave].card_sub)
+func transform_foe() -> void:
+ # Phase 2 reveal on the SAME foe: no new enemy, health/position/facing/AI untouched, damage rules unchanged (still hittable).
+ # Runs as a real-time state machine (transform_clock, ~0.9 s): slow-motion + darken + red/black pulse + core/halo charge,
+ # then reveal (form swap, energy burst, shake), then control is fully back.
+ if transform_count>0:
+  return
+ transform_count=1
+ transform_clock=0.0
+ transform_revealed=false
+ transform_foe_ref=foe
+ foe.form_t=0.05
+ enemy_wait=maxf(enemy_wait,0.5)
+ Engine.time_scale=0.25
+ dim_rect.color=Color(0.1,0.0,0.03,0.0)
+ flash_rect.color=Color(1,0.1,0.2,0.55)
+ shake=10
+ get_tree().create_timer(1.5,true,false,true).timeout.connect(restore_time)
+func _exit_tree() -> void:
+ restore_time()
+func restore_time() -> void:
+ Engine.time_scale=1.0
+func update_transform(delta:float) -> void:
+ if transform_clock<0.0:
+  return
+ transform_clock+=delta/maxf(Engine.time_scale,0.05)
+ var c=transform_clock
+ var f=transform_foe_ref
+ if is_instance_valid(f):
+  f.form_t=clampf(c/0.55,0.0,1.0)
+ flash_rect.color.a=maxf(0.0,0.55*(1.0-c/0.4)) if not transform_revealed else flash_rect.color.a
+ if c<0.55:
+  dim_rect.color.a=minf(0.65,c/0.25*0.65)
+ elif not transform_revealed:
+  transform_revealed=true
+  restore_time()
+  if is_instance_valid(f):
+   f.set_boss_form(boss_frames_path)
+   f.burst_t=1.0
+   f.scale=Vector2(f.scale.x*0.95,f.scale.y*0.95)
+   create_tween().tween_property(f,"scale",Vector2(boss_scale,boss_scale),0.25)
+   sparks.burst(f.position-Vector2(0,90),true)
+  flash_rect.color=Color(1,0.7,0.75,0.7)
+  create_tween().tween_property(flash_rect,"color:a",0.0,0.35)
+  shake=18
+  Sound.play("special")
+ if transform_revealed:
+  dim_rect.color.a=maxf(0.0,0.65*(1.0-(c-0.55)/0.35))
+  if is_instance_valid(f):
+   f.burst_t=maxf(0.0,1.0-(c-0.55)/0.5)
+  if c>=0.9:
+   dim_rect.color=Color(0.02,0.0,0.07,0.0)
+   if is_instance_valid(f):
+    f.burst_t=0.0
+   transform_clock=-1.0
 func enter_phase_two() -> void:
  phase=2
  foe.attack=36
@@ -270,8 +330,9 @@ func enter_phase_two() -> void:
  recovery=0.65
  foe.aura=true
  foe.aura_color=Color("ff4f72")
+ transform_foe()
  intro_card.text="PHASE 2"
- intro_sub.text="SUPPRESSION PROTOCOL ESCALATED  /  ATTACKS FASTER AND HIT HARDER"
+ intro_sub.text="SOUL ASCENDED  /  ATTACKS FASTER AND HIT HARDER"
  intro_card.modulate.a=1
  intro_sub.modulate.a=1
  var tween=create_tween()
@@ -312,6 +373,7 @@ func _unhandled_key_input(event:InputEvent) -> void:
 func _process(delta:float) -> void:
  if ended:
   return
+ update_transform(delta)
  hp.value=hero.health
  ep.value=energy
  ult_bar.value=ultimate
@@ -499,6 +561,8 @@ func finisher() -> void:
 func end(won:bool) -> void:
  if ended: return
  ended=true
+ restore_time()
+ transform_clock=-1.0
  hp.value=hero.health
  enemy_hp.value=foe.health
  Sound.play("win" if won else "hurt")
