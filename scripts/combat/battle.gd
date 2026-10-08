@@ -512,9 +512,12 @@ func show_support(event:Dictionary, healed:int) -> void:
   radio_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
   UI.outline(radio_label,6)
  radio_label.text=str(event.get("who","SUPPORT"))+"\n"+str(event.get("line",""))
- radio_label.modulate.a=1.0
+ # the line waits until the phase banner has faded, so the two never stack
+ radio_label.modulate.a=0.0
  var tween=create_tween()
- tween.tween_interval(3.2)
+ tween.tween_interval(1.5)
+ tween.tween_property(radio_label,"modulate:a",1.0,0.2)
+ tween.tween_interval(3.4)
  tween.tween_property(radio_label,"modulate:a",0.0,0.5)
 func request_retreat() -> void:
  if ended:

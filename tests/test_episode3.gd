@@ -265,8 +265,10 @@ func run() -> void:
  # Mira's support
  var healed_to=battle.hero.health
  check(battle.support_fired.has("mira_lantern") and battle.support_cues.size()==1 and abs(healed_to-(battle.hero.max_health*0.75))<1.0,"Mira's lantern signal healed 25% of max health once")
- check(is_instance_valid(battle.radio_label) and battle.radio_label.text.begins_with("MIRA VEY") and battle.radio_label.modulate.a>0.0,"Mira's radio line is shown")
  check(battle.hero.get_child_count()>0 and battle.hero.get_children().any(func(c): return c.get_script()!=null and str(c.get_script().resource_path).ends_with("support_fx.gd")),"Lantern-signal visual cue is on the Hero")
+ check(is_instance_valid(battle.radio_label) and battle.radio_label.text.begins_with("MIRA VEY"),"Mira's radio line is queued with her name")
+ await create_timer(0.8).timeout
+ check(battle.radio_label.modulate.a>0.0,"Mira's radio line appears once the banner has faded")
  # no retrigger when the threshold is crossed again
  battle.phase=1
  phase_foe.health=phase_foe.max_health*0.30
