@@ -53,3 +53,6 @@ const ARRAY = [
  {"who":"PLAYER","text":"Then I'll tune it back."},
  {"who":"ARRAY","text":"Resonance channel opening. Soul Realm breach detected."}
 ]
+const BREACH_QUIET = [
+ {"who":"NARRATOR","text":"The breach is quiet. The rain still hums, but the voice that was tuning it has stopped."}
+]

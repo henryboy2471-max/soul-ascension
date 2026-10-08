@@ -221,10 +221,28 @@ func start_episode(mission_id:String="1-1") -> void:
  episode.exit_requested.connect(show_home)
  screen.add_child(episode)
 func on_battle_finished(won:bool, from_episode:bool) -> void:
- if won and from_episode:
+ if won and from_episode and MissionDefs.get_def(current_mission).get("flow","district")=="lantern":
+  show_battle_complete()
+ elif won and from_episode:
   show_ending()
  else:
   show_result(won)
+func show_battle_complete() -> void:
+ # Temporary hand-off after the Hollow Cantor falls: the Episode 2 ending, rewards and teaser are not wired yet, so no rewards are
+ # paid and the mission is not marked complete. The run ends cleanly and the saved Lantern Quarter progress is kept.
+ Sound.stop_loop()
+ Profile.end_run_pending(true)
+ clear_screen()
+ scene_name="battle_complete"
+ backdrop()
+ UI.panel(screen,Rect2(283,150,714,380),Color(0.025,0.035,0.075,0.96),Color(UI.VIOLET,0.7))
+ UI.trim(screen,Rect2(283,150,714,380),UI.VIOLET)
+ UI.chip(screen,"SOUL REALM  /  THE SLEEPERS' STAIR",Rect2(325,186,330,26),UI.VIOLET,13)
+ UI.label(screen,"BATTLE COMPLETE",Vector2(324,226),48)
+ UI.label(screen,"The Hollow Cantor's chorus has gone silent.",Vector2(326,296),22,Color("cbd0e2"),620)
+ UI.label(screen,"ENDING PENDING",Vector2(326,372),24,UI.GOLD)
+ UI.label(screen,"Progress saved locally" if Profile.save_ok else "Save failed — check device storage",Vector2(326,414),15,UI.MUTED if Profile.save_ok else Color("ff7188"))
+ UI.button(screen,"HOME",Rect2(325,452,280,56),show_home,true)
 func show_ending() -> void:
  clear_screen()
  scene_name="ending"
@@ -235,7 +253,8 @@ func show_ending() -> void:
  screen.add_child(episode)
 func start_battle(from_episode:bool=false, mission_id:String="1-1") -> bool:
  if not Profile.begin_run(mission_id):
-  if not from_episode:
+  if not from_episode or MissionDefs.get_def(mission_id).get("flow","district")=="lantern":
+   # Standalone battles and Episode 2's breach show the normal recharge screen; Episode 1's own breach keeps its in-scene line.
    var cost=MissionDefs.energy_cost(mission_id)
    planned("ENERGY RECHARGING","Missions require %d energy. One energy regenerates every five minutes, including while the game is closed. Paid refills are not available." % cost,"MISSIONS  /  %d ENERGY" % cost,"")
   return false
@@ -286,7 +305,11 @@ func show_result(won:bool) -> void:
  xp.readout_size=13
  UI.label(screen,"Progress saved locally" if Profile.save_ok else "Save failed — check device storage",Vector2(326,484),15,UI.MUTED if Profile.save_ok else Color("ff7188"))
  UI.button(screen,"HOME",Rect2(325,535,280,65),show_home)
- UI.button(screen,"REPLAY BATTLE  /  6 ENERGY",Rect2(630,535,316,65),func(): start_battle(false,reward.id),true)
+ if MissionDefs.get_def(reward.id).battle_only_waves.is_empty():
+  # Story-only missions have no standalone battle: return to the open breach (the energy is charged again on entry).
+  UI.button(screen,"RETURN TO THE BREACH  /  %d ENERGY" % MissionDefs.energy_cost(reward.id),Rect2(630,535,316,65),func(): start_episode(reward.id),true)
+ else:
+  UI.button(screen,"REPLAY BATTLE  /  6 ENERGY",Rect2(630,535,316,65),func(): start_battle(false,reward.id),true)
 func show_hero() -> void:
  var node=new_modal("THE UNBOUND","OWNED  /  COMMON  /  ECHO STRIKER")
  var rig=Fighter.new()
@@ -312,6 +335,8 @@ func show_codex() -> void:
  var entries=[]
  for entry in EpisodeData.CODEX:
   var source=MissionDefs.mission_for_codex(entry.id)
+  if entry.get("secret",false) and not Profile.data.codex.has(entry.id):
+   continue
   if source.is_empty() or MissionDefs.is_unlocked(source.id,Profile.data.completed):
    entries.append(entry)
  var node=new_modal("CODEX","STORY AND WORLD ENTRIES  /  "+str(Profile.data.codex.size())+" OF "+str(entries.size())+" FOUND")
@@ -319,10 +344,11 @@ func show_codex() -> void:
  for i in range(entries.size()):
   var entry=entries[i]
   var found=Profile.data.codex.has(entry.id)
-  var col=i/3
-  var row=i%3
+  var rows=4 if entries.size()>9 else 3
+  var col=i/rows
+  var row=i%rows
   var x=294+col*(236 if wide else 350)
-  var y=200+row*118
+  var y=200+row*(92 if rows==4 else 118)
   var width=224 if wide else 330
   UI.label(node,entry.title if found else "UNDISCOVERED",Vector2(x,y),17,UI.GOLD if found else Color("68738c"),width)
   var source=MissionDefs.mission_for_codex(entry.id)

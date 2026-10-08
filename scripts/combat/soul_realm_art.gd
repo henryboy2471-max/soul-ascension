@@ -6,6 +6,11 @@ var time=0.0
 var motes:Array=[]
 var shards:Array=[]
 var mode="root"
+# "rain" = Episode 2 treatment: violet-white rain streaks, ripples on the floor, a cooler halo. rain_k scales its intensity (Phase 2).
+var theme_id=""
+var rain_k=1.0
+var live:SoulRealmArt
+var drops:Array=[]
 func _ready() -> void:
  if mode=="root":
   # Static scenery is baked once into a texture; only the halo, shards, runes and motes animate.
@@ -21,8 +26,9 @@ func _ready() -> void:
   sprite.centered=false
   sprite.texture=vp.get_texture()
   add_child(sprite)
-  var live=SoulRealmArt.new()
+  live=SoulRealmArt.new()
   live.mode="dynamic"
+  live.theme_id=theme_id
   add_child(live)
   return
  if mode=="static":
@@ -33,6 +39,15 @@ func _ready() -> void:
   motes.append({"x":rng.randf_range(0,1280),"y":rng.randf_range(0,720),"s":rng.randf_range(14,46),"r":rng.randf_range(1.5,3.6),"c":rng.randi()%3})
  for i in range(11):
   shards.append({"x":rng.randf_range(60,1220),"y":rng.randf_range(60,300),"w":rng.randf_range(14,38),"h":rng.randf_range(40,110),"p":rng.randf_range(0,TAU),"a":rng.randf_range(-0.5,0.5)})
+ if theme_id=="rain":
+  var rain_rng=RandomNumberGenerator.new()
+  rain_rng.seed=99
+  for i in range(150):
+   drops.append({"x":rain_rng.randf_range(-40,1320),"y":rain_rng.randf_range(0,720),"s":rain_rng.randf_range(520,900),"l":rain_rng.randf_range(26,70),"o":rain_rng.randf()})
+func set_rain(k:float) -> void:
+ rain_k=k
+ if is_instance_valid(live):
+  live.rain_k=k
 func _process(delta:float) -> void:
  if mode!="dynamic":
   return
@@ -102,3 +117,26 @@ func draw_dynamic() -> void:
   var fade=clampf(y/200.0,0.0,1.0)
   draw_circle(Vector2(xo,y),m.r*2.4,Color(palette[m.c],0.08*fade))
   draw_circle(Vector2(xo,y),m.r,Color(palette[m.c],0.8*fade))
+ if theme_id=="rain":
+  draw_rain()
+func draw_rain() -> void:
+ # Vertical violet-white rain (denser and brighter with rain_k) and ripples where it lands on the floor.
+ var count=int(minf(drops.size(),70.0*rain_k))
+ for i in range(count):
+  var d=drops[i]
+  var y=fposmod(d.y+time*d.s,780.0)-30.0
+  var a=(0.32+0.26*d.o)*minf(rain_k,1.6)
+  draw_line(Vector2(d.x,y),Vector2(d.x-3.0,y+d.l),Color(0.86,0.8,1.0,a),2.0 if d.o>0.6 else 1.5)
+ for i in range(int(7*rain_k)):
+  var u=fposmod(time*0.9+i*0.37,1.0)
+  var rx=140.0+fposmod(i*211.0,1000.0)
+  var ry=380.0+fposmod(i*97.0,300.0)
+  draw_set_transform(Vector2(rx,ry),0,Vector2(1,0.28))
+  draw_arc(Vector2.ZERO,6.0+u*34.0,0,TAU,24,Color(0.85,0.78,1.0,0.5*(1.0-u)),2)
+ draw_set_transform(Vector2.ZERO,0,Vector2.ONE)
+ if rain_k>1.2:
+  var pulse=0.5+0.5*sin(time*3.2)
+  draw_rect(Rect2(0,0,1280,720),Color(0.7,0.55,1.0,0.05+0.05*pulse))
+  for i in range(4):
+   var x=160.0+i*320.0+sin(time*0.6+i)*30.0
+   draw_rect(Rect2(x-6.0,0,12.0,720),Color(0.85,0.78,1.0,0.05+0.08*pulse))

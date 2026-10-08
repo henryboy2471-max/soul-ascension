@@ -41,6 +41,10 @@ var death_t=0.0
 var form_t=0.0
 var burst_t=0.0
 var boss_form=false
+# Episode 2 Hollow Cantor: code-drawn halo / bell-ring VFX; temp_art is true while it borrows the interim Shade sprite.
+var cantor=false
+var temp_art=false
+var form_color=Color("ff4f72")
 const ANIM_FALLBACKS = {
  "attack3":["attack2","attack1","skill"],"attack2":["attack1","skill"],"attack1":["skill"],
  "skill":["attack1"],"finisher":["skill","attack3","attack1"],
@@ -283,13 +287,15 @@ func draw_sprite_overlays(color:Color) -> void:
     draw_circle(Vector2(cos(a)*(18+t*46),-70+sin(a)*30-rise),3.0*(1.0-t)+1.0,Color(color,0.8*(1.0-t)))
   return
  # Code-drawn effects stand in for animations the art pack could not supply (they are VFX, not character frames).
+ if cantor:
+  draw_cantor_vfx(color)
  if swing>0.0 and not has_animation("attack1"):
   var t=clampf(swing/0.3,0.0,1.0)
   var sc=color
   var rad=86.0
   if boss_form:
    # Phase 2 upgrade: larger, red-hot slash with a second echo arc
-   sc=Color("ff4f72")
+   sc=form_color
    rad=112.0
    draw_arc(Vector2(20,-78),rad+26,-1.7,1.1,28,Color(sc,0.25*t),10)
   draw_arc(Vector2(20,-78),rad,-1.6,1.0,28,Color(sc,0.18*t),22)
@@ -297,26 +303,26 @@ func draw_sprite_overlays(color:Color) -> void:
   draw_arc(Vector2(20,-78),rad,-1.4+(1.0-t)*0.8,1.0,28,Color(1,1,1,0.85*t),3)
  if casting>0.0 and not has_animation("skill"):
   var u=clampf(casting/0.45,0.0,1.0)
-  var cc=Color("ff4f72") if boss_form else color
+  var cc=form_color if boss_form else color
   draw_arc(Vector2(0,-70),60+(1.0-u)*50,0,TAU,40,Color(cc,0.7*u),4)
   if boss_form:
    draw_arc(Vector2(0,-70),90+(1.0-u)*80,0,TAU,40,Color(cc,0.4*u),3)
  if burst_t>0.0:
   # Transformation energy burst: expanding red/black rings and radial rays
   var e=1.0-burst_t
-  draw_arc(Vector2(0,-95),30+e*190,0,TAU,56,Color("ff4f72",0.8*burst_t),8)
+  draw_arc(Vector2(0,-95),30+e*190,0,TAU,56,Color(form_color,0.8*burst_t),8)
   draw_arc(Vector2(0,-95),18+e*120,0,TAU,48,Color(0.05,0.0,0.1,0.9*burst_t),10)
   for i in range(16):
    var ang=i*TAU/16.0
-   draw_line(Vector2(0,-95)+Vector2.from_angle(ang)*(40+e*60),Vector2(0,-95)+Vector2.from_angle(ang)*(70+e*210),Color("ff4f72",0.7*burst_t),3)
+   draw_line(Vector2(0,-95)+Vector2.from_angle(ang)*(40+e*60),Vector2(0,-95)+Vector2.from_angle(ang)*(70+e*210),Color(form_color,0.7*burst_t),3)
  if trailing and not has_animation("dash"):
   for i in range(4):
    draw_line(Vector2(-40-i*14,-30-i*22),Vector2(-95-i*10,-30-i*22),Color(color,0.5-i*0.1),3)
- if form_t>0.0 or boss_form:
+ if (form_t>0.0 or boss_form) and not cantor:
   # Chest core, halo and shoulder spikes (code-drawn VFX): charge up during the transformation, stay lit afterwards.
   var k=1.0 if boss_form else form_t
   var pulse=0.5+0.5*sin(Time.get_ticks_msec()/140.0)
-  var red=Color("ff4f72")
+  var red=form_color
   draw_arc(Vector2(4,-178),22+k*8,0,TAU,32,Color(red,0.85*k),3)
   draw_arc(Vector2(4,-178),30+k*10+pulse*3,0,TAU,32,Color(red,0.35*k),2)
   draw_circle(Vector2(6,-108),(10+pulse*3)*k,Color(red,0.35+0.3*pulse))
@@ -338,3 +344,32 @@ func draw_sprite_overlays(color:Color) -> void:
   draw_arc(Vector2(8,-66),65,-1.5,1.5,30,Color(0.4,0.8,1,0.7),5)
  if invincible>0:
   draw_arc(Vector2(0,-65),83,0,TAU,40,Color(color,0.5),2)
+
+func draw_cantor_vfx(color:Color) -> void:
+ # Halo above the head with a small bell, expanding bell-toll rings at the chest, and (in Phase 2) a wider halo,
+ # extra rings and pillars of light. All code-drawn, so it works with the interim sprite and with future dedicated art.
+ var k=1.0 if boss_form else form_t
+ var t=Time.get_ticks_msec()/1000.0
+ var pale=Color("e9e2ff")
+ var accent_c=form_color if (boss_form or form_t>0.0) else Color("b9a4ff")
+ var halo=Vector2(0,-212)
+ var r=30.0+16.0*k
+ draw_arc(halo,r,0,TAU,40,Color(pale,0.85),3)
+ draw_arc(halo,r+8.0+sin(t*3.0)*2.0,0,TAU,40,Color(accent_c,0.45),2)
+ for i in range(8):
+  var a=i*TAU/8.0+t*(0.9+1.2*k)
+  draw_circle(halo+Vector2.from_angle(a)*r,2.4,Color(pale,0.9))
+ # bell hanging in the halo
+ draw_colored_polygon(PackedVector2Array([halo+Vector2(-9,6),halo+Vector2(-6,-8),halo+Vector2(0,-13),halo+Vector2(6,-8),halo+Vector2(9,6)]),Color(pale,0.9))
+ draw_circle(halo+Vector2(0,9+sin(t*5.0)*2.0),2.6,Color(accent_c,0.95))
+ # bell-toll rings, one every ~1.6 s (faster in Phase 2)
+ var period=1.6-0.7*k
+ var rings=2+int(k*2.0)
+ for i in range(rings):
+  var u=fposmod(t/period+float(i)/float(rings),1.0)
+  draw_arc(Vector2(0,-95),30.0+u*(120.0+40.0*k),0,TAU,48,Color(pale if i%2==0 else accent_c,0.55*(1.0-u)),3.0+3.0*(1.0-u))
+ if k>0.0:
+  for i in range(5):
+   var x=-92.0+i*46.0
+   var h=fposmod(t*0.8+i*0.37,1.0)
+   draw_line(Vector2(x,-250.0*h),Vector2(x,-250.0*h-60.0*k),Color(accent_c,0.5*k*(1.0-h)),3)

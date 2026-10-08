@@ -47,16 +47,48 @@ func begin_run(id:String) -> bool:
  if active_run!="" or not MissionDefs.has_mission(id) or not MissionDefs.is_unlocked(id,data.completed):
   return false
  Economy.regenerate(data,int(Time.get_unix_time_from_system()))
+ var resumable=bool(MissionDefs.get_def(id).get("resume_run",false))
+ if resumable and bool(mission_progress(id).get("combat_run",false)):
+  # The energy for this run was already paid and saved (the app was closed or reloaded mid-run): resume without charging again.
+  active_run=id
+  return true
  if not Economy.spend(data,"energy",MissionDefs.energy_cost(id)):
   return false
  active_run=id
+ if resumable:
+  mark_combat_run(id,true)
  persist()
  return true
+# Saves (or clears) the "energy paid, run active" state of a resumable mission inside its mission progress.
+func mark_combat_run(id:String, active:bool) -> void:
+ var progress=mission_progress(id).duplicate(true)
+ if not active and not progress.has("combat_run"):
+  return
+ if active:
+  progress["combat_run"]=true
+ else:
+  progress.erase("combat_run")
+ if not data.get("mission_progress") is Dictionary:
+  data["mission_progress"]={}
+ data.mission_progress[id]=progress
+# Ends an active run without rewards or completion (used while a mission's ending is still pending).
+func end_run_pending(won:bool) -> void:
+ if active_run=="":
+  return
+ var id=active_run
+ active_run=""
+ mark_combat_run(id,false)
+ if won:
+  var progress=mission_progress(id).duplicate(true)
+  progress["battle_won"]=true
+  data.mission_progress[id]=progress
+ persist()
 func finish_run(won:bool) -> Dictionary:
  if active_run=="":
   return {}
  var id=active_run
  active_run=""
+ mark_combat_run(id,false)
  var reward={"xp":0,"gold":0,"levels":0,"first":false,"id":id}
  if won:
   reward.first=not data.completed.has(id)

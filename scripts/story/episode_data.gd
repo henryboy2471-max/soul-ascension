@@ -66,5 +66,6 @@ const CODEX = [
  {"id":"enforcer","title":"SOUL-WARPED ENFORCER","text":"A Meridian suppression unit twisted by the Echo resonance. Its last words: Not harmless. Not harmless."},
  {"id":"violet_rain","title":"VIOLET RAIN","text":"A rain that carries a trace of the Echo signal. Every drop hums at the frequency of the second signal and pulls on anyone with an awakened resonance."},
  {"id":"sleepers","title":"THE SLEEPERS","text":"Awakened civilians sheltering in Depot 4 who stand with open eyes while their fears leak out of the Soul Realm. They wake badly. Only the Lantern Circuit knows how to sit with them."},
- {"id":"rain_array","title":"RAIN ARRAY 7","text":"A Meridian roof relay tuned to the Echo signature during an 'atmospheric resonance study'. Whoever holds it can lean on every sleeper in the quarter at once."}
+ {"id":"rain_array","title":"RAIN ARRAY 7","text":"A Meridian roof relay tuned to the Echo signature during an 'atmospheric resonance study'. Whoever holds it can lean on every sleeper in the quarter at once."},
+ {"id":"hollow_cantor","title":"HOLLOW CANTOR","text":"A choir of every sleeper's fear given one voice and a bell. It tolls the Echo signal through the rain and feeds on the answer. It rises a second time when its chorus is struck.","secret":true}
 ]

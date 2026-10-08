@@ -206,9 +206,9 @@ func run() -> void:
  await process_frame
  var scene_before=main.scene_name
  ep.on_interact("array")
- await skip(ep,func(): return main.scene_name=="home",900)
- check(scene_before=="episode" and main.scene_name=="home" and profile.mission_progress("1-2").get("array",false) and profile.active_run=="" and int(profile.data.energy)==energy0,"The Rain Array opens the breach and the episode ends there for now: no battle, no energy spent")
- check(profile.data.codex.has("violet_rain") and profile.data.codex.has("sleepers") and profile.data.codex.has("rain_array") and not profile.data.codex.has("hollow_cantor"),"Codex: violet_rain, sleepers and rain_array unlocked; hollow_cantor is left for M3")
+ await skip(ep,func(): return ep.step==4,900)
+ check(scene_before=="episode" and main.scene_name=="episode" and ep.step==4 and profile.mission_progress("1-2").get("array",false) and profile.active_run=="" and int(profile.data.energy)==energy0,"The Rain Array opens the breach; exploration stays free: no battle, no energy spent")
+ check(profile.data.codex.has("violet_rain") and profile.data.codex.has("sleepers") and profile.data.codex.has("rain_array") and not profile.data.codex.has("hollow_cantor"),"Codex: violet_rain, sleepers and rain_array unlocked; hollow_cantor stays locked until the Cantor falls")
  main.show_codex()
  await process_frame
  t=[]
@@ -217,7 +217,7 @@ func run() -> void:
  main.close_modal()
  # resuming after the breach shows the portal open
  ep=await start()
- check(ep.explore.props.breach_open and ep.step==3,"Returning after the breach opened shows it open")
+ check(ep.explore.props.breach_open and ep.step==4,"Returning after the breach opened shows it open")
  root.get_tree().node_added.disconnect(on_node)
  # --- all six possible orders reach 3/3 with the roof locked until the last one ---
  var orders=[["res_a","res_b","res_c"],["res_a","res_c","res_b"],["res_b","res_a","res_c"],["res_b","res_c","res_a"],["res_c","res_a","res_b"],["res_c","res_b","res_a"]]

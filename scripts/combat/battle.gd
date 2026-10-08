@@ -28,7 +28,18 @@ var transform_revealed=false
 var transform_foe_ref:Fighter
 var telegraph=-1.0
 var telegraph_len=0.8
+var telegraph_radius=100.0
+var telegraph_style=""
+var foe_speed=170.0
 var recovery=1.0
+var realm_art:SoulRealmArt
+var phase2_def:Dictionary={}
+var support_fired:Dictionary={}
+var support_events:Array=[]
+var whisper_tween:Tween
+var whisper_label:Label
+var radio_label:Label
+var support_cues:Array=[]
 var phase=1
 var boss_mode=false
 var mission_id="1-1"
@@ -71,7 +82,9 @@ func _ready() -> void:
  arena=Node2D.new()
  add_child(arena)
  if boss_mode:
-  arena.add_child(SoulRealmArt.new())
+  realm_art=SoulRealmArt.new()
+  realm_art.theme_id=str(MissionDefs.get_def(mission_id).get("realm",""))
+  arena.add_child(realm_art)
  else:
   arena.add_child(ArenaArt.new())
  dim_rect=ColorRect.new()
@@ -92,6 +105,8 @@ func _ready() -> void:
  hero.position=Vector2(400,450)
  arena.add_child(hero)
  waves=wave_defs()
+ if boss_mode:
+  support_events=MissionDefs.get_def(mission_id).get("support",[]).duplicate(true)
  spawn_foe(waves[0])
  telegraph_art=load("res://scripts/combat/telegraph.gd").new()
  telegraph_art.battle=self
@@ -205,7 +220,37 @@ func _ready() -> void:
   Sound.loop("realm")
  else:
   Sound.stop_loop()
+ if boss_mode and not MissionDefs.get_def(mission_id).get("whispers",[]).is_empty():
+  play_whispers(MissionDefs.get_def(mission_id).whispers)
+ else:
+  boss_intro()
+func play_whispers(lines:Array) -> void:
+ # Brief cinematic: one whisper per synced resonator memory, then the normal wave card. Controls stay locked until it ends.
+ whisper_label=UI.label(self,"",Vector2(190,300),30,Color("e4d8ff"),900)
+ whisper_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+ UI.outline(whisper_label,8)
+ whisper_label.modulate.a=0
+ intro_card.modulate.a=0
+ intro_sub.modulate.a=0
+ intro=lines.size()*1.7+1.5
+ cinematic_bars(lines.size()*1.7)
+ whisper_tween=create_tween()
+ for line in lines:
+  whisper_tween.tween_callback(func(): whisper_label.text=str(line.who)+"\n"+str(line.text))
+  whisper_tween.tween_property(whisper_label,"modulate:a",1.0,0.35)
+  whisper_tween.tween_interval(0.95)
+  whisper_tween.tween_property(whisper_label,"modulate:a",0.0,0.35)
+ whisper_tween.tween_callback(end_whispers)
+func end_whispers() -> void:
+ if is_instance_valid(whisper_tween):
+  whisper_tween.kill()
+ if is_instance_valid(whisper_label):
+  whisper_label.modulate.a=0.0
+ intro=0.8
  boss_intro()
+func skip_whispers() -> void:
+ if is_instance_valid(whisper_tween) and whisper_tween.is_valid() and whisper_tween.is_running():
+  end_whispers()
 func boss_intro(card_text:String="", card_sub:String="") -> void:
  if card_text!="":
   intro_card.text=card_text
@@ -243,6 +288,16 @@ func spawn_foe(def:Dictionary) -> void:
  if def.look=="shade":
   # Sprite art when present (world height 185 = about 10% taller than the Hero); the procedural rig stays as fallback.
   foe.load_sprite_set("res://assets/enemies/resonance_shade/frames.tres",185.0,Color("b46bff"))
+ elif def.look=="cantor":
+  # Hollow Cantor: its own frames.tres when delivered (assets/enemies/hollow_cantor), otherwise the approved interim Resonance Shade
+  # sprite with a rain-white/violet tint. Combat logic is identical either way.
+  var art=resolve_enemy_frames(def)
+  foe.cantor=true
+  foe.temp_art=art.temporary
+  if art.path!="":
+   foe.load_sprite_set(art.path,float(def.get("height",185.0)),def.accent)
+   if art.temporary and foe.sprite!=null:
+    foe.sprite.modulate=def.get("fallback_tint",Color(0.86,0.82,1.12))
  elif def.look=="warped":
   # Soul-Warped Enforcer sprite art; world height 180 x node scale 1.2 stands about 1.3x the Hero. Orange fire VFX for missing attack frames.
   foe.load_sprite_set("res://assets/enemies/enforcer/frames.tres",180.0,Color("ff8a2a"))
@@ -254,9 +309,15 @@ func spawn_foe(def:Dictionary) -> void:
  current.defeated.connect(on_foe_defeated.bind(current))
  phase=1
  telegraph=-1.0
- telegraph_len=0.8
- recovery=1.0
- enemy_wait=1.5
+ # Per-wave pacing comes from mission data; the defaults are the original values every Episode 1 wave uses.
+ var pace=def.get("pace",{})
+ telegraph_len=float(pace.get("telegraph",0.8))
+ recovery=float(pace.get("recovery",1.0))
+ enemy_wait=float(pace.get("wait",1.5))
+ foe_speed=float(pace.get("move",170.0))
+ telegraph_radius=float(pace.get("radius",100.0))
+ telegraph_style=str(pace.get("style",""))
+ phase2_def={}
  if is_instance_valid(foe_name_label):
   foe_name_label.text=def.name
   foe_sub_label.text=def.sub
@@ -278,12 +339,22 @@ func spawn_foe(def:Dictionary) -> void:
 func hint(keys:String, touch:String) -> String:
  # Keyboard hints on desktop, plain wording on touch devices.
  return touch if DisplayServer.is_touchscreen_available() else keys
+static func resolve_enemy_frames(def:Dictionary, exists:Callable=Callable()) -> Dictionary:
+ # {"path","temporary"}: the dedicated frames when that resource exists, else the approved interim sprite (temporary=true).
+ var check=func(path:String) -> bool: return ResourceLoader.exists(path) if not exists.is_valid() else bool(exists.call(path))
+ var own=str(def.get("frames",""))
+ if own!="" and check.call(own):
+  return {"path":own,"temporary":false}
+ var fallback=str(def.get("fallback_frames",""))
+ if fallback!="" and check.call(fallback):
+  return {"path":fallback,"temporary":true}
+ return {"path":"","temporary":true}
 func foe_accent(def:Dictionary) -> Color:
- return Color("b46bff") if def.look=="shade" else Color("ff8a2a")
+ return def.get("hud",Color("b46bff") if def.look=="shade" else Color("ff8a2a"))
 func hud_phase_two() -> void:
- # HUD transition: foe panel, bar and tag turn Phase 2 red, sub-title reads SOUL ASCENDED.
- var red=Color("ff4f72")
- foe_sub_label.text="SOUL ASCENDED"
+ # HUD transition: foe panel, bar and tag turn Phase 2 red (or the mission's own accent), sub-title reads SOUL ASCENDED.
+ var red=phase2_def.get("accent",Color("ff4f72"))
+ foe_sub_label.text=str(phase2_def.get("hud_sub","SOUL ASCENDED"))
  foe_sub_label.add_theme_color_override("font_color",red)
  enemy_hp.color=red
  enemy_hp.tick=-1.0
@@ -300,6 +371,9 @@ func hud_phase_two() -> void:
 func on_foe_defeated(defeated_foe:Fighter) -> void:
  if defeated_foe!=foe or ended:
   return
+ var codex_id=str(waves[wave].get("codex_on_defeat",""))
+ if codex_id!="" and Profile.unlock_codex(codex_id):
+  status.text="CODEX UPDATED  /  "+codex_id.replace("_"," ").to_upper()
  if wave+1<waves.size():
   next_wave()
  else:
@@ -333,8 +407,8 @@ func transform_foe() -> void:
  foe.form_t=0.05
  enemy_wait=maxf(enemy_wait,0.5)
  Engine.time_scale=0.25
- dim_rect.color=Color(0.1,0.0,0.03,0.0)
- flash_rect.color=Color(1,0.1,0.2,0.55)
+ dim_rect.color=phase2_def.get("dim",Color(0.1,0.0,0.03,0.0))
+ flash_rect.color=phase2_def.get("flash",Color(1,0.1,0.2,0.55))
  shake=10
  get_tree().create_timer(1.5,true,false,true).timeout.connect(restore_time)
 func _exit_tree() -> void:
@@ -356,10 +430,14 @@ func update_transform(delta:float) -> void:
   transform_revealed=true
   restore_time()
   if is_instance_valid(f):
-   f.set_boss_form(boss_frames_path)
+   var tint=phase2_def.get("tint",Color(1.12,0.58,0.55))
+   if phase2_def.has("tint") and not f.temp_art:
+    tint=Color.WHITE
+   f.set_boss_form(str(phase2_def.get("frames",boss_frames_path)),180.0,tint)
    f.burst_t=1.0
    f.scale=Vector2(f.scale.x*0.95,f.scale.y*0.95)
-   create_tween().tween_property(f,"scale",Vector2(boss_scale,boss_scale),0.25)
+   var end_scale=float(phase2_def.get("scale",boss_scale))
+   create_tween().tween_property(f,"scale",Vector2(end_scale,end_scale),0.25)
    sparks.burst(f.position-Vector2(0,90),true)
   flash_rect.color=Color(1,0.7,0.75,0.7)
   create_tween().tween_property(flash_rect,"color:a",0.0,0.35)
@@ -375,28 +453,67 @@ func update_transform(delta:float) -> void:
     f.burst_t=0.0
    transform_clock=-1.0
 func enter_phase_two() -> void:
+ # Phase 2 data comes from the wave (missing = the original Episode 1 values). The transition runs once per foe (phase flag + transform_count).
+ phase2_def=waves[wave].get("phase2",{})
  phase=2
- foe.attack=36
- telegraph_len=0.62
- recovery=0.65
+ foe.attack=phase2_def.get("atk",36)
+ telegraph_len=float(phase2_def.get("telegraph",0.62))
+ recovery=float(phase2_def.get("recovery",0.65))
+ telegraph_radius=float(phase2_def.get("radius",telegraph_radius))
  foe.aura=true
- foe.aura_color=Color("ff4f72")
+ foe.form_color=phase2_def.get("accent",Color("ff4f72"))
+ foe.aura_color=foe.form_color
+ if phase2_def.has("rain") and is_instance_valid(realm_art):
+  realm_art.set_rain(float(phase2_def.rain))
  transform_foe()
  hud_phase_two()
- intro_card.text="PHASE 2"
- intro_sub.text="SOUL ASCENDED  /  ATTACKS FASTER AND HIT HARDER"
+ run_support("phase2")
+ intro_card.text=str(phase2_def.get("banner","PHASE 2"))
+ intro_sub.text=str(phase2_def.get("sub","SOUL ASCENDED  /  ATTACKS FASTER AND HIT HARDER"))
  intro_card.modulate.a=1
  intro_sub.modulate.a=1
  var tween=create_tween()
  tween.tween_interval(1.1)
  tween.tween_property(intro_card,"modulate:a",0.0,0.4)
  tween.parallel().tween_property(intro_sub,"modulate:a",0.0,0.4)
- flash_rect.color=Color(1,0.3,0.4,0.5)
+ flash_rect.color=phase2_def.get("flash",Color(1,0.3,0.4,0.5))
  create_tween().tween_property(flash_rect,"color:a",0.0,0.5)
  cinematic_bars(0.9)
  shake=12
- status.text="PHASE 2  /  SOUL ASCENDED"
+ status.text=("PHASE 2  /  "+str(phase2_def.hud_sub)) if phase2_def.has("hud_sub") else "PHASE 2  /  SOUL ASCENDED"
  Sound.play("hurt")
+func run_support(trigger:String) -> Array:
+ # Reusable support hook: mission data lists one-shot events {id, trigger, heal_pct, who, line, cue}. Each fires at most once per battle
+ # and never revives a defeated Hero or heals past max health.
+ var fired=[]
+ for event in support_events:
+  if str(event.get("trigger",""))!=trigger or support_fired.has(event.id):
+   continue
+  support_fired[event.id]=true
+  var healed=BattleSupport.apply_heal(hero,event)
+  fired.append({"id":event.id,"healed":healed})
+  if ended or hero.dead:
+   continue
+  show_support(event,healed)
+ return fired
+func show_support(event:Dictionary, healed:int) -> void:
+ var fx=load("res://scripts/combat/support_fx.gd").new()
+ hero.add_child(fx)
+ support_cues.append(event.id)
+ Sound.play("win")
+ flash_rect.color=Color(1.0,0.92,0.6,0.35)
+ create_tween().tween_property(flash_rect,"color:a",0.0,0.5)
+ if healed>0:
+  damage_number(hero.position,healed,false,Color("8cf0c0"))
+ if not is_instance_valid(radio_label):
+  radio_label=UI.label(self,"",Vector2(260,306),20,Color("f7e3a0"),760)
+  radio_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+  UI.outline(radio_label,6)
+ radio_label.text=str(event.get("who","SUPPORT"))+"\n"+str(event.get("line",""))
+ radio_label.modulate.a=1.0
+ var tween=create_tween()
+ tween.tween_interval(3.2)
+ tween.tween_property(radio_label,"modulate:a",0.0,0.5)
 func request_retreat() -> void:
  if ended:
   return
@@ -511,7 +628,9 @@ func _process(delta:float) -> void:
   telegraph-=delta
   if telegraph<=0:
    foe.swing=0.4
-   if hero.position.distance_to(target)<100:
+   if telegraph_style=="bell":
+    Sound.play("special")
+   if hero.position.distance_to(target)<telegraph_radius:
     hero.receive(foe.attack)
    enemy_wait=recovery
    telegraph=-1
@@ -521,10 +640,12 @@ func _process(delta:float) -> void:
   var distance=foe.position.distance_to(hero.position)
   if distance>110:
    foe.moving=true
-   foe.position+=foe.position.direction_to(hero.position)*170*delta
+   foe.position+=foe.position.direction_to(hero.position)*foe_speed*delta
   else:
    telegraph=telegraph_len
    target=hero.position
+   if telegraph_style=="bell":
+    Sound.play("tap")
  telegraph_art.queue_redraw()
 func act(kind:String) -> void:
  if ended or intro>0 or hero.stun>0 or kind=="block":

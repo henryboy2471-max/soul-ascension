@@ -10,13 +10,19 @@ var synced:Array=[]
 var progress:Dictionary={}
 func load_progress() -> void:
  progress=Profile.mission_progress(mission_id).duplicate(true)
+ progress.erase("combat_run")
+ progress.erase("battle_won")
  synced=[]
  for id in progress.get("resonators",[]):
   if RES_IDS.has(id) and not synced.has(id):
    synced.append(id)
 func save_progress() -> void:
+ # Only this scene's own keys are written; keys owned by the battle (combat_run, battle_won) are kept as the profile holds them.
  progress["resonators"]=synced.duplicate()
- Profile.set_mission_progress(mission_id,progress)
+ var stored=Profile.mission_progress(mission_id).duplicate(true)
+ for key in progress:
+  stored[key]=progress[key]
+ Profile.set_mission_progress(mission_id,stored)
 func run_intro() -> void:
  load_progress()
  if progress.get("intro",false):
@@ -44,10 +50,20 @@ func lantern_config() -> Dictionary:
    {"id":"res_c","x":RES_X[2],"label":"HOLD  /  SYNC RESONATOR","kind":"channel","range":120.0},
    {"id":"notice","x":LanternArt.NOTICE_X,"label":"READ  /  MERIDIAN NOTICE","kind":"talk","range":110.0},
    {"id":"gate","x":LanternArt.GATE_X,"label":"READ  /  ROOF GATE","kind":"talk","range":130.0},
-   {"id":"array","x":LanternArt.ARRAY_X,"label":"HOLD  /  SYNC RAIN ARRAY","kind":"channel","range":130.0}
+   {"id":"array","x":LanternArt.ARRAY_X,"label":"HOLD  /  SYNC RAIN ARRAY","kind":"channel","range":130.0},
+   {"id":"breach","x":LanternArt.ARRAY_X,"label":breach_label(),"kind":"talk","range":130.0}
   ],
-  "enabled":{"depot":false,"mira":false,"res_a":false,"res_b":false,"res_c":false,"notice":true,"gate":false,"array":false}
+  "enabled":{"depot":false,"mira":false,"res_a":false,"res_b":false,"res_c":false,"notice":true,"gate":false,"array":false,"breach":false}
  }
+func stored_progress() -> Dictionary:
+ return Profile.mission_progress(mission_id)
+func breach_label() -> String:
+ var stored=stored_progress()
+ if stored.get("battle_won",false):
+  return "THE BREACH  /  QUIET"
+ if stored.get("combat_run",false):
+  return "RESUME  /  THE BREACH  ·  ENERGY PAID"
+ return "ENTER  /  THE BREACH  ·  %d ENERGY" % MissionDefs.energy_cost(mission_id)
 func begin_explore() -> void:
  explore=Explore.new()
  explore.config=lantern_config()
@@ -66,6 +82,8 @@ func begin_explore() -> void:
   target=2
  if synced.size()>=3:
   target=3
+  if progress.get("array",false):
+   target=4
  set_step(target)
 func objective_text(n:int) -> String:
  var text=str(mission.objectives[n].text)
@@ -78,7 +96,7 @@ func unsynced_xs() -> Array:
  return xs
 func set_step(n:int) -> void:
  step=n
- for id in ["depot","mira","gate","array"]+RES_IDS:
+ for id in ["depot","mira","gate","array","breach"]+RES_IDS:
   explore.enabled[id]=false
  explore.clear_counter()
  match n:
@@ -102,6 +120,13 @@ func set_step(n:int) -> void:
    explore.props.lantern_state.roof_open=true
    explore.enabled.array=true
    explore.set_objective(objective_text(3),float(mission.objectives[3].x))
+  4:
+   explore.set_gate_locked(false)
+   explore.props.lantern_state.roof_open=true
+   explore.props.breach_open=true
+   explore.props.breach_scale=1.0
+   explore.enabled.breach=true
+   explore.set_objective(objective_text(4),float(mission.objectives[4].x))
 func on_interact(id:String) -> void:
  if busy:
   return
@@ -135,6 +160,9 @@ func on_interact(id:String) -> void:
   "array":
    if step==3:
     await run_array()
+  "breach":
+   if step==4:
+    await enter_breach()
   _:
    if RES_IDS.has(id) and step==2 and not synced.has(id):
     await sync_resonator(id)
@@ -174,5 +202,22 @@ func run_array() -> void:
  save_progress()
  var breach=mission.breach_card
  await card(breach.kicker,breach.title,breach.subtitle,false,breach.length)
- # M2 ends at the breach-opening transition: back to the menu (the battle follows in M3).
- exit_requested.emit()
+ # The breach stays open: exploration is free, and the player decides when to step through.
+ set_step(4)
+func enter_breach() -> void:
+ var stored=stored_progress()
+ if stored.get("battle_won",false):
+  await say(Episode2Data.BREACH_QUIET)
+  return
+ Economy.regenerate(Profile.data,int(Time.get_unix_time_from_system()))
+ var prompt=BreachPrompt.new()
+ prompt.setup(MissionDefs.energy_cost(mission_id),int(Profile.data.energy),bool(stored.get("combat_run",false)))
+ add_child(prompt)
+ var go=await prompt.decided
+ prompt.queue_free()
+ if not go:
+  return
+ # Energy is charged inside request_battle (Profile.begin_run) and only on success. When energy is short the shared recharge
+ # screen opens over this scene and nothing here changes: resonators, the open breach and the saved progress stay intact.
+ if request_battle.is_valid():
+  request_battle.call()
