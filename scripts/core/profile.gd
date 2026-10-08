@@ -71,18 +71,35 @@ func mark_combat_run(id:String, active:bool) -> void:
  if not data.get("mission_progress") is Dictionary:
   data["mission_progress"]={}
  data.mission_progress[id]=progress
-# Ends an active run without rewards or completion (used while a mission's ending is still pending).
-func end_run_pending(won:bool) -> void:
- if active_run=="":
+# The boss fell: the paid run is over (combat_run cleared, saved) and the ending is pending. Rewards and completion come only from
+# finish_run, after the ending sequence. The run stays open in memory so finish_run can settle it.
+func mark_battle_won(id:String) -> void:
+ if active_run!=id:
   return
- var id=active_run
- active_run=""
  mark_combat_run(id,false)
- if won:
-  var progress=mission_progress(id).duplicate(true)
-  progress["battle_won"]=true
-  data.mission_progress[id]=progress
+ var progress=mission_progress(id).duplicate(true)
+ progress["battle_won"]=true
+ data.mission_progress[id]=progress
  persist()
+# Reload/resume while the ending is pending: reopens the (already paid) run so finish_run can settle it. Never charges energy.
+func begin_ending(id:String) -> bool:
+ if active_run!="" or data.completed.has(id) or not bool(mission_progress(id).get("battle_won",false)):
+  return false
+ active_run=id
+ return true
+func ending_pending(id:String) -> bool:
+ return bool(mission_progress(id).get("battle_won",false)) and not data.completed.has(id)
+# Win bookkeeping for story missions that track an ending: the pending flag is consumed and the story flags are recorded.
+func settle_story(id:String) -> void:
+ var progress=mission_progress(id).duplicate(true)
+ if not progress.has("battle_won"):
+  return
+ progress.erase("battle_won")
+ var flags=progress.get("flags",{}).duplicate(true)
+ for key in MissionDefs.get_def(id).get("story_flags",{}):
+  flags[key]=MissionDefs.get_def(id).story_flags[key]
+ progress["flags"]=flags
+ data.mission_progress[id]=progress
 func finish_run(won:bool) -> Dictionary:
  if active_run=="":
   return {}
@@ -90,6 +107,8 @@ func finish_run(won:bool) -> Dictionary:
  active_run=""
  mark_combat_run(id,false)
  var reward={"xp":0,"gold":0,"levels":0,"first":false,"id":id}
+ if won:
+  settle_story(id)
  if won:
   reward.first=not data.completed.has(id)
   var amounts=MissionDefs.reward(id,reward.first)

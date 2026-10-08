@@ -53,6 +53,25 @@ const ARRAY = [
  {"who":"PLAYER","text":"Then I'll tune it back."},
  {"who":"ARRAY","text":"Resonance channel opening. Soul Realm breach detected."}
 ]
-const BREACH_QUIET = [
- {"who":"NARRATOR","text":"The breach is quiet. The rain still hums, but the voice that was tuning it has stopped."}
+# --- Ending (M4). Realm: the Cantor has fallen and the Soul Realm calms. Return: the Lantern Quarter, rain settling, breach closing.
+const ENDING_REALM = [
+ {"who":"NARRATOR","text":"The bell stops. The rain does not fall so much as settle, and the Soul Realm goes very still."},
+ {"who":"MIRA","text":"Echo. Say something. Your signal went quiet and I thought..."},
+ {"who":"PLAYER","text":"I'm here. It wasn't a monster, Mira. It sounded like all of them at once: every sleeper, one voice, one bell."},
+ {"who":"MIRA","text":"The resonators held. Three lanterns, still lit. They didn't stop it. They gave the sleepers somewhere to stand while you cut it loose."},
+ {"who":"PLAYER","text":"Somebody wrote that chorus. Somebody taught the Soul Realm what to sing."},
+ {"who":"MIRA","text":"Rain Array 7. Think about the number. Seven means six more. This was never just the Lantern Quarter."},
+ {"who":"PLAYER","text":"Then we follow the signal. All of it."},
+ {"who":"MIRA","text":"Come home first. The breach won't stay open for long, and the sleepers are going to wake up wanting to know who is still humming."}
+]
+const ENDING_RETURN_A = [
+ {"who":"NARRATOR","text":"The breach folds shut behind them like an eyelid. The rain settles to a thin violet mist. It is still falling."},
+ {"who":"SLEEPER","text":"...The voice stopped. Why does it feel like it's still listening?"},
+ {"who":"PELL","text":"Depot 4 to Mira. Pulses are back to normal, every one of them. But the Meridian screens across the quarter just came alive."}
+]
+const ENDING_RETURN_B = [
+ {"who":"VAUST","text":"Citizens of Neon District. A Resonance Amnesty is now in effect. Register within forty-eight hours. Unregistered resonance will be suppressed."},
+ {"who":"REGISTRY","text":"1 ASCENDANT FLAGGED  /  SIGNATURE: ECHO."},
+ {"who":"MIRA","text":"...They have your name already."},
+ {"who":"PLAYER","text":"Then they've been listening a lot longer than the rain."}
 ]

@@ -6,9 +6,10 @@ var width=1280.0
 var time=0.0
 var breach_open=false
 var breach_scale=0.0
+var breach_closing=false
 var terminal_done=false
 # Lantern Quarter state (read by LanternArt): resonators synced in order [a,b,c], roof gate open.
-var lantern_state:Dictionary={"synced":[false,false,false],"roof_open":false}
+var lantern_state:Dictionary={"synced":[false,false,false],"roof_open":false,"rain":1.0,"calm":false,"broadcast":0.0}
 var bake=true
 const GROUND_TOP = 470.0
 const STATIC_KINDS = ["sky","far","mid","near","ground"]
@@ -38,7 +39,10 @@ func _process(delta:float) -> void:
  if kind=="props" or kind=="fore":
   if not Profile.data.settings.get("reduced_motion",false):
    time+=delta
-  if breach_open:
+  if breach_open and breach_closing:
+   # the breach folds shut (Episode 2 ending)
+   breach_scale=maxf(0.0,breach_scale-delta*0.4)
+  elif breach_open:
    breach_scale=minf(1.0,breach_scale+delta*0.9)
   queue_redraw()
 func _draw() -> void:

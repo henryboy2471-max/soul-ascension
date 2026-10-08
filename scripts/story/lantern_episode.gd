@@ -59,8 +59,6 @@ func stored_progress() -> Dictionary:
  return Profile.mission_progress(mission_id)
 func breach_label() -> String:
  var stored=stored_progress()
- if stored.get("battle_won",false):
-  return "THE BREACH  /  QUIET"
  if stored.get("combat_run",false):
   return "RESUME  /  THE BREACH  ·  ENERGY PAID"
  return "ENTER  /  THE BREACH  ·  %d ENERGY" % MissionDefs.energy_cost(mission_id)
@@ -206,9 +204,6 @@ func run_array() -> void:
  set_step(4)
 func enter_breach() -> void:
  var stored=stored_progress()
- if stored.get("battle_won",false):
-  await say(Episode2Data.BREACH_QUIET)
-  return
  Economy.regenerate(Profile.data,int(Time.get_unix_time_from_system()))
  var prompt=BreachPrompt.new()
  prompt.setup(MissionDefs.energy_cost(mission_id),int(Profile.data.energy),bool(stored.get("combat_run",false)))
@@ -221,3 +216,80 @@ func enter_breach() -> void:
  # screen opens over this scene and nothing here changes: resonators, the open breach and the saved progress stay intact.
  if request_battle.is_valid():
   request_battle.call()
+
+# ---------------- Ending (M4): calm Soul Realm -> Lantern Quarter aftermath -> completed (main then pays the rewards) ----------------
+func aftermath_config() -> Dictionary:
+ var cfg=lantern_config()
+ cfg["start_px"]=2480.0
+ cfg["npc_x"]=2400.0
+ cfg["walker_count"]=1
+ # the sleepers turn toward the stair; nobody is cheering
+ var turned=[]
+ for sleeper in cfg.sleepers:
+  turned.append({"x":sleeper.x,"facing":1})
+ cfg["sleepers"]=turned
+ for id in cfg.enabled:
+  cfg.enabled[id]=false
+ return cfg
+func fade_rect() -> ColorRect:
+ var rect=ColorRect.new()
+ rect.color=Color(0.0,0.0,0.02,1.0)
+ rect.size=Vector2(1280,720)
+ rect.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ add_child(rect)
+ return rect
+func fade_to(rect:ColorRect, alpha:float, seconds:float) -> void:
+ var tween=create_tween()
+ tween.tween_property(rect,"color:a",alpha,seconds)
+ await tween.finished
+func set_all_art(explore_node:Explore, key:String, value) -> void:
+ for art in explore_node.layers+[explore_node.props,explore_node.fore]:
+  art.lantern_state[key]=value
+func run_ending() -> void:
+ load_progress()
+ for id in mission.ending.codex:
+  Profile.unlock_codex(id)
+ var black=fade_rect()
+ # --- part 1: the Soul Realm goes quiet ---
+ Sound.stop_loop()
+ var stage=RealmCalm.new()
+ add_child(stage)
+ move_child(black,get_child_count()-1)
+ await fade_to(black,0.0,1.2)
+ stage.start_calm()
+ Sound.play("tap")
+ await get_tree().create_timer(1.4).timeout
+ Sound.play("tap")
+ await get_tree().create_timer(1.2).timeout
+ Sound.loop("realm")
+ await say(Episode2Data.ENDING_REALM)
+ await fade_to(black,1.0,0.9)
+ stage.queue_free()
+ # --- part 2: back in the Lantern Quarter: rain settling, resonators steady, the breach folding shut ---
+ explore=Explore.new()
+ explore.config=aftermath_config()
+ add_child(explore)
+ move_child(black,get_child_count()-1)
+ Sound.stop_loop()
+ explore.set_cinematic(true)
+ for i in range(3):
+  explore.props.lantern_state.synced[i]=true
+ set_all_art(explore,"roof_open",true)
+ set_all_art(explore,"calm",true)
+ set_all_art(explore,"rain",0.45)
+ explore.props.breach_open=true
+ explore.props.breach_scale=1.0
+ explore.player.facing=-1
+ await fade_to(black,0.0,1.1)
+ explore.props.breach_closing=true
+ await get_tree().create_timer(0.6).timeout
+ await say(Episode2Data.ENDING_RETURN_A)
+ # the Meridian screens wake up across the quarter
+ Sound.play("hurt")
+ explore.pulse_flash(Color(1.0,0.45,0.55))
+ var tween=create_tween()
+ tween.tween_method(func(k): set_all_art(explore,"broadcast",k),0.0,1.0,0.8)
+ await tween.finished
+ await say(Episode2Data.ENDING_RETURN_B)
+ await fade_to(black,1.0,1.3)
+ completed.emit()

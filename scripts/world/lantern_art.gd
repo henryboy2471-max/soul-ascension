@@ -76,7 +76,9 @@ func draw_ground() -> void:
   draw_set_transform(Vector2.ZERO,0,Vector2.ONE)
 func draw_props() -> void:
  var font=ThemeDB.fallback_font
- var pulse=0.5+0.5*sin(time*3.0)
+ var calm=bool(lantern_state.get("calm",false))
+ # after the ending the resonators hold a steady, quiet glow instead of pulsing
+ var pulse=0.35 if calm else 0.5+0.5*sin(time*3.0)
  var synced=lantern_state.synced
  # Depot 4: a drained tram shed with an open doorway and warm interior light
  var dx=380.0
@@ -114,7 +116,7 @@ func draw_props() -> void:
   if lit:
    draw_colored_polygon(PackedVector2Array([Vector2(rx-8,GROUND_TOP-140),Vector2(rx+8,GROUND_TOP-140),Vector2(rx+70,GROUND_TOP+60),Vector2(rx-70,GROUND_TOP+60)]),Color(0.6,0.95,1.0,0.06))
   for k in range(3):
-   draw_arc(Vector2(rx,GROUND_TOP-164),22+k*9+(fposmod(time*14.0,9.0) if lit else 0.0),0,TAU,24,Color(core,0.25-k*0.06),2)
+   draw_arc(Vector2(rx,GROUND_TOP-164),22+k*9+(fposmod(time*14.0,9.0) if lit and not calm else 0.0),0,TAU,24,Color(core,0.25-k*0.06),2)
  # Meridian maintenance notice
  draw_rect(Rect2(NOTICE_X-5,GROUND_TOP-30,10,60),Color(0.09,0.1,0.18))
  draw_rect(Rect2(NOTICE_X-58,GROUND_TOP-92,116,66),Color(0.04,0.06,0.13))
@@ -148,7 +150,8 @@ func draw_props() -> void:
  draw_rect(Rect2(ax-36,GROUND_TOP-58,72,44),screen_color,false,2)
  for g in range(3):
   draw_circle(Vector2(ax,GROUND_TOP-36),60-g*14,Color(screen_color,0.04+0.02*pulse))
- if breach_open:
+ draw_broadcast_screens(font)
+ if breach_open and breach_scale>0.01:
   var bc=Vector2(ax+10,GROUND_TOP-30)
   var s=breach_scale
   for g in range(6):
@@ -164,14 +167,28 @@ func draw_props() -> void:
   draw_set_transform(bc,0,Vector2(0.6,1))
   draw_circle(Vector2.ZERO,38*s,Color(0.9,0.85,1.0,0.35+0.2*pulse))
   draw_set_transform(Vector2.ZERO,0,Vector2.ONE)
+func draw_broadcast_screens(font:Font) -> void:
+ # Meridian screens on the facades light up with the Amnesty broadcast (ending only; broadcast stays 0 during play).
+ var b=float(lantern_state.get("broadcast",0.0))
+ if b<=0.01:
+  return
+ for sx in [1640.0,2230.0]:
+  var flick=0.75+0.25*sin(time*23.0+sx)
+  draw_rect(Rect2(sx-115,GROUND_TOP-330,230,96),Color(0.05,0.02,0.05,0.9*b))
+  draw_rect(Rect2(sx-115,GROUND_TOP-330,230,96),Color(1.0,0.35,0.45,0.9*b*flick),false,3)
+  draw_rect(Rect2(sx-115,GROUND_TOP-330,230,96),Color(1.0,0.2,0.3,0.12*b*flick))
+  draw_string(font,Vector2(sx-109,GROUND_TOP-296),"RESONANCE AMNESTY",HORIZONTAL_ALIGNMENT_CENTER,218,17,Color(1.0,0.85,0.88,b*flick))
+  draw_string(font,Vector2(sx-109,GROUND_TOP-270),"REGISTER  48:00:00",HORIZONTAL_ALIGNMENT_CENTER,218,15,Color(1.0,0.5,0.58,b*flick))
+  draw_circle(Vector2(sx,GROUND_TOP-170),150.0*b,Color(1.0,0.3,0.4,0.05*b))
 func draw_fore() -> void:
  # heavier violet rain: more streaks, violet tint, two speeds, plus splash ripples on the ground
+ var rain=float(lantern_state.get("rain",1.0))
  if not Profile.data.settings.get("reduced_motion",false):
-  for i in range(90):
+  for i in range(int(90*rain)):
    var x=fmod(i*97.3-time*90+6000,1340)-30
    var y=fmod(i*53.7+time*(620+(i%3)*80)+i*11,780)-30
-   draw_line(Vector2(x,y),Vector2(x-9,y+26),Color(0.72,0.55,1.0,0.2 if i%2==0 else 0.12),1.5)
-  for i in range(14):
+   draw_line(Vector2(x,y),Vector2(x-9,y+26),Color(0.72,0.55,1.0,(0.2 if i%2==0 else 0.12)*clampf(rain+0.3,0.0,1.0)),1.5)
+  for i in range(int(14*rain)):
    var rx=fmod(i*131.0+time*20.0,1280.0)
    var phase=fmod(time*1.6+i*0.37,1.0)
    draw_set_transform(Vector2(rx,590+(i%4)*28),0,Vector2(1,0.25))

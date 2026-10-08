@@ -308,16 +308,13 @@ func run() -> void:
  var xp0=int(profile.data.xp)
  battle.foe.receive(1000000.0)
  var guard=0
- while main.scene_name!="battle_complete" and guard<400:
+ while main.scene_name!="ending" and guard<400:
   await create_timer(0.1).timeout
   guard+=1
- check(main.scene_name=="battle_complete","Cantor defeat hands off to the temporary battle-complete screen")
+ check(main.scene_name=="ending","Cantor defeat hands off to the Episode 2 ending sequence")
  check(profile.data.codex.has("hollow_cantor"),"Defeating the Hollow Cantor unlocks Codex entry hollow_cantor")
- t=[]
- texts(main,t)
- check(t.has("BATTLE COMPLETE") and t.has("ENDING PENDING"),"Battle complete / ending pending screen")
  check(int(profile.data.gold)==gold0 and int(profile.data.xp)==xp0 and not profile.data.completed.has("1-2"),"No rewards or completion yet (those belong to M4)")
- check(profile.active_run=="" and not profile.mission_progress("1-2").has("combat_run") and profile.mission_progress("1-2").get("battle_won",false) and profile.mission_progress("1-2").resonators.size()==3,"Run closed cleanly; Lantern Quarter progress kept")
+ check(not profile.mission_progress("1-2").has("combat_run") and profile.mission_progress("1-2").get("battle_won",false) and profile.mission_progress("1-2").resonators.size()==3,"Paid run is closed (combat_run cleared), battle_won saved, Lantern Quarter progress kept")
  main.show_codex()
  await process_frame
  t=[]

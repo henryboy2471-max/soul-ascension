@@ -10,7 +10,9 @@ const SPEAKERS = {
  "PELL":{"name":"PELL  /  DEPOT RADIO","color":Color("6fd7e4"),"portrait":"none"},
  "SLEEPER":{"name":"A SLEEPER","color":Color("bd95ff"),"portrait":"none"},
  "GATE":{"name":"ROOF GATE","color":Color("ff8597"),"portrait":"none"},
- "ARRAY":{"name":"RAIN ARRAY 7","color":Color("bd95ff"),"portrait":"none"}
+ "ARRAY":{"name":"RAIN ARRAY 7","color":Color("bd95ff"),"portrait":"none"},
+ "VAUST":{"name":"DIRECTOR VAUST  /  MERIDIAN BROADCAST","color":Color("ff8597"),"portrait":"none"},
+ "REGISTRY":{"name":"MERIDIAN REGISTRY","color":Color("ff8597"),"portrait":"none"}
 }
 const INTRO = [
  {"who":"NARRATOR","text":"Twenty-one years ago, the sky fractured. The light it left behind rewrote what people could become. They called it Aether."},

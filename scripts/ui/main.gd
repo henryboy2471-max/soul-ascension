@@ -212,9 +212,13 @@ func start_episode(mission_id:String="1-1") -> void:
   var locked=MissionDefs.get_def(mission_id)
   planned("EPISODE LOCKED","Clear the previous episode to unlock "+str(locked.get("number","this episode")).capitalize()+": "+str(locked.get("title_case","")),"LOCKED","")
   return
+ current_mission=mission_id
+ if MissionDefs.get_def(mission_id).get("flow","district")=="lantern" and Profile.begin_ending(mission_id):
+  # The boss was already beaten and paid for but the ending never finished (reload): resume the ending, no energy, no fight.
+  show_lantern_ending()
+  return
  clear_screen()
  scene_name="episode"
- current_mission=mission_id
  var episode=LanternEpisode.new() if MissionDefs.get_def(mission_id).get("flow","district")=="lantern" else Episode.new()
  episode.mission_id=mission_id
  episode.request_battle=func(): return start_battle(true,mission_id)
@@ -222,27 +226,22 @@ func start_episode(mission_id:String="1-1") -> void:
  screen.add_child(episode)
 func on_battle_finished(won:bool, from_episode:bool) -> void:
  if won and from_episode and MissionDefs.get_def(current_mission).get("flow","district")=="lantern":
-  show_battle_complete()
+  Profile.mark_battle_won(current_mission)
+  show_lantern_ending()
  elif won and from_episode:
   show_ending()
  else:
   show_result(won)
-func show_battle_complete() -> void:
- # Temporary hand-off after the Hollow Cantor falls: the Episode 2 ending, rewards and teaser are not wired yet, so no rewards are
- # paid and the mission is not marked complete. The run ends cleanly and the saved Lantern Quarter progress is kept.
+func show_lantern_ending() -> void:
+ # Episode 2 ending: calm Soul Realm -> Lantern Quarter aftermath. The mission is completed (and paid) only when it finishes.
  Sound.stop_loop()
- Profile.end_run_pending(true)
  clear_screen()
- scene_name="battle_complete"
- backdrop()
- UI.panel(screen,Rect2(283,150,714,380),Color(0.025,0.035,0.075,0.96),Color(UI.VIOLET,0.7))
- UI.trim(screen,Rect2(283,150,714,380),UI.VIOLET)
- UI.chip(screen,"SOUL REALM  /  THE SLEEPERS' STAIR",Rect2(325,186,330,26),UI.VIOLET,13)
- UI.label(screen,"BATTLE COMPLETE",Vector2(324,226),48)
- UI.label(screen,"The Hollow Cantor's chorus has gone silent.",Vector2(326,296),22,Color("cbd0e2"),620)
- UI.label(screen,"ENDING PENDING",Vector2(326,372),24,UI.GOLD)
- UI.label(screen,"Progress saved locally" if Profile.save_ok else "Save failed — check device storage",Vector2(326,414),15,UI.MUTED if Profile.save_ok else Color("ff7188"))
- UI.button(screen,"HOME",Rect2(325,452,280,56),show_home,true)
+ scene_name="ending"
+ var episode=LanternEpisode.new()
+ episode.mission_id=current_mission
+ episode.phase="ending"
+ episode.completed.connect(func(): show_result(true))
+ screen.add_child(episode)
 func show_ending() -> void:
  clear_screen()
  scene_name="ending"
@@ -269,6 +268,14 @@ func start_battle(from_episode:bool=false, mission_id:String="1-1") -> bool:
  battle.finished.connect(on_battle_finished.bind(from_episode))
  battle.retreat.connect(func(): show_result(false))
  return true
+func show_teaser(teaser:Dictionary) -> void:
+ # NEXT EPISODE card after the rewards, then back to the menu.
+ clear_screen()
+ scene_name="teaser"
+ var card=TitleCard.new()
+ card.setup(teaser.kicker,teaser.number+"  /  "+teaser.title,teaser.subtitle,true,float(teaser.length))
+ screen.add_child(card)
+ card.done.connect(show_home)
 func show_result(won:bool) -> void:
  Sound.stop_loop()
  var reward=Profile.finish_run(won)
@@ -304,10 +311,15 @@ func show_result(won:bool) -> void:
  xp.readout=str(Profile.data.xp)+" / "+str(Progression.required(int(Profile.data.level)))+" XP"
  xp.readout_size=13
  UI.label(screen,"Progress saved locally" if Profile.save_ok else "Save failed — check device storage",Vector2(326,484),15,UI.MUTED if Profile.save_ok else Color("ff7188"))
- UI.button(screen,"HOME",Rect2(325,535,280,65),show_home)
+ var teaser=MissionDefs.get_def(reward.id).ending.teaser
+ if won and MissionDefs.get_def(reward.id).get("flow","district")=="lantern":
+  UI.chip(screen,"CODEX  /  HOLLOW CANTOR",Rect2(584,399,214,26),UI.VIOLET,13)
+  UI.button(screen,"NEXT EPISODE",Rect2(325,535,280,65),func(): show_teaser(teaser),true)
+ else:
+  UI.button(screen,"HOME",Rect2(325,535,280,65),show_home)
  if MissionDefs.get_def(reward.id).battle_only_waves.is_empty():
   # Story-only missions have no standalone battle: return to the open breach (the energy is charged again on entry).
-  UI.button(screen,"RETURN TO THE BREACH  /  %d ENERGY" % MissionDefs.energy_cost(reward.id),Rect2(630,535,316,65),func(): start_episode(reward.id),true)
+  UI.button(screen,"RETURN TO THE BREACH  /  %d ENERGY" % MissionDefs.energy_cost(reward.id),Rect2(630,535,316,65),func(): start_episode(reward.id),not won)
  else:
   UI.button(screen,"REPLAY BATTLE  /  6 ENERGY",Rect2(630,535,316,65),func(): start_battle(false,reward.id),true)
 func show_hero() -> void:

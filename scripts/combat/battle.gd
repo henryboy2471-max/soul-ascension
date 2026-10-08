@@ -371,6 +371,8 @@ func hud_phase_two() -> void:
 func on_foe_defeated(defeated_foe:Fighter) -> void:
  if defeated_foe!=foe or ended:
   return
+ if is_instance_valid(realm_art) and waves[wave].has("phase2"):
+  realm_art.set_rain(0.5)
  var codex_id=str(waves[wave].get("codex_on_defeat",""))
  if codex_id!="" and Profile.unlock_codex(codex_id):
   status.text="CODEX UPDATED  /  "+codex_id.replace("_"," ").to_upper()

@@ -59,6 +59,7 @@ var flash_rect:ColorRect
 var time=0.0
 var lift=0.0
 var floor_fill:ColorRect
+var hud_nodes:Array=[]
 func _ready() -> void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -138,7 +139,9 @@ func _ready() -> void:
  hud_node=Hud.new()
  hud_node.ex=self
  add_child(hud_node)
+ var hud_start=get_child_count()
  build_hud()
+ hud_nodes=get_children().slice(hud_start)
  update_positions(1.0)
  Sound.loop("city")
  flash_rect=ColorRect.new()
@@ -183,6 +186,13 @@ func build_hud() -> void:
  toast_panel.modulate.a=0.0
  move_hint=UI.label(self,"MOVE  /  WASD",Vector2(61,696),16,UI.MUTED)
  act_hint=UI.label(self,"ACT  /  E",Vector2(1110,696),16,UI.MUTED)
+# Cutscene mode: the objective panel, EXIT, toasts and touch hints are hidden and the Hero cannot walk (Episode 2 ending).
+func set_cinematic(on:bool) -> void:
+ for node in hud_nodes:
+  if is_instance_valid(node) and node!=toast_panel:
+   node.visible=not on
+ locked=on
+ act_block=99.0 if on else 0.0
 func set_objective(text:String, x:float) -> void:
  objective_targets=[]
  objective_text=text

@@ -79,8 +79,9 @@ static func defs() -> Dictionary:
      "phase2":{"banner":"THE CHORUS RISES","sub":"THE RAIN BREAKS  /  THE BELL TOLLS FASTER","hud_sub":"THE CHORUS RISES","accent":Color("e4d8ff"),"atk":35.0,"telegraph":0.7,"recovery":0.62,"radius":175.0,"rain":2.2,"scale":1.62,"dim":Color(0.05,0.0,0.14,0.0),"flash":Color(0.85,0.8,1.0,0.55),"tint":Color(0.78,0.72,1.25)}}
    ],
    "battle_only_waves":[],
-   "ending":{"lines":[],"codex":[],"teaser":{"kicker":"NEXT EPISODE","number":"EPISODE 3","title":"THE RELAY KEEPER","subtitle":"TO BE CONTINUED...","length":4.0}},
-   "result":{"won_title":"THE RAIN CLEARS","lost_title":"RISE. TRY AGAIN.","subtitle":"Lantern Quarter  /  Under the violet rain"}
+   "story_flags":{"cantor_defeated":true,"ending_seen":true,"arrays_remaining":6,"amnesty_declared":true},
+   "ending":{"lines":[],"codex":["hollow_cantor"],"teaser":{"kicker":"NEXT EPISODE","number":"EPISODE 3","title":"THE RELAY KEEPER","subtitle":"SIX ARRAYS REMAIN","length":4.4}},
+   "result":{"won_title":"THE CHORUS FALLS SILENT","lost_title":"RISE. TRY AGAIN.","subtitle":"Lantern Quarter  /  Under the violet rain"}
   }
  }
 static func has_mission(id:String) -> bool:
