@@ -63,6 +63,10 @@ func valid(d:Dictionary) -> bool:
   if not d.settings.get(key) is bool: return false
  for id in d.completed:
   if not id is String: return false
+ if d.has("mission_progress"):
+  if not d.mission_progress is Dictionary: return false
+  for id in d.mission_progress:
+   if not id is String or not d.mission_progress[id] is Dictionary: return false
  if d.has("codex"):
   if not d.codex is Array: return false
   for id in d.codex:

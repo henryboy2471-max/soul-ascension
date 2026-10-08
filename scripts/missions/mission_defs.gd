@@ -12,6 +12,7 @@ static func defs() -> Dictionary:
    "description":"An Aether storm has shut down the tram network. A Meridian enforcer detects your unstable signature. Survive its suppression protocol.",
    "tagline":"Explore, investigate the relay, and survive the Soul Realm.","modal_sub":"STORY 01—01  /  NEON DISTRICT",
    "missions_sub":"CHAPTER 01  /  EPISODE 1 PLAYABLE  /  EPISODE 2 NEXT",
+   "flow":"district",
    "energy":6,"playable":true,
    "unlock":{"requires":[]},
    "rewards":{"first":{"xp":120,"gold":250},"replay":{"xp":55,"gold":100}},
@@ -34,7 +35,7 @@ static func defs() -> Dictionary:
    "ending":{"lines":EpisodeData.OUTRO,"codex":["enforcer"],"teaser":{"kicker":"NEXT EPISODE","number":"EPISODE 2","title":"UNDER THE VIOLET RAIN","subtitle":"TO BE CONTINUED...","length":4.0}},
    "result":{"won_title":"ASCENSION BEGINS","lost_title":"RISE. TRY AGAIN.","subtitle":"Neon District  /  A spark in the static"}
   },
-  # Episode 2 data only (M1). Scenes, objectives and waves arrive in later milestones; "playable" stays false until they exist.
+  # Episode 2: exploration is playable (M2); the Soul Realm battle, boss and ending arrive in later milestones.
   "1-2":{
    "id":"1-2","episode":2,"number":"EPISODE 2","season":"SEASON 01  /  THE FRACTURE",
    "title":"UNDER THE VIOLET RAIN","title_case":"Under the violet rain",
@@ -42,12 +43,21 @@ static func defs() -> Dictionary:
    "description":"A violet rain is falling over the Lantern Quarter and the sleepers are walking toward the sky. Find what is tuning the rain.",
    "tagline":"Follow the rain to its source.","modal_sub":"STORY 01—02  /  LANTERN QUARTER",
    "missions_sub":"CHAPTER 01  /  EPISODE 2 NEXT",
-   "energy":6,"playable":false,
+   "flow":"lantern",
+   "energy":6,"playable":true,
    "unlock":{"requires":["1-1"]},
    "rewards":{"first":{"xp":150,"gold":300},"replay":{"xp":65,"gold":120}},
    "codex":["violet_rain","sleepers","rain_array","hollow_cantor"],
+   "resonators":3,
    "intro_card_length":3.6,
-   "objectives":[],
+   "objectives":[
+    {"text":"Enter Depot 4","x":470.0},
+    {"text":"Find Mira Vey in Depot 4","x":980.0},
+    {"text":"Resonators Synced %d/3","x":1350.0},
+    {"text":"Climb to the Rain Array","x":2600.0}
+   ],
+   "breach_card":{"kicker":"SOUL REALM  /  MISSION ZONE 02","title":"THE SLEEPERS' STAIR","subtitle":"THE BREACH OPENS","length":2.4},
+   "stage_label":"SOUL REALM  /  THE SLEEPERS' STAIR","battle_stage_label":"01—02  /  LANTERN QUARTER",
    "waves":[],"battle_only_waves":[],
    "ending":{"lines":[],"codex":[],"teaser":{"kicker":"NEXT EPISODE","number":"EPISODE 3","title":"THE RELAY KEEPER","subtitle":"TO BE CONTINUED...","length":4.0}},
    "result":{"won_title":"THE RAIN CLEARS","lost_title":"RISE. TRY AGAIN.","subtitle":"Lantern Quarter  /  Under the violet rain"}

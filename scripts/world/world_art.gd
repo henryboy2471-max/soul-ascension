@@ -7,6 +7,8 @@ var time=0.0
 var breach_open=false
 var breach_scale=0.0
 var terminal_done=false
+# Lantern Quarter state (read by LanternArt): resonators synced in order [a,b,c], roof gate open.
+var lantern_state:Dictionary={"synced":[false,false,false],"roof_open":false}
 var bake=true
 const GROUND_TOP = 470.0
 const STATIC_KINDS = ["sky","far","mid","near","ground"]
@@ -20,7 +22,7 @@ func _ready() -> void:
   vp.transparent_bg=kind!="sky"
   vp.disable_3d=true
   vp.render_target_update_mode=SubViewport.UPDATE_ONCE
-  var painter=WorldArt.new()
+  var painter=get_script().new()
   painter.kind=kind
   painter.width=width
   painter.bake=false

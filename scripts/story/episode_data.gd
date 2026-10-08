@@ -6,7 +6,11 @@ const SPEAKERS = {
  "SYSTEM":{"name":"SKYBRIDGE 09 RELAY","color":Color("6fd7e4"),"portrait":"none"},
  "PLAYER":{"name":"","color":Color("efce8e"),"portrait":"hero"},
  "MIRA":{"name":"MIRA VEY","color":Color("ffd86b"),"portrait":"mira"},
- "ENFORCER":{"name":"MERIDIAN ENFORCER","color":Color("fa6f82"),"portrait":"enforcer"}
+ "ENFORCER":{"name":"MERIDIAN ENFORCER","color":Color("fa6f82"),"portrait":"enforcer"},
+ "PELL":{"name":"PELL  /  DEPOT RADIO","color":Color("6fd7e4"),"portrait":"none"},
+ "SLEEPER":{"name":"A SLEEPER","color":Color("bd95ff"),"portrait":"none"},
+ "GATE":{"name":"ROOF GATE","color":Color("ff8597"),"portrait":"none"},
+ "ARRAY":{"name":"RAIN ARRAY 7","color":Color("bd95ff"),"portrait":"none"}
 }
 const INTRO = [
  {"who":"NARRATOR","text":"Twenty-one years ago, the sky fractured. The light it left behind rewrote what people could become. They called it Aether."},
@@ -59,5 +63,8 @@ const CODEX = [
  {"id":"mural","title":"LANTERN CIRCUIT","text":"A mutual-aid network that hides awakened civilians inside ordinary city services. Their motto: when the sky goes dark, we keep the light."},
  {"id":"terminal","title":"ECHO SIGNAL","text":"An Aether signature so quiet it is almost unreadable. Unlike conventional Aether, Echo learns from the resonance of others without taking their power."},
  {"id":"breach","title":"SOUL REALM","text":"A resonance space torn open by the Echo signal. Memories and fears take shape inside it as constructs. Entering costs energy to hold the channel open."},
- {"id":"enforcer","title":"SOUL-WARPED ENFORCER","text":"A Meridian suppression unit twisted by the Echo resonance. Its last words: Not harmless. Not harmless."}
+ {"id":"enforcer","title":"SOUL-WARPED ENFORCER","text":"A Meridian suppression unit twisted by the Echo resonance. Its last words: Not harmless. Not harmless."},
+ {"id":"violet_rain","title":"VIOLET RAIN","text":"A rain that carries a trace of the Echo signal. Every drop hums at the frequency of the second signal and pulls on anyone with an awakened resonance."},
+ {"id":"sleepers","title":"THE SLEEPERS","text":"Awakened civilians sheltering in Depot 4 who stand with open eyes while their fears leak out of the Soul Realm. They wake badly. Only the Lantern Circuit knows how to sit with them."},
+ {"id":"rain_array","title":"RAIN ARRAY 7","text":"A Meridian roof relay tuned to the Echo signature during an 'atmospheric resonance study'. Whoever holds it can lean on every sleeper in the quarter at once."}
 ]

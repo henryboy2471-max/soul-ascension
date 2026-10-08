@@ -5,9 +5,15 @@ var currency_label:Label
 var notice:Label
 var scene_name="home"
 var current_mission="1-1"
-# The mission the home screen advertises. Episode 1 for now; later milestones point this at the next playable mission.
+# The mission the home screen advertises: the first unlocked playable mission that is not cleared yet (Episode 1 on a fresh save).
 func home_mission() -> String:
- return "1-1"
+ var featured="1-1"
+ for id in ["1-1","1-2"]:
+  if MissionDefs.is_playable(id) and MissionDefs.is_unlocked(id,Profile.data.completed):
+   featured=id
+   if not Profile.data.completed.has(id):
+    return id
+ return featured
 var rotate_overlay:Control
 var orientation_timer=0.0
 func _process(delta:float) -> void:
@@ -132,7 +138,7 @@ An entire world listening.",Vector2(32,282),17,Color("c2c5d8"))
  var replay=MissionDefs.reward(home_def.id,false)
  UI.label(screen,home_def.region,Vector2(47,382),25)
  UI.label(screen,home_def.number+"   "+home_def.title_case,Vector2(47,422),15,UI.MUTED)
- UI.label(screen,"EXPLORE FREE  ·  %d ENERGY FOR THE BOSS" % home_def.energy if not Profile.data.completed.has(home_def.id) else "CLEARED  ·  REPLAY +%d XP  ·  +%d GOLD" % [replay.xp,replay.gold],Vector2(47,462),14,UI.GOLD)
+ UI.label(screen,("INVESTIGATE  ·  NO ENERGY COST" if home_def.get("flow","district")=="lantern" else "EXPLORE FREE  ·  %d ENERGY FOR THE BOSS" % home_def.energy) if not Profile.data.completed.has(home_def.id) else "CLEARED  ·  REPLAY +%d XP  ·  +%d GOLD" % [replay.xp,replay.gold],Vector2(47,462),14,UI.GOLD)
  UI.button(screen,"PLAY "+home_def.number,Rect2(30,510,292,79),show_mission,true)
  UI.button(screen,"MISSIONS",Rect2(30,604,139,66),show_missions)
  UI.button(screen,"UPGRADE",Rect2(183,604,139,66),show_upgrade)
@@ -187,8 +193,8 @@ func planned(title:String, copy:String, sub:String="COMING SOON", footer:String=
  UI.label(node,copy,Vector2(294,232),24,UI.MUTED,674)
  if footer!="":
   UI.label(node,footer,Vector2(294,476),17,UI.GOLD,658)
-func show_mission() -> void:
- var mission=MissionDefs.get_def(home_mission())
+func show_mission(id:String="") -> void:
+ var mission=MissionDefs.get_def(id if id!="" else home_mission())
  var node=new_modal(mission.title,mission.modal_sub)
  UI.label(node,mission.description,Vector2(294,208),23,Color("cbd0e2"),677)
  UI.label(node,mission.tagline,Vector2(294,334),23,UI.GOLD)
@@ -197,13 +203,19 @@ Strike: J   Heavy: K   Dodge: Space   Block: hold L
 Pulse: Q   Rift: E   Mend: R   Ultimate: F
 On a phone, use the matching touch buttons.",Vector2(294,383),17,UI.MUTED,690)
  UI.button(node,"BEGIN "+mission.number,Rect2(294,551,348,75),func(): start_episode(mission.id),true)
- UI.button(node,"BATTLE ONLY",Rect2(656,568,170,58),func(): start_battle(false,mission.id))
+ if not mission.battle_only_waves.is_empty():
+  UI.button(node,"BATTLE ONLY",Rect2(656,568,170,58),func(): start_battle(false,mission.id))
 func start_episode(mission_id:String="1-1") -> void:
  close_modal()
+ if not MissionDefs.is_unlocked(mission_id,Profile.data.completed) or not MissionDefs.is_playable(mission_id):
+  # A locked (or unfinished) episode never starts; the player stays on the menu.
+  var locked=MissionDefs.get_def(mission_id)
+  planned("EPISODE LOCKED","Clear the previous episode to unlock "+str(locked.get("number","this episode")).capitalize()+": "+str(locked.get("title_case","")),"LOCKED","")
+  return
  clear_screen()
  scene_name="episode"
  current_mission=mission_id
- var episode=Episode.new()
+ var episode=LanternEpisode.new() if MissionDefs.get_def(mission_id).get("flow","district")=="lantern" else Episode.new()
  episode.mission_id=mission_id
  episode.request_battle=func(): return start_battle(true,mission_id)
  episode.exit_requested.connect(show_home)
@@ -274,7 +286,7 @@ func show_result(won:bool) -> void:
  xp.readout_size=13
  UI.label(screen,"Progress saved locally" if Profile.save_ok else "Save failed — check device storage",Vector2(326,484),15,UI.MUTED if Profile.save_ok else Color("ff7188"))
  UI.button(screen,"HOME",Rect2(325,535,280,65),show_home)
- UI.button(screen,"REPLAY BATTLE  /  6 ENERGY",Rect2(630,535,316,65),func(): start_battle(false),true)
+ UI.button(screen,"REPLAY BATTLE  /  6 ENERGY",Rect2(630,535,316,65),func(): start_battle(false,reward.id),true)
 func show_hero() -> void:
  var node=new_modal("THE UNBOUND","OWNED  /  COMMON  /  ECHO STRIKER")
  var rig=Fighter.new()
@@ -296,17 +308,25 @@ Critical   12% / 160%",Vector2(530,250),22,Color("cbd0e2"))
  UI.button(node,"AETHER POSE",Rect2(416,568,210,58),func(): rig.swing=1.0;rig.invincible=1.0;Sound.play("special"))
  UI.button(node,"CODEX",Rect2(638,568,170,58),show_codex)
 func show_codex() -> void:
- var node=new_modal("CODEX","STORY AND WORLD ENTRIES  /  "+str(Profile.data.codex.size())+" OF "+str(EpisodeData.CODEX.size())+" FOUND")
- for i in range(EpisodeData.CODEX.size()):
-  var entry=EpisodeData.CODEX[i]
+ # Entries that belong to a locked episode stay hidden, so a fresh save shows only the Episode 1 entries.
+ var entries=[]
+ for entry in EpisodeData.CODEX:
+  var source=MissionDefs.mission_for_codex(entry.id)
+  if source.is_empty() or MissionDefs.is_unlocked(source.id,Profile.data.completed):
+   entries.append(entry)
+ var node=new_modal("CODEX","STORY AND WORLD ENTRIES  /  "+str(Profile.data.codex.size())+" OF "+str(entries.size())+" FOUND")
+ var wide=entries.size()>6
+ for i in range(entries.size()):
+  var entry=entries[i]
   var found=Profile.data.codex.has(entry.id)
   var col=i/3
   var row=i%3
-  var x=294+col*350
+  var x=294+col*(236 if wide else 350)
   var y=200+row*118
-  UI.label(node,entry.title if found else "UNDISCOVERED",Vector2(x,y),17,UI.GOLD if found else Color("68738c"),330)
+  var width=224 if wide else 330
+  UI.label(node,entry.title if found else "UNDISCOVERED",Vector2(x,y),17,UI.GOLD if found else Color("68738c"),width)
   var source=MissionDefs.mission_for_codex(entry.id)
-  UI.label(node,entry.text if found else "Explore Episode %d to uncover this entry." % int(source.get("episode",1)),Vector2(x,y+26),13,Color("cbd0e2") if found else Color("68738c"),330)
+  UI.label(node,entry.text if found else "Explore Episode %d to uncover this entry." % int(source.get("episode",1)),Vector2(x,y+26),13,Color("cbd0e2") if found else Color("68738c"),width)
 func show_upgrade() -> void:
  var node=new_modal("GROW YOUR AETHER","LEVELS INCREASE YOUR COMBAT STATS")
  UI.label(node,"Level "+str(Profile.data.level)+"   →   "+str(mini(100,Profile.data.level+1)),Vector2(294,221),37,UI.GOLD)
@@ -316,8 +336,11 @@ func show_upgrade() -> void:
  UI.label(node,str(Profile.data.xp)+" / "+str(Progression.required(int(Profile.data.level)))+" XP",Vector2(294,441),20)
  UI.label(node,"Gear and skill material upgrades arrive in later episodes.",Vector2(294,500),17,UI.MUTED,674)
 func show_missions() -> void:
- var mission_def=MissionDefs.get_def(home_mission())
- var node=new_modal(mission_def.region,mission_def.missions_sub)
+ var chapter=MissionDefs.get_def("1-1")
+ var sub=chapter.missions_sub
+ if MissionDefs.is_playable("1-2") and MissionDefs.is_unlocked("1-2",Profile.data.completed):
+  sub="CHAPTER 01  /  EPISODES 1 AND 2 PLAYABLE"
+ var node=new_modal(chapter.region,sub)
  var story=MissionData.story()
  for i in range(10):
   var mission=story[i]
@@ -326,7 +349,9 @@ func show_missions() -> void:
   var title=mission.id+"  "+mission.title
   UI.label(node,title,Vector2(294+col*350,208+row*63),16,Color.WHITE if i==0 else UI.MUTED,320)
   UI.label(node,mission_status(mission.id),Vector2(294+col*350,233+row*63),13,UI.GOLD if i==0 else Color("68738c"))
- UI.button(node,"PLAY "+mission_def.number,Rect2(294,568,310,58),show_mission,true)
+ UI.button(node,"PLAY EPISODE 1",Rect2(294,568,240,58),func(): show_mission("1-1"),true)
+ if MissionDefs.is_playable("1-2") and MissionDefs.is_unlocked("1-2",Profile.data.completed):
+  UI.button(node,"PLAY EPISODE 2",Rect2(544,568,240,58),func(): show_mission("1-2"),true)
 func mission_status(id:String) -> String:
  var d=MissionDefs.get_def(id)
  if d.is_empty():
@@ -335,8 +360,6 @@ func mission_status(id:String) -> String:
   return "CLEARED · REPLAY AVAILABLE"
  if d.playable and MissionDefs.is_unlocked(id,Profile.data.completed):
   return d.number+" · PLAYABLE"
- if d.playable:
-  return d.number+" · LOCKED"
  return d.number+" · UP NEXT"
 func show_settings() -> void:
  var node=new_modal("SETTINGS","SAVED ON THIS DEVICE")

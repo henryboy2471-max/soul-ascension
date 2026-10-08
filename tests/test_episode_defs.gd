@@ -21,14 +21,25 @@ func run() -> void:
  var golden=JSON.parse_string(FileAccess.get_file_as_string("res://tests/golden/episode1_trace.json"))
  var tracer=load("res://tests/support/episode1_trace.gd").new()
  var trace=await tracer.run(root,main)
+ # Post-clear menu screens changed on purpose (Episode 2 becomes available after clearing 1-1); everything else must be identical.
+ var post=["SCREEN home-cleared","SCREEN missions-cleared","SCREEN codex-cleared"]
+ var menus=JSON.parse_string(FileAccess.get_file_as_string("res://tests/golden/episode1_menus_after_clear.json"))
  var first_diff=-1
+ var menu_index=0
+ var menus_ok=true
  for i in range(mini(trace.size(),golden.size())):
-  if trace[i]!=golden[i]:
+  var is_post=false
+  for prefix in post:
+   if str(golden[i]).begins_with(prefix): is_post=true
+  if is_post:
+   if trace[i]!=menus[menu_index]: menus_ok=false
+   menu_index+=1
+  elif trace[i]!=golden[i] and first_diff<0:
    first_diff=i
-   break
  if first_diff>=0:
   print("INFO: first difference at event %d\n  golden: %s\n  now:    %s" % [first_diff,str(golden[first_diff]).substr(0,300),str(trace[first_diff]).substr(0,300)])
- check(trace.size()==golden.size() and first_diff<0,"Episode 1 story order, dialogue, objectives, cards, waves, Phase 2, ending, teaser and menu texts match the locked commit (%d events)" % golden.size())
+ check(trace.size()==golden.size() and first_diff<0,"Episode 1 story order, dialogue, objectives, cards, waves, Phase 2, ending, teaser, rewards and pre-clear menus match the locked commit (%d events)" % golden.size())
+ check(menus_ok and menu_index==3,"The three post-clear menu screens match the reviewed Episode 2-aware snapshot")
  var joined="\n".join(trace)
  check(joined.contains("EPISODE 2  /  UNDER THE VIOLET RAIN | TO BE CONTINUED..."),"The ending still shows the Episode 2 teaser card")
  check(joined.contains("+120 | GOLD | +250") and joined.contains("REWARD gold=750"),"First clear pays 120 XP / 250 gold")
@@ -47,7 +58,7 @@ func run() -> void:
  profile.data.onboarded=true
  profile.data.settings.sound=false
  var m2=MissionDefs.get_def("1-2")
- check(not m2.is_empty() and m2.title=="UNDER THE VIOLET RAIN" and m2.unlock.requires==["1-1"] and not m2.playable,"1-2 is defined, requires 1-1 and has no scenes yet (not playable)")
+ check(not m2.is_empty() and m2.title=="UNDER THE VIOLET RAIN" and m2.unlock.requires==["1-1"] and m2.playable and m2.flow=="lantern","1-2 is defined, requires 1-1 and uses the Lantern Quarter flow")
  check(m2.rewards.first.xp==150 and m2.rewards.first.gold==300 and m2.rewards.replay.xp==65 and m2.rewards.replay.gold==120,"1-2 reward data")
  check(not MissionDefs.is_unlocked("1-2",profile.data.completed) and MissionDefs.is_unlocked("1-1",profile.data.completed),"1-2 is locked on a fresh save, 1-1 is open")
  var energy0=int(profile.data.energy)
@@ -77,7 +88,7 @@ func run() -> void:
  root.add_child(main)
  await process_frame
  main.close_modal()
- check(main.home_mission()=="1-1" and main.mission_status("1-1")=="CLEARED · REPLAY AVAILABLE" and main.mission_status("1-2")=="EPISODE 2 · UP NEXT" and main.mission_status("1-3")=="PLANNED","Missions screen status: 1-1 cleared, 1-2 up next, 1-3 planned")
+ check(main.home_mission()=="1-2" and main.mission_status("1-1")=="CLEARED · REPLAY AVAILABLE" and main.mission_status("1-2")=="EPISODE 2 · PLAYABLE" and main.mission_status("1-3")=="PLANNED","After clearing 1-1 the home screen features Episode 2 and the missions screen shows 1-2 playable")
  var story=MissionData.story()
  check(story.size()==10 and story[0].title=="A spark in the static" and story[1].title=="Under the violet rain" and story[2].title=="The relay keeper","The mission list keeps its titles")
  main.queue_free()

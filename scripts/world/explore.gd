@@ -18,6 +18,16 @@ var fore:WorldArt
 var stick:VirtualStick
 var act_button:TouchAction
 var hud_node:Hud
+# Optional per-mission setup (set before the node enters the tree). Defaults reproduce the Episode 1 district exactly.
+# Keys: world_w, start_px, art (WorldArt script), npc_x, walker_count, sleepers [{x,facing}], spots, enabled, gate_x.
+var config:Dictionary={}
+var world_w=WORLD_W
+var npc_x=560.0
+var gate_x=-1.0
+var gate_locked=false
+var objective_targets:Array=[]
+var counter_done=0
+var counter_total=0
 var spots=[
  {"id":"mira","x":560.0,"label":"TALK  /  MIRA VEY","kind":"talk","range":130.0},
  {"id":"board","x":1050.0,"label":"READ  /  TRAM BOARD","kind":"talk","range":110.0},
@@ -52,26 +62,34 @@ var floor_fill:ColorRect
 func _ready() -> void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  mouse_filter=Control.MOUSE_FILTER_IGNORE
+ world_w=float(config.get("world_w",WORLD_W))
+ px=float(config.get("start_px",px))
+ npc_x=float(config.get("npc_x",npc_x))
+ gate_x=float(config.get("gate_x",gate_x))
+ if config.has("spots"):
+  spots=config.spots
+  enabled=config.enabled
+ var art_script=config.get("art",WorldArt)
  floor_fill=ColorRect.new()
  floor_fill.color=Color(0.02,0.025,0.06)
  floor_fill.position=Vector2(0,560)
  floor_fill.size=Vector2(1280,200)
  floor_fill.mouse_filter=Control.MOUSE_FILTER_IGNORE
  add_child(floor_fill)
- for spec in [["sky",0.03,1500.0],["far",0.12,1700.0],["mid",0.3,1800.0],["near",0.6,2300.0],["ground",1.0,WORLD_W]]:
-  var layer=WorldArt.new()
+ for spec in [["sky",0.03,1500.0],["far",0.12,1700.0],["mid",0.3,1800.0],["near",0.6,2300.0],["ground",1.0,world_w]]:
+  var layer=art_script.new()
   layer.kind=spec[0]
   layer.width=spec[2]
   layer.set_meta("factor",spec[1])
   add_child(layer)
   layers.append(layer)
- props=WorldArt.new()
+ props=art_script.new()
  props.kind="props"
- props.width=WORLD_W
+ props.width=world_w
  add_child(props)
  var rng=RandomNumberGenerator.new()
  rng.seed=9
- for i in range(5):
+ for i in range(int(config.get("walker_count",5))):
   var walker=Fighter.new()
   walker.look="ped"
   walker.armed=false
@@ -83,6 +101,20 @@ func _ready() -> void:
   walker.scale=Vector2(0.9,0.9)
   add_child(walker)
   walkers.append({"node":walker,"x":rng.randf_range(250,2300),"dir":1 if rng.randf()<0.5 else -1,"speed":rng.randf_range(35,70)})
+ # Sleepers: the same ambient pedestrian rigs, standing still (no new character art).
+ for s in config.get("sleepers",[]):
+  var sleeper=Fighter.new()
+  sleeper.look="ped"
+  sleeper.armed=false
+  sleeper.coat_color=Color.from_hsv(rng.randf(),0.3,0.3)
+  sleeper.accent=Color(0.75,0.55,1.0)
+  sleeper.hair_color=Color.from_hsv(rng.randf(),0.3,0.45)
+  sleeper.skin_color=Color("8a6a58")
+  sleeper.modulate=Color(0.62,0.55,0.8)
+  sleeper.scale=Vector2(0.95,0.95)
+  sleeper.facing=int(s.get("facing",1))
+  add_child(sleeper)
+  walkers.append({"node":sleeper,"x":float(s.x),"dir":sleeper.facing,"speed":0.0,"still":true})
  npc=Fighter.new()
  npc.look="mira"
  npc.accent=Color("ffd86b")
@@ -100,7 +132,7 @@ func _ready() -> void:
  player.scale=Vector2(1.2,1.2)
  player.load_sprite_set("res://assets/characters/hero/frames.tres",170.0,Color("4aa3ff"))
  add_child(player)
- fore=WorldArt.new()
+ fore=art_script.new()
  fore.kind="fore"
  add_child(fore)
  hud_node=Hud.new()
@@ -152,6 +184,7 @@ func build_hud() -> void:
  move_hint=UI.label(self,"MOVE  /  WASD",Vector2(61,696),16,UI.MUTED)
  act_hint=UI.label(self,"ACT  /  E",Vector2(1110,696),16,UI.MUTED)
 func set_objective(text:String, x:float) -> void:
+ objective_targets=[]
  objective_text=text
  target_x=x
  obj_label.text=text
@@ -159,6 +192,18 @@ func set_objective(text:String, x:float) -> void:
  var tween=create_tween()
  obj_panel.modulate=Color(2.2,1.9,1.2)
  tween.tween_property(obj_panel,"modulate",Color.WHITE,0.8)
+# Counter objective: "Resonators Synced n/3". `targets` are the waypoint x positions still to visit (the nearest one is shown).
+func set_counter_objective(text:String, targets:Array, done:int, total:int) -> void:
+ set_objective(text,float(targets[0]) if not targets.is_empty() else -1.0)
+ objective_targets=targets
+ counter_done=done
+ counter_total=total
+func clear_counter() -> void:
+ counter_done=0
+ counter_total=0
+ objective_targets=[]
+func set_gate_locked(value:bool) -> void:
+ gate_locked=value
 func toast(text:String) -> void:
  # "CODEX UPDATED  /  Title" -> kicker + title card that slides in under the EXIT button.
  var parts=text.split("/",false,1)
@@ -196,7 +241,7 @@ func move_input() -> Vector2:
  if Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN): move.y+=1
  return move.limit_length()
 func update_positions(blend:float) -> void:
- var goal=clampf(px-640.0,0.0,WORLD_W-1280.0)
+ var goal=clampf(px-640.0,0.0,world_w-1280.0)
  cam=goal if blend>=1.0 else lerpf(cam,goal,blend)
  for layer in layers:
   layer.position.x=-cam*layer.get_meta("factor")
@@ -205,7 +250,7 @@ func update_positions(blend:float) -> void:
  for layer in layers:
   layer.position.y=lift
  props.position.y=lift
- npc.position=Vector2(560.0-cam,548.0+lift)
+ npc.position=Vector2(npc_x-cam,548.0+lift)
  for w in walkers:
   w.node.position=Vector2(w.x-cam,516.0+lift)
  player.position=Vector2(px-cam,py+lift)
@@ -214,7 +259,10 @@ func _process(delta:float) -> void:
  act_block=maxf(0.0,act_block-delta)
  for w in walkers:
   w.x+=w.dir*w.speed*delta
-  if w.x<150.0 or w.x>WORLD_W-150.0:
+  if w.get("still",false):
+   w.node.moving=false
+   continue
+  if w.x<150.0 or w.x>world_w-150.0:
    w.dir=-w.dir
   w.node.facing=w.dir
   w.node.moving=true
@@ -225,7 +273,10 @@ func _process(delta:float) -> void:
  var move=Vector2.ZERO
  if not locked:
   move=move_input()
-  px=clampf(px+move.x*SPEED*delta,80.0,WORLD_W-80.0)
+  var max_x=world_w-80.0
+  if gate_locked and gate_x>0.0:
+   max_x=minf(max_x,gate_x-40.0)
+  px=clampf(px+move.x*SPEED*delta,80.0,max_x)
   py=clampf(py+move.y*SPEED*0.55*delta,515.0,585.0)
   if absf(move.x)>0.1:
    player.facing=1 if move.x>0 else -1
@@ -235,7 +286,7 @@ func _process(delta:float) -> void:
   if step_timer<=0:
    Sound.play("step")
    step_timer=0.28
- npc.facing=1 if px>560.0 else -1
+ npc.facing=1 if px>npc_x else -1
  lift=lerpf(lift,-125.0 if locked else 0.0,1.0-exp(-delta*8.0))
  # touch controls step aside while a conversation is open, so nothing sits on top of the dialogue box
  for node in [stick,act_button,move_hint,act_hint]:
@@ -272,6 +323,12 @@ func _process(delta:float) -> void:
    else:
     channel_t=maxf(0.0,channel_t-delta*2.0)
     act_edge=false
+ if not objective_targets.is_empty():
+  var nearest=float(objective_targets[0])
+  for tx in objective_targets:
+   if absf(px-float(tx))<absf(px-nearest):
+    nearest=float(tx)
+  target_x=nearest
  if target_x>=0:
   dist_label.text=str(int(absf(px-target_x)/12.0))+" M"
  else:
@@ -279,9 +336,9 @@ func _process(delta:float) -> void:
  hud_node.queue_redraw()
 func spot_accent(id:String) -> Color:
  match id:
-  "terminal": return Color("6fd7e4")
-  "breach": return Color("bd95ff")
-  "mira": return UI.GOLD
+  "terminal","res_a","res_b","res_c": return Color("6fd7e4")
+  "breach","array": return Color("bd95ff")
+  "mira","depot": return UI.GOLD
  return Color("c9cfe6")
 func paint_prompt(c:Node2D) -> void:
  var spot=active_spot
@@ -318,6 +375,14 @@ func paint_prompt(c:Node2D) -> void:
   if channel_t>0.01:
    c.draw_string(font,Vector2(top.x+w-62,top.y+h*0.5+6.0),str(int(channel_t*100.0))+"%",HORIZONTAL_ALIGNMENT_RIGHT,50,16,accent)
 func paint_hud(c:Node2D) -> void:
+ if counter_total>0:
+  # counter objective pips (Resonators Synced n/total), inside the objective panel
+  for i in range(counter_total):
+   var centre=Vector2(386.0+i*26.0,76.0)
+   c.draw_circle(centre,9.0,Color(0.02,0.03,0.07,0.9))
+   if i<counter_done:
+    c.draw_circle(centre,7.0,Color("6fd7e4"))
+   c.draw_arc(centre,9.0,0,TAU,20,Color("6fd7e4") if i<counter_done else Color(UI.GOLD,0.95),2)
  if target_x>=0 and not locked:
   var sx=target_x-cam
   var bob=sin(time*3.0)*5.0

@@ -6,7 +6,7 @@ var save_ok=true
 var active_run=""
 var clock=0.0
 func defaults() -> Dictionary:
- return {"name":"Ascendant","body":"male","onboarded":false,"level":1,"xp":0,"gold":500,"crystals":0,"energy":60,"energy_at":int(Time.get_unix_time_from_system()),"completed":[],"codex":[],"heroes":{"echo":{"level":1,"stars":1}},"inventory":[],"equipment":{},"achievements":[],"purchases":[],"vip_xp":0,"battle_pass_xp":0,"settings":{"sound":true,"shake":true,"reduced_motion":false}}
+ return {"name":"Ascendant","body":"male","onboarded":false,"level":1,"xp":0,"gold":500,"crystals":0,"energy":60,"energy_at":int(Time.get_unix_time_from_system()),"completed":[],"codex":[],"heroes":{"echo":{"level":1,"stars":1}},"inventory":[],"equipment":{},"achievements":[],"purchases":[],"vip_xp":0,"battle_pass_xp":0,"settings":{"sound":true,"shake":true,"reduced_motion":false},"mission_progress":{}}
 func _ready() -> void:
  data=defaults()
  var loaded=backend.read_data()
@@ -34,6 +34,14 @@ func unlock_codex(id:String) -> bool:
  data.codex.append(id)
  persist()
  return true
+# Per-mission story progress (e.g. which Episode 2 resonators are synced), saved with the profile so a mission can be resumed.
+func mission_progress(id:String) -> Dictionary:
+ return data.get("mission_progress",{}).get(id,{})
+func set_mission_progress(id:String, progress:Dictionary) -> void:
+ if not data.get("mission_progress") is Dictionary:
+  data["mission_progress"]={}
+ data.mission_progress[id]=progress
+ persist()
 func begin_run(id:String) -> bool:
  # Any defined mission whose unlock requirement is met can be started; the UI only offers missions marked playable.
  if active_run!="" or not MissionDefs.has_mission(id) or not MissionDefs.is_unlocked(id,data.completed):
