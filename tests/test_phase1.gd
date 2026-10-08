@@ -103,7 +103,7 @@ func run() -> void:
  touch.index=1;touch.pressed=true;touch.position=Vector2(168,605)
  battle.stick._input(touch)
  touch=InputEventScreenTouch.new()
- touch.index=2;touch.pressed=true;touch.position=Vector2(1095,660)
+ touch.index=2;touch.pressed=true;touch.position=battle.controls.attack.global_position+battle.controls.attack.size/2.0
  battle.controls.attack._input(touch)
  check(battle.stick.direction.length()>0 and battle.controls.attack.held,"Multitouch movement and attack")
  touch.pressed=false

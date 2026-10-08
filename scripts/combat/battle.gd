@@ -35,9 +35,9 @@ var target=Vector2.ZERO
 var ended=false
 var intro=0.8
 var auto=false
-var hp:ProgressBar
-var ep:ProgressBar
-var enemy_hp:ProgressBar
+var hp:HudBar
+var ep:HudBar
+var enemy_hp:HudBar
 var combo_label:Label
 var tip:Label
 var status:Label
@@ -50,14 +50,17 @@ var dash_time=0.0
 var buffered=""
 var buffer_time=0.0
 var hitstop=0.0
-var hp_text:Label
-var foe_text:Label
-var ult_bar:ProgressBar
-var ult_text:Label
+var ult_bar:HudBar
 var retreat_button:Button
 var retreat_armed=0.0
 var bar_top:ColorRect
 var bar_bottom:ColorRect
+var foe_panel:Panel
+var foe_trim:Control
+var wave_chip:Label
+var hurt_vignette:Control
+const HERO_BLUE=Color("4aa3ff")
+const ACTION_COST={"pulse":25,"rift":35,"mend":30,"dodge":12}
 var flash_rect:ColorRect
 var dim_rect:ColorRect
 var intro_card:Label
@@ -94,65 +97,81 @@ func _ready() -> void:
  add_child(telegraph_art)
  sparks=load("res://scripts/combat/impact.gd").new()
  add_child(sparks)
- hero.struck.connect(func(amount,critical): damage_number(hero.position,amount,critical,Color("ff8597")); Sound.play("hurt"))
+ hero.struck.connect(func(amount,critical): damage_number(hero.position,amount,critical,Color("ff8597")); hurt_vignette.pulse(0.55 if critical else 0.4); Sound.play("hurt"))
  hero.defeated.connect(func(): end(false))
- UI.panel(self,Rect2(24,22,390,104))
- UI.label(self,Profile.data.name.to_upper()+"  /  LV. "+str(Profile.data.level),Vector2(42,34),20)
- hp=UI.bar(self,Rect2(42,66,352,14),Color("b48bff"),hero.max_health)
- ep=UI.bar(self,Rect2(42,85,352,8),Color("6fd7e4"),100)
- ult_bar=UI.bar(self,Rect2(42,97,352,6),UI.GOLD,100)
- hp_text=UI.label(self,"",Vector2(42,64),12,Color.WHITE,346)
- hp_text.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
- UI.label(self,"AETHER",Vector2(42,106),11,UI.MUTED)
- ult_text=UI.label(self,"",Vector2(200,106),11,UI.GOLD,194)
- ult_text.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
- UI.panel(self,Rect2(866,22,390,104))
- foe_name_label=UI.label(self,waves[0].name,Vector2(884,34),20)
- enemy_hp=UI.bar(self,Rect2(884,66,352,14),Color("ec708e"),foe.max_health)
- foe_text=UI.label(self,"",Vector2(884,64),12,Color.WHITE,346)
- foe_text.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
- foe_sub_label=UI.label(self,waves[0].sub,Vector2(884,95),12,UI.MUTED)
- UI.label(self,"SOUL REALM  /  RESONANT BRIDGE" if boss_mode else "01—01  /  SKYBRIDGE 09",Vector2(455 if boss_mode else 475,28),16,UI.GOLD)
- retreat_button=UI.button(self,"RETREAT",Rect2(572,66,136,46),request_retreat)
- retreat_button.add_theme_font_size_override("font_size",15)
- tip=UI.label(self,"",Vector2(295,155),25,UI.GOLD,720)
+ # --- HUD: black/navy panels, gold trim, Hero blue (left), foe accent (right: Shade purple, Enforcer orange, Phase 2 red) ---
+ UI.panel(self,Rect2(24,24,406,116),Color(0.025,0.035,0.08,0.94),Color(HERO_BLUE,0.55))
+ UI.trim(self,Rect2(24,24,406,116),UI.GOLD)
+ UI.label(self,Profile.data.name.to_upper(),Vector2(42,32),22)
+ UI.chip(self,"LV. "+str(Profile.data.level),Rect2(338,34,72,22),UI.GOLD,13)
+ UI.label(self,"HP",Vector2(42,64),14,HERO_BLUE)
+ hp=UI.hud_bar(self,Rect2(76,62,334,22),HERO_BLUE,hero.max_health)
+ hp.low_warn=0.3
+ hp.readout_size=14
+ UI.label(self,"AETHER",Vector2(42,88),13,UI.MUTED)
+ ep=UI.hud_bar(self,Rect2(104,88,306,14),Color("6fd7e4"),100)
+ ep.readout_size=12
+ UI.label(self,"ULT",Vector2(42,105),13,UI.GOLD)
+ ult_bar=UI.hud_bar(self,Rect2(76,107,334,12),UI.GOLD,100)
+ ult_bar.readout_size=11
+ foe_panel=UI.panel(self,Rect2(850,24,406,116),Color(0.035,0.025,0.06,0.94),Color(foe_accent(waves[0]),0.6))
+ foe_trim=UI.trim(self,Rect2(850,24,406,116),foe_accent(waves[0]))
+ foe_sub_label=UI.label(self,waves[0].sub,Vector2(868,32),12,foe_accent(waves[0]),292)
+ foe_name_label=UI.label(self,waves[0].name,Vector2(868,50),24,Color.WHITE,380)
+ wave_chip=UI.chip(self,"WAVE 1/"+str(waves.size()) if boss_mode else "STAGE 1",Rect2(1166,32,74,22),foe_accent(waves[0]),13)
+ enemy_hp=UI.hud_bar(self,Rect2(868,90,372,24),foe_accent(waves[0]),foe.max_health)
+ enemy_hp.readout_size=14
+ var stage=UI.label(self,"SOUL REALM  /  RESONANT BRIDGE" if boss_mode else "01—01  /  SKYBRIDGE 09",Vector2(440,30),15,UI.GOLD,400)
+ stage.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+ UI.outline(stage,5)
+ retreat_button=UI.button(self,"RETREAT",Rect2(576,66,128,42),request_retreat)
+ retreat_button.add_theme_font_size_override("font_size",14)
+ tip=UI.label(self,"",Vector2(260,148),21,UI.GOLD,760)
  tip.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
- combo_label=UI.label(self,"",Vector2(560,220),32,UI.GOLD)
- status=UI.label(self,"",Vector2(395,513),18,UI.VIOLET,550)
+ UI.outline(tip,7)
+ combo_label=UI.label(self,"",Vector2(560,222),34,UI.GOLD)
+ UI.outline(combo_label,8)
+ status=UI.label(self,"",Vector2(340,182),17,UI.VIOLET,600)
  status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
- UI.label(self,"PROTOTYPE COMBAT ART",Vector2(22,475),11,UI.MUTED)
+ UI.outline(status,6)
+ UI.label(self,"PROTOTYPE COMBAT ART",Vector2(540,700),11,Color(UI.MUTED,0.55),200)
  stick=VirtualStick.new()
  stick.position=Vector2(36,520)
  stick.size=Vector2(180,180)
  add_child(stick)
- UI.label(self,"MOVE  /  WASD",Vector2(61,698),12,UI.MUTED)
+ UI.label(self,"MOVE  /  WASD",Vector2(61,698),14,UI.MUTED)
  var definitions=[
-  ["pulse","PULSE","Q · 25",Vector2(757,521)],
-  ["rift","RIFT","E · 35",Vector2(855,521)],
-  ["mend","MEND","R · 30",Vector2(953,521)],
-  ["dodge","DODGE","SPACE",Vector2(855,619)],
-  ["block","BLOCK","L · HOLD",Vector2(953,619)],
-  ["heavy","HEAVY","K",Vector2(1051,521)],
-  ["attack","STRIKE","J · HOLD",Vector2(1051,619)],
-  ["ultimate","ULTIMATE","F · 100%",Vector2(642,611)]
+  ["pulse","PULSE","Q · 25",Vector2(828,500),Color("b48bff")],
+  ["rift","RIFT","E · 35",Vector2(932,500),Color("8f9bff")],
+  ["mend","MEND","R · 30",Vector2(1036,500),Color("5fe0b0")],
+  ["heavy","HEAVY","K",Vector2(1140,500),Color("ff9a4a")],
+  ["dodge","DODGE","SPACE",Vector2(932,600),Color("4aa3ff")],
+  ["block","BLOCK","L · HOLD",Vector2(1036,600),Color("6fb6ff")],
+  ["attack","STRIKE","J · HOLD",Vector2(1140,600),Color("efce8e")],
+  ["ultimate","ULTIMATE","F · 100%",Vector2(690,586),Color("efce8e")]
  ]
  for spec in definitions:
   var control=TouchAction.new()
   control.title=spec[1]
   control.subtitle=spec[2]
   control.position=spec[3]
-  control.size=Vector2(88,88)
+  control.size=Vector2(96,96)
+  control.tint=spec[4]
   if spec[0]=="ultimate":
-   control.tint=UI.GOLD
    control.charge=0.0
-   control.size=Vector2(104,104)
+   control.size=Vector2(112,112)
   add_child(control)
   controls[spec[0]]=control
   control.activated.connect(act.bind(spec[0]))
  if Profile.data.completed.has("1-1"):
-  UI.button(self,"AUTO: OFF",Rect2(263,629,177,66),toggle_auto)
+  UI.button(self,"AUTO: OFF",Rect2(250,632,150,56),toggle_auto)
  else:
-  UI.label(self,"Auto unlocks after first clear",Vector2(249,655),13,UI.MUTED)
+  var auto_hint=UI.label(self,"Auto unlocks after first clear",Vector2(236,664),13,Color(UI.MUTED,0.8),200)
+  UI.outline(auto_hint,4)
+ hurt_vignette=HurtVignette.new()
+ hurt_vignette.size=Vector2(1280,720)
+ hurt_vignette.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ add_child(hurt_vignette)
  ultimate_title=UI.label(self,"",Vector2(235,300),55,Color.WHITE,850)
  ultimate_title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  ultimate_sub=UI.label(self,"",Vector2(235,368),20,UI.GOLD,850)
@@ -168,13 +187,13 @@ func _ready() -> void:
  add_child(flash_rect)
  bar_top=ColorRect.new()
  bar_top.color=Color.BLACK
- bar_top.size=Vector2(1280,40)
- bar_top.position=Vector2(0,-40)
+ bar_top.size=Vector2(1280,22)
+ bar_top.position=Vector2(0,-22)
  bar_top.mouse_filter=Control.MOUSE_FILTER_IGNORE
  add_child(bar_top)
  bar_bottom=ColorRect.new()
  bar_bottom.color=Color.BLACK
- bar_bottom.size=Vector2(1280,40)
+ bar_bottom.size=Vector2(1280,22)
  bar_bottom.position=Vector2(0,720)
  bar_bottom.mouse_filter=Control.MOUSE_FILTER_IGNORE
  add_child(bar_bottom)
@@ -204,9 +223,9 @@ func boss_intro(card_text:String="", card_sub:String="") -> void:
 func cinematic_bars(hold:float) -> void:
  var tween=create_tween().set_parallel(true)
  tween.tween_property(bar_top,"position:y",0.0,0.2)
- tween.tween_property(bar_bottom,"position:y",680.0,0.2)
+ tween.tween_property(bar_bottom,"position:y",698.0,0.2)
  tween.chain().tween_interval(hold)
- tween.chain().tween_property(bar_top,"position:y",-40.0,0.3)
+ tween.chain().tween_property(bar_top,"position:y",-22.0,0.3)
  tween.parallel().tween_property(bar_bottom,"position:y",720.0,0.3)
 func wave_defs() -> Array:
  if boss_mode:
@@ -246,6 +265,39 @@ func spawn_foe(def:Dictionary) -> void:
   foe_name_label.text=def.name
   foe_sub_label.text=def.sub
   enemy_hp.max_value=def.hp
+  enemy_hp.value=def.hp
+  enemy_hp.ghost=def.hp
+  var accent=foe_accent(def)
+  foe_sub_label.add_theme_color_override("font_color",accent)
+  enemy_hp.color=accent
+  enemy_hp.tick=0.5 if def.boss else -1.0
+  foe_trim.accent=accent
+  foe_trim.queue_redraw()
+  var style=foe_panel.get_theme_stylebox("panel").duplicate()
+  style.border_color=Color(accent,0.6)
+  foe_panel.add_theme_stylebox_override("panel",style)
+  if boss_mode:
+   wave_chip.text="WAVE "+str(wave+1)+"/"+str(waves.size())
+   UI.chip_color(wave_chip,accent)
+func foe_accent(def:Dictionary) -> Color:
+ return Color("b46bff") if def.look=="shade" else Color("ff8a2a")
+func hud_phase_two() -> void:
+ # HUD transition: foe panel, bar and tag turn Phase 2 red, sub-title reads SOUL ASCENDED.
+ var red=Color("ff4f72")
+ foe_sub_label.text="SOUL ASCENDED  /  PHASE 2"
+ foe_sub_label.add_theme_color_override("font_color",red)
+ enemy_hp.color=red
+ enemy_hp.tick=-1.0
+ foe_trim.accent=red
+ foe_trim.queue_redraw()
+ wave_chip.text="PHASE 2"
+ UI.chip_color(wave_chip,red)
+ var style=foe_panel.get_theme_stylebox("panel").duplicate()
+ style.border_color=Color(red,0.8)
+ foe_panel.add_theme_stylebox_override("panel",style)
+ foe_panel.modulate=Color(2.0,1.3,1.4)
+ create_tween().tween_property(foe_panel,"modulate",Color.WHITE,0.7)
+ hurt_vignette.pulse(0.35)
 func on_foe_defeated(defeated_foe:Fighter) -> void:
  if defeated_foe!=foe or ended:
   return
@@ -331,6 +383,7 @@ func enter_phase_two() -> void:
  foe.aura=true
  foe.aura_color=Color("ff4f72")
  transform_foe()
+ hud_phase_two()
  intro_card.text="PHASE 2"
  intro_sub.text="SOUL ASCENDED  /  ATTACKS FASTER AND HIT HARDER"
  intro_card.modulate.a=1
@@ -380,9 +433,11 @@ func _process(delta:float) -> void:
  if phase==1 and waves[wave].boss and not ended and foe.health>0 and foe.health<=foe.max_health*0.5:
   enter_phase_two()
  enemy_hp.value=foe.health
- hp_text.text=str(int(ceil(hero.health)))+" / "+str(int(hero.max_health))
- foe_text.text=str(int(ceil(foe.health)))+" / "+str(int(foe.max_health))
- ult_text.text="ULTIMATE READY  ·  F" if ultimate>=100 else "ULTIMATE  "+str(int(ultimate))+"%"
+ hp.readout=str(int(ceil(hero.health)))+" / "+str(int(hero.max_health))
+ enemy_hp.readout=str(int(ceil(foe.health)))+" / "+str(int(foe.max_health))
+ ep.readout=str(int(energy))
+ ult_bar.readout="READY  ·  F" if ultimate>=100 else str(int(ultimate))+"%"
+ ult_bar.color=UI.GOLD if ultimate<100 else Color("fff0b8")
  controls.ultimate.charge=ultimate/100.0
  hero.aura=ultimate>=100
  if retreat_armed>0:
@@ -393,6 +448,10 @@ func _process(delta:float) -> void:
   cooldowns[key]=maxf(0,cooldowns[key]-delta)
   if controls.has(key):
    controls[key].cooldown=cooldowns[key]/maxima[key]
+   controls[key].seconds=cooldowns[key]
+   var cost=ACTION_COST.get(key,0)
+   controls[key].dim=energy<cost
+ controls.ultimate.dim=ultimate<100
  controls.ultimate.subtitle="READY · F" if ultimate>=100 else str(int(ultimate))+"% · F"
  combo_timer=maxf(0,combo_timer-delta)
  if combo_timer==0:
@@ -405,7 +464,8 @@ func _process(delta:float) -> void:
   return
  energy=minf(100,energy+delta*8)
  if tutorial_hits==0:
-  pass
+  if wave>=1:
+   tip.text=""
  elif tutorial_hits<3:
   tip.text="Build your combo. Hold BLOCK [L] to reduce incoming damage."
  else:
@@ -538,10 +598,15 @@ func act(kind:String) -> void:
  if kind in ["heavy","pulse","rift","ultimate"]:
   foe.stun=0.5 if kind!="ultimate" else 1.6
 func damage_number(point:Vector2, amount:int, critical:bool, color:Color) -> void:
- var label=UI.label(self,str(amount)+( "!" if critical else ""),point-Vector2(18,160),32 if critical else 24,color)
+ # Outlined, popping numbers: bigger and warmer on criticals; spread sideways so stacked hits stay readable.
+ var label=UI.label(self,str(amount)+( "!" if critical else ""),point+Vector2(randf_range(-26,26)-14,-175),40 if critical else 28,Color("ffd27a") if critical and color==UI.GOLD else color)
+ UI.outline(label,9 if critical else 7)
+ label.pivot_offset=Vector2(14,16)
+ label.scale=Vector2(0.6,0.6)
  var tween=create_tween().set_parallel(true)
- tween.tween_property(label,"position:y",label.position.y-60,0.7)
- tween.tween_property(label,"modulate:a",0.0,0.7)
+ tween.tween_property(label,"scale",Vector2(1.2,1.2) if critical else Vector2(1.0,1.0),0.12)
+ tween.tween_property(label,"position:y",label.position.y-70,0.8)
+ tween.tween_property(label,"modulate:a",0.0,0.35).set_delay(0.45)
  tween.chain().tween_callback(label.queue_free)
 func finisher() -> void:
  ultimate_title.text="FINISH"

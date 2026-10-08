@@ -31,6 +31,10 @@ var walkers:Array=[]
 var step_timer=0.0
 var act_block=0.0
 var toast_label:Label
+var move_hint:Label
+var act_hint:Label
+var toast_panel:Panel
+var toast_kicker:Label
 var channel_t=0.0
 var active_spot:Dictionary={}
 var objective_text=""
@@ -43,9 +47,17 @@ var exit_armed=0.0
 var obj_panel:Panel
 var flash_rect:ColorRect
 var time=0.0
+var lift=0.0
+var floor_fill:ColorRect
 func _ready() -> void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  mouse_filter=Control.MOUSE_FILTER_IGNORE
+ floor_fill=ColorRect.new()
+ floor_fill.color=Color(0.02,0.025,0.06)
+ floor_fill.position=Vector2(0,560)
+ floor_fill.size=Vector2(1280,200)
+ floor_fill.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ add_child(floor_fill)
  for spec in [["sky",0.03,1500.0],["far",0.12,1700.0],["mid",0.3,1800.0],["near",0.6,2300.0],["ground",1.0,WORLD_W]]:
   var layer=WorldArt.new()
   layer.kind=spec[0]
@@ -103,15 +115,21 @@ func _ready() -> void:
  flash_rect.mouse_filter=Control.MOUSE_FILTER_IGNORE
  add_child(flash_rect)
 func build_hud() -> void:
- obj_panel=UI.panel(self,Rect2(24,20,440,82))
- UI.label(self,"OBJECTIVE",Vector2(42,30),11,UI.GOLD)
- obj_label=UI.label(self,"",Vector2(42,48),19,Color.WHITE,300)
- dist_label=UI.label(self,"",Vector2(350,30),12,UI.MUTED,100)
+ obj_panel=UI.panel(self,Rect2(24,20,440,82),Color(0.025,0.035,0.08,0.92),Color(UI.GOLD,0.45))
+ UI.trim(self,Rect2(24,20,440,82),UI.GOLD)
+ var obj_bar=ColorRect.new()
+ obj_bar.color=UI.GOLD
+ obj_bar.position=Vector2(24,34)
+ obj_bar.size=Vector2(4,54)
+ obj_bar.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ add_child(obj_bar)
+ UI.label(self,"OBJECTIVE",Vector2(44,27),14,UI.GOLD)
+ obj_label=UI.label(self,"",Vector2(44,48),21,Color.WHITE,330)
+ dist_label=UI.label(self,"",Vector2(362,28),15,UI.GOLD,86)
  dist_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
+ # The interaction prompt is drawn by paint_hud as a pill with a key cap; this label only carries its text.
  prompt_label=UI.label(self,"",Vector2(340,300),19,Color.WHITE,600)
- prompt_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
- prompt_label.add_theme_color_override("font_outline_color",Color(0.01,0.01,0.05))
- prompt_label.add_theme_constant_override("outline_size",8)
+ prompt_label.visible=false
  exit_button=UI.button(self,"EXIT",Rect2(1138,22,118,44),request_exit)
  exit_button.focus_mode=Control.FOCUS_NONE
  exit_button.add_theme_font_size_override("font_size",15)
@@ -127,11 +145,12 @@ func build_hud() -> void:
  act_button.tint=UI.GOLD
  add_child(act_button)
  act_button.activated.connect(func(): act_edge=true)
- toast_label=UI.label(self,"",Vector2(340,112),16,UI.GOLD,600)
- toast_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
- toast_label.modulate.a=0.0
- UI.label(self,"MOVE  /  WASD",Vector2(61,698),12,UI.MUTED)
- UI.label(self,"ACT  /  E",Vector2(1110,696),12,UI.MUTED)
+ toast_panel=UI.panel(self,Rect2(884,78,372,58),Color(0.025,0.035,0.08,0.96),Color(UI.GOLD,0.7))
+ toast_kicker=UI.label(toast_panel,"CODEX UPDATED",Vector2(18,7),14,UI.GOLD)
+ toast_label=UI.label(toast_panel,"",Vector2(18,26),19,Color.WHITE,340)
+ toast_panel.modulate.a=0.0
+ move_hint=UI.label(self,"MOVE  /  WASD",Vector2(61,698),14,UI.MUTED)
+ act_hint=UI.label(self,"ACT  /  E",Vector2(1110,696),14,UI.MUTED)
 func set_objective(text:String, x:float) -> void:
  objective_text=text
  target_x=x
@@ -141,11 +160,17 @@ func set_objective(text:String, x:float) -> void:
  obj_panel.modulate=Color(2.2,1.9,1.2)
  tween.tween_property(obj_panel,"modulate",Color.WHITE,0.8)
 func toast(text:String) -> void:
- toast_label.text=text
- toast_label.modulate.a=1.0
+ # "CODEX UPDATED  /  Title" -> kicker + title card that slides in under the EXIT button.
+ var parts=text.split("/",false,1)
+ toast_kicker.text=parts[0].strip_edges() if parts.size()>1 else "NOTICE"
+ toast_label.text=parts[1].strip_edges() if parts.size()>1 else text
+ toast_panel.position=Vector2(884,64)
+ toast_panel.modulate.a=0.0
  var tween=create_tween()
- tween.tween_interval(1.6)
- tween.tween_property(toast_label,"modulate:a",0.0,0.6)
+ tween.tween_property(toast_panel,"modulate:a",1.0,0.2)
+ tween.parallel().tween_property(toast_panel,"position:y",78.0,0.2)
+ tween.tween_interval(1.8)
+ tween.tween_property(toast_panel,"modulate:a",0.0,0.6)
 func open_breach() -> void:
  props.breach_open=true
  enabled.breach=true
@@ -176,10 +201,14 @@ func update_positions(blend:float) -> void:
  for layer in layers:
   layer.position.x=-cam*layer.get_meta("factor")
  props.position.x=-cam
- npc.position=Vector2(560.0-cam,548.0)
+ # While a conversation is open the whole street lifts so the dialogue box never covers characters.
+ for layer in layers:
+  layer.position.y=lift
+ props.position.y=lift
+ npc.position=Vector2(560.0-cam,548.0+lift)
  for w in walkers:
-  w.node.position=Vector2(w.x-cam,516.0)
- player.position=Vector2(px-cam,py)
+  w.node.position=Vector2(w.x-cam,516.0+lift)
+ player.position=Vector2(px-cam,py+lift)
 func _process(delta:float) -> void:
  time+=delta
  act_block=maxf(0.0,act_block-delta)
@@ -207,6 +236,10 @@ func _process(delta:float) -> void:
    Sound.play("step")
    step_timer=0.28
  npc.facing=1 if px>560.0 else -1
+ lift=lerpf(lift,-125.0 if locked else 0.0,1.0-exp(-delta*8.0))
+ # touch controls step aside while a conversation is open, so nothing sits on top of the dialogue box
+ for node in [stick,act_button,move_hint,act_hint]:
+  node.visible=not locked
  update_positions(1.0-exp(-delta*9.0))
  # nearest enabled interaction spot
  active_spot={}
@@ -244,6 +277,46 @@ func _process(delta:float) -> void:
  else:
   dist_label.text=""
  hud_node.queue_redraw()
+func spot_accent(id:String) -> Color:
+ match id:
+  "terminal": return Color("6fd7e4")
+  "breach": return Color("bd95ff")
+  "mira": return UI.GOLD
+ return Color("c9cfe6")
+func paint_prompt(c:Node2D) -> void:
+ var spot=active_spot
+ var accent=spot_accent(spot.id)
+ var font=ThemeDB.fallback_font
+ var words=str(spot.label)
+ var fs=19
+ var size=font.get_string_size(words,HORIZONTAL_ALIGNMENT_LEFT,-1,fs)
+ var w=size.x+84.0+(46.0 if spot.kind=="channel" else 0.0)
+ var h=44.0
+ var cx=clampf(spot.x-cam,w*0.5+16.0,1280.0-w*0.5-16.0)
+ var top=Vector2(cx-w*0.5,262.0+lift*0.0)
+ var box=StyleBoxFlat.new()
+ box.bg_color=Color(0.02,0.03,0.07,0.92)
+ box.border_color=Color(accent,0.85)
+ box.set_border_width_all(1)
+ box.set_corner_radius_all(8)
+ box.shadow_color=Color(accent,0.25)
+ box.shadow_size=8
+ c.draw_style_box(box,Rect2(top,Vector2(w,h)))
+ # key cap
+ var key=Vector2(top.x+26.0,top.y+h*0.5)
+ c.draw_circle(key,15.0,Color(accent,0.18))
+ c.draw_arc(key,15.0,0,TAU,28,accent,2)
+ c.draw_string(font,key+Vector2(-20,6),"E",HORIZONTAL_ALIGNMENT_CENTER,40,17,Color.WHITE)
+ c.draw_string_outline(font,Vector2(top.x+50.0,top.y+h*0.5+7.0),words,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,5,Color(0,0,0,0.8))
+ c.draw_string(font,Vector2(top.x+50.0,top.y+h*0.5+7.0),words,HORIZONTAL_ALIGNMENT_LEFT,-1,fs,Color.WHITE)
+ # little pointer toward the interaction point
+ c.draw_colored_polygon(PackedVector2Array([Vector2(cx-8,top.y+h),Vector2(cx+8,top.y+h),Vector2(cx,top.y+h+9)]),Color(accent,0.85))
+ if spot.kind=="channel":
+  # hold progress: bar along the bottom of the pill
+  c.draw_rect(Rect2(top+Vector2(10,h-9),Vector2(w-20,6)),Color(0,0,0,0.65))
+  c.draw_rect(Rect2(top+Vector2(10,h-9),Vector2((w-20)*clampf(channel_t,0.0,1.0),6)),accent)
+  if channel_t>0.01:
+   c.draw_string(font,Vector2(top.x+w-62,top.y+h*0.5+6.0),str(int(channel_t*100.0))+"%",HORIZONTAL_ALIGNMENT_RIGHT,50,16,accent)
 func paint_hud(c:Node2D) -> void:
  if target_x>=0 and not locked:
   var sx=target_x-cam
@@ -252,15 +325,17 @@ func paint_hud(c:Node2D) -> void:
    for i in range(6):
     c.draw_line(Vector2(sx,250+bob),Vector2(sx,470),Color(0.94,0.81,0.56,0.05+i*0.015),22-i*3)
    c.draw_colored_polygon(PackedVector2Array([Vector2(sx,262+bob),Vector2(sx+13,244+bob),Vector2(sx,226+bob),Vector2(sx-13,244+bob)]),UI.GOLD)
+   var meters=str(int(absf(px-target_x)/12.0))+" M"
+   var font=ThemeDB.fallback_font
+   c.draw_string_outline(font,Vector2(sx-40,214+bob),meters,HORIZONTAL_ALIGNMENT_CENTER,80,15,5,Color(0,0,0,0.85))
+   c.draw_string(font,Vector2(sx-40,214+bob),meters,HORIZONTAL_ALIGNMENT_CENTER,80,15,UI.GOLD)
   else:
    var left=sx<=60
    var ex=34.0 if left else 1246.0
    var dir=-1.0 if left else 1.0
    c.draw_colored_polygon(PackedVector2Array([Vector2(ex+dir*18,330),Vector2(ex-dir*6,310),Vector2(ex-dir*6,350)]),Color(UI.GOLD,0.55+0.3*sin(time*4.0)))
- if channel_t>0.01 and not active_spot.is_empty():
-  var center=Vector2(active_spot.x-cam,380)
-  c.draw_arc(center,34,0,TAU,40,Color(0,0,0,0.5),9)
-  c.draw_arc(center,34,-PI/2,-PI/2+TAU*channel_t,40,Color("6fd7e4"),7)
+ if not locked and act_block<=0.0 and not active_spot.is_empty():
+  paint_prompt(c)
 class Hud extends Node2D:
  var ex
  func _draw() -> void:
