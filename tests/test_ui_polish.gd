@@ -51,6 +51,12 @@ func run() -> void:
    if r.intersects(Rect2(b.controls[key].position,b.controls[key].size)): clear=false
  check(clear,"HUD panels do not overlap the buttons")
  check(b.foe.position.y>345 and b.hero.position.y>345,"Fighters stand below the HUD panels")
+ b.hero.position=Vector2(1000,640)
+ await process_frame
+ await process_frame
+ var lowest=Rect2(b.controls.attack.position,b.controls.attack.size)
+ check(b.hero.position.y<=496.0 and b.hero.position.y<lowest.position.y,"The Hero cannot walk behind the touch buttons (feet stay above y 500)")
+ b.hero.position=Vector2(300,450)
  check(b.enemy_hp.tick<0.0 and b.wave_chip.text=="WAVE 1/2","Wave 1 HUD: no phase tick, WAVE 1/2 chip")
  var shade_color=b.enemy_hp.color
  # --- cooldown + Aether indicators ---

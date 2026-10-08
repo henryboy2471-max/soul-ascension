@@ -14,11 +14,15 @@ func _initialize() -> void:
 func run() -> void:
  var profile=root.get_node("Profile")
  profile.data=profile.defaults()
- profile.data.onboarded=true
+ profile.data.onboarded=false
  profile.data.settings.sound=false
  var main=load("res://scenes/main.tscn").instantiate()
  root.add_child(main)
  await process_frame
+ await shot("onboarding",0.8)
+ profile.data.onboarded=true
+ main.close_modal()
+ main.show_home()
  await shot("home",0.8)
  main.show_mission(); await shot("mission")
  main.close_modal()
@@ -92,6 +96,9 @@ func run() -> void:
  main.show_home()
  await shot("home_after",0.8)
  main.show_hero(); await shot("hero_screen")
+ main.show_settings(); await shot("settings")
+ main.planned("SUMMON","Coming soon: hero banners with published odds, rarity guarantees and summon history. Nothing can be summoned yet."); await shot("planned")
+ main.close_modal()
  main.show_missions(); await shot("missions")
  print("UI CAPS DONE %d" % n)
  quit()

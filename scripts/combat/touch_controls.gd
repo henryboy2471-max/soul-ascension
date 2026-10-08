@@ -60,4 +60,4 @@ func _draw() -> void:
   var fs=18 if title.length()<=6 else 14
   draw_string_outline(font,Vector2(0,mid.y-1),title,HORIZONTAL_ALIGNMENT_CENTER,size.x,fs,4,Color(0,0,0,0.85))
   draw_string(font,Vector2(0,mid.y-1),title,HORIZONTAL_ALIGNMENT_CENTER,size.x,fs,Color(0.6,0.62,0.72) if dim else Color.WHITE)
-  draw_string(font,Vector2(0,mid.y+19),subtitle,HORIZONTAL_ALIGNMENT_CENTER,size.x,13,Color("ff8597") if dim else Color(tint,0.95))
+  draw_string(font,Vector2(0,mid.y+19),subtitle,HORIZONTAL_ALIGNMENT_CENTER,size.x,16,Color("ff8597") if dim else Color(tint,0.95))

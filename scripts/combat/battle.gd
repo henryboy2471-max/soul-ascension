@@ -102,44 +102,43 @@ func _ready() -> void:
  # --- HUD: black/navy panels, gold trim, Hero blue (left), foe accent (right: Shade purple, Enforcer orange, Phase 2 red) ---
  UI.panel(self,Rect2(24,24,406,116),Color(0.025,0.035,0.08,0.94),Color(HERO_BLUE,0.55))
  UI.trim(self,Rect2(24,24,406,116),UI.GOLD)
- UI.label(self,Profile.data.name.to_upper(),Vector2(42,32),22)
- UI.chip(self,"LV. "+str(Profile.data.level),Rect2(338,34,72,22),UI.GOLD,13)
- UI.label(self,"HP",Vector2(42,64),14,HERO_BLUE)
- hp=UI.hud_bar(self,Rect2(76,62,334,22),HERO_BLUE,hero.max_health)
+ UI.label(self,Profile.data.name.to_upper(),Vector2(42,30),24)
+ UI.chip(self,"LV. "+str(Profile.data.level),Rect2(332,32,78,26),UI.GOLD,15)
+ UI.label(self,"HP",Vector2(42,62),16,HERO_BLUE)
+ hp=UI.hud_bar(self,Rect2(80,62,330,24),HERO_BLUE,hero.max_health)
  hp.low_warn=0.3
- hp.readout_size=14
- UI.label(self,"AETHER",Vector2(42,88),13,UI.MUTED)
- ep=UI.hud_bar(self,Rect2(104,88,306,14),Color("6fd7e4"),100)
- ep.readout_size=12
- UI.label(self,"ULT",Vector2(42,105),13,UI.GOLD)
- ult_bar=UI.hud_bar(self,Rect2(76,107,334,12),UI.GOLD,100)
- ult_bar.readout_size=11
+ hp.readout_size=17
+ UI.label(self,"AETHER",Vector2(42,87),16,Color("9ee4ee"))
+ ep=UI.hud_bar(self,Rect2(114,89,296,16),Color("6fd7e4"),100)
+ ep.readout_size=15
+ UI.label(self,"ULT",Vector2(42,107),16,UI.GOLD)
+ ult_bar=UI.hud_bar(self,Rect2(80,110,330,16),UI.GOLD,100)
+ ult_bar.readout_size=15
  foe_panel=UI.panel(self,Rect2(850,24,406,116),Color(0.035,0.025,0.06,0.94),Color(foe_accent(waves[0]),0.6))
  foe_trim=UI.trim(self,Rect2(850,24,406,116),foe_accent(waves[0]))
- foe_sub_label=UI.label(self,waves[0].sub,Vector2(868,32),12,foe_accent(waves[0]),292)
- foe_name_label=UI.label(self,waves[0].name,Vector2(868,50),24,Color.WHITE,380)
- wave_chip=UI.chip(self,"WAVE 1/"+str(waves.size()) if boss_mode else "STAGE 1",Rect2(1166,32,74,22),foe_accent(waves[0]),13)
- enemy_hp=UI.hud_bar(self,Rect2(868,90,372,24),foe_accent(waves[0]),foe.max_health)
- enemy_hp.readout_size=14
- var stage=UI.label(self,"SOUL REALM  /  RESONANT BRIDGE" if boss_mode else "01—01  /  SKYBRIDGE 09",Vector2(440,30),15,UI.GOLD,400)
+ foe_sub_label=UI.label(self,waves[0].sub,Vector2(868,28),17,foe_accent(waves[0]),280)
+ foe_name_label=UI.label(self,waves[0].name,Vector2(868,54),27,Color.WHITE,380)
+ wave_chip=UI.chip(self,"WAVE 1/"+str(waves.size()) if boss_mode else "STAGE 1",Rect2(1148,30,92,26),foe_accent(waves[0]),16)
+ enemy_hp=UI.hud_bar(self,Rect2(868,92,372,28),foe_accent(waves[0]),foe.max_health)
+ enemy_hp.readout_size=17
+ var stage=UI.label(self,"SOUL REALM  /  RESONANT BRIDGE" if boss_mode else "01—01  /  SKYBRIDGE 09",Vector2(440,30),17,UI.GOLD,400)
  stage.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  UI.outline(stage,5)
  retreat_button=UI.button(self,"RETREAT",Rect2(576,66,128,42),request_retreat)
- retreat_button.add_theme_font_size_override("font_size",14)
- tip=UI.label(self,"",Vector2(260,148),21,UI.GOLD,760)
+ retreat_button.add_theme_font_size_override("font_size",16)
+ tip=UI.label(self,"",Vector2(260,148),23,UI.GOLD,760)
  tip.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  UI.outline(tip,7)
  combo_label=UI.label(self,"",Vector2(560,222),34,UI.GOLD)
  UI.outline(combo_label,8)
- status=UI.label(self,"",Vector2(340,182),17,UI.VIOLET,600)
+ status=UI.label(self,"",Vector2(340,184),20,UI.VIOLET,600)
  status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  UI.outline(status,6)
- UI.label(self,"PROTOTYPE COMBAT ART",Vector2(540,700),11,Color(UI.MUTED,0.55),200)
  stick=VirtualStick.new()
  stick.position=Vector2(36,520)
  stick.size=Vector2(180,180)
  add_child(stick)
- UI.label(self,"MOVE  /  WASD",Vector2(61,698),14,UI.MUTED)
+ UI.label(self,"MOVE  /  WASD",Vector2(61,696),16,UI.MUTED)
  var definitions=[
   ["pulse","PULSE","Q · 25",Vector2(828,500),Color("b48bff")],
   ["rift","RIFT","E · 35",Vector2(932,500),Color("8f9bff")],
@@ -166,7 +165,7 @@ func _ready() -> void:
  if Profile.data.completed.has("1-1"):
   UI.button(self,"AUTO: OFF",Rect2(250,632,150,56),toggle_auto)
  else:
-  var auto_hint=UI.label(self,"Auto unlocks after first clear",Vector2(236,664),13,Color(UI.MUTED,0.8),200)
+  var auto_hint=UI.label(self,"Auto unlocks after first clear",Vector2(224,662),17,Color(UI.MUTED,0.95),240)
   UI.outline(auto_hint,4)
  hurt_vignette=HurtVignette.new()
  hurt_vignette.size=Vector2(1280,720)
@@ -219,7 +218,7 @@ func boss_intro(card_text:String="", card_sub:String="") -> void:
  tween.tween_interval(0.9)
  tween.tween_property(intro_card,"modulate:a",0.0,0.35)
  tween.parallel().tween_property(intro_sub,"modulate:a",0.0,0.35)
- tween.tween_callback(func(): tip.text="Move close, then STRIKE [J]. Red circle? DODGE [SPACE].")
+ tween.tween_callback(func(): tip.text=hint("Move close, then STRIKE [J]. Red circle? DODGE [SPACE].","Move close, then tap STRIKE. Red circle? Tap DODGE."))
 func cinematic_bars(hold:float) -> void:
  var tween=create_tween().set_parallel(true)
  tween.tween_property(bar_top,"position:y",0.0,0.2)
@@ -230,10 +229,10 @@ func cinematic_bars(hold:float) -> void:
 func wave_defs() -> Array:
  if boss_mode:
   return [
-   {"name":"RESONANCE SHADE","sub":"SOUL REALM ECHO  /  UNSTABLE","hp":240.0,"atk":20.0,"def":3.0,"look":"shade","accent":Color("6fd7e4"),"scale":1.0,"boss":false,"card":"RESONANCE SHADE","card_sub":"AN ECHO OF THE SUPPRESSION SCAN  /  CLEAR IT"},
-   {"name":"MERIDIAN ENFORCER","sub":"SOUL-WARPED CONSTRUCT  /  SUPPRESSION","hp":820.0,"atk":28.0,"def":6.0,"look":"warped","accent":Color("c27bff"),"scale":1.2,"boss":true,"card":"SOUL-WARPED ENFORCER","card_sub":"A MERIDIAN CONSTRUCT TWISTED BY YOUR ECHO  /  SURVIVE IT"}
+   {"name":"RESONANCE SHADE","sub":"SOUL REALM ECHO","hp":240.0,"atk":20.0,"def":3.0,"look":"shade","accent":Color("6fd7e4"),"scale":1.0,"boss":false,"card":"RESONANCE SHADE","card_sub":"AN ECHO OF THE SUPPRESSION SCAN  /  CLEAR IT"},
+   {"name":"MERIDIAN ENFORCER","sub":"SOUL-WARPED CONSTRUCT","hp":820.0,"atk":28.0,"def":6.0,"look":"warped","accent":Color("c27bff"),"scale":1.2,"boss":true,"card":"SOUL-WARPED ENFORCER","card_sub":"A MERIDIAN CONSTRUCT TWISTED BY YOUR ECHO  /  SURVIVE IT"}
   ]
- return [{"name":"MERIDIAN ENFORCER","sub":"SUPPRESSION CLASS  /  NEUTRAL","hp":650.0,"atk":28.0,"def":6.0,"look":"enforcer","accent":Color(0,0,0,0),"scale":1.0,"boss":false,"card":"MERIDIAN ENFORCER","card_sub":"SUPPRESSION CLASS  /  SKYBRIDGE 09  /  SURVIVE THE SCAN"}]
+ return [{"name":"MERIDIAN ENFORCER","sub":"SUPPRESSION CLASS","hp":650.0,"atk":28.0,"def":6.0,"look":"enforcer","accent":Color(0,0,0,0),"scale":1.0,"boss":false,"card":"MERIDIAN ENFORCER","card_sub":"SUPPRESSION CLASS  /  SKYBRIDGE 09  /  SURVIVE THE SCAN"}]
 func spawn_foe(def:Dictionary) -> void:
  foe=Fighter.new()
  foe.enemy=true
@@ -279,12 +278,15 @@ func spawn_foe(def:Dictionary) -> void:
   if boss_mode:
    wave_chip.text="WAVE "+str(wave+1)+"/"+str(waves.size())
    UI.chip_color(wave_chip,accent)
+func hint(keys:String, touch:String) -> String:
+ # Keyboard hints on desktop, plain wording on touch devices.
+ return touch if DisplayServer.is_touchscreen_available() else keys
 func foe_accent(def:Dictionary) -> Color:
  return Color("b46bff") if def.look=="shade" else Color("ff8a2a")
 func hud_phase_two() -> void:
  # HUD transition: foe panel, bar and tag turn Phase 2 red, sub-title reads SOUL ASCENDED.
  var red=Color("ff4f72")
- foe_sub_label.text="SOUL ASCENDED  /  PHASE 2"
+ foe_sub_label.text="SOUL ASCENDED"
  foe_sub_label.add_theme_color_override("font_color",red)
  enemy_hp.color=red
  enemy_hp.tick=-1.0
@@ -396,7 +398,7 @@ func enter_phase_two() -> void:
  create_tween().tween_property(flash_rect,"color:a",0.0,0.5)
  cinematic_bars(0.9)
  shake=12
- status.text="PHASE 2  /  the enforcer escalates"
+ status.text="PHASE 2  /  SOUL ASCENDED"
  Sound.play("hurt")
 func request_retreat() -> void:
  if ended:
@@ -467,9 +469,9 @@ func _process(delta:float) -> void:
   if wave>=1:
    tip.text=""
  elif tutorial_hits<3:
-  tip.text="Build your combo. Hold BLOCK [L] to reduce incoming damage."
+  tip.text=hint("Build your combo. Hold BLOCK [L] to reduce incoming damage.","Build your combo. Hold BLOCK to reduce incoming damage.")
  else:
-  tip.text="PULSE [Q] staggers. RIFT [E] reaches farther. MEND [R] restores health."
+  tip.text=hint("PULSE [Q] staggers. RIFT [E] reaches farther. MEND [R] restores health.","PULSE staggers. RIFT reaches farther. MEND restores health.")
  var move=move_input()
  if buffer_time>0:
   buffer_time-=delta
@@ -497,7 +499,8 @@ func _process(delta:float) -> void:
   dash_time-=delta
   hero.position+=dash*delta
  hero.position.x=clampf(hero.position.x,75,1205)
- hero.position.y=clampf(hero.position.y,345,540)
+ # feet stay above the touch buttons' top edge (y 500), so the right-hand buttons never cover a fighter
+ hero.position.y=clampf(hero.position.y,345,496)
  hero.trailing=dash_time>0
  hero.moving=move.length()>0.1 or dash_time>0
  hero.facing=1 if foe.position.x>hero.position.x else -1

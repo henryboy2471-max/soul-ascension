@@ -50,12 +50,12 @@ func _ready() -> void:
  name_plate.position=Vector2(256,484)
  name_plate.mouse_filter=Control.MOUSE_FILTER_IGNORE
  add_child(name_plate)
- name_label=UI.label(self,"",Vector2(270,487),19,Color.WHITE,700)
+ name_label=UI.label(self,"",Vector2(270,486),21,Color.WHITE,700)
  UI.outline(name_label,4)
- text_label=UI.label(self,"",Vector2(262,530),24,Color("e6e9f6"),930)
- hint=UI.label(self,"TAP  /  ENTER",Vector2(1000,644),14,UI.GOLD,200)
+ text_label=UI.label(self,"",Vector2(262,530),25,Color("e6e9f6"),930)
+ hint=UI.label(self,"TAP  /  ENTER",Vector2(1000,640),17,UI.GOLD,200)
  hint.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
- counter=UI.label(self,"",Vector2(262,646),13,Color(UI.MUTED,0.8),200)
+ counter=UI.label(self,"",Vector2(262,642),17,Color(UI.MUTED,0.95),200)
  var skip=UI.button(self,"SKIP",Rect2(1118,22,132,46),finish_all)
  skip.focus_mode=Control.FOCUS_NONE
  skip.add_theme_font_size_override("font_size",15)
@@ -122,7 +122,7 @@ func style_for(accent:Color, named:bool) -> void:
   plate.set_border_width_all(1)
   plate.set_corner_radius_all(4)
   name_plate.add_theme_stylebox_override("panel",plate)
-  name_plate.size=Vector2(maxf(120.0,float(name_label.text.length())*14.5+28.0),32)
+  name_plate.size=Vector2(maxf(120.0,float(name_label.text.length())*15.5+28.0),32)
  var ring=StyleBoxFlat.new()
  ring.bg_color=Color(0,0,0,0)
  ring.border_color=Color(accent,0.85)

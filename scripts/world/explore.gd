@@ -123,9 +123,9 @@ func build_hud() -> void:
  obj_bar.size=Vector2(4,54)
  obj_bar.mouse_filter=Control.MOUSE_FILTER_IGNORE
  add_child(obj_bar)
- UI.label(self,"OBJECTIVE",Vector2(44,27),14,UI.GOLD)
- obj_label=UI.label(self,"",Vector2(44,48),21,Color.WHITE,330)
- dist_label=UI.label(self,"",Vector2(362,28),15,UI.GOLD,86)
+ UI.label(self,"OBJECTIVE",Vector2(44,25),16,UI.GOLD)
+ obj_label=UI.label(self,"",Vector2(44,48),22,Color.WHITE,320)
+ dist_label=UI.label(self,"",Vector2(352,26),17,UI.GOLD,96)
  dist_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
  # The interaction prompt is drawn by paint_hud as a pill with a key cap; this label only carries its text.
  prompt_label=UI.label(self,"",Vector2(340,300),19,Color.WHITE,600)
@@ -146,11 +146,11 @@ func build_hud() -> void:
  add_child(act_button)
  act_button.activated.connect(func(): act_edge=true)
  toast_panel=UI.panel(self,Rect2(884,78,372,58),Color(0.025,0.035,0.08,0.96),Color(UI.GOLD,0.7))
- toast_kicker=UI.label(toast_panel,"CODEX UPDATED",Vector2(18,7),14,UI.GOLD)
- toast_label=UI.label(toast_panel,"",Vector2(18,26),19,Color.WHITE,340)
+ toast_kicker=UI.label(toast_panel,"CODEX UPDATED",Vector2(18,5),16,UI.GOLD)
+ toast_label=UI.label(toast_panel,"",Vector2(18,26),21,Color.WHITE,340)
  toast_panel.modulate.a=0.0
- move_hint=UI.label(self,"MOVE  /  WASD",Vector2(61,698),14,UI.MUTED)
- act_hint=UI.label(self,"ACT  /  E",Vector2(1110,696),14,UI.MUTED)
+ move_hint=UI.label(self,"MOVE  /  WASD",Vector2(61,696),16,UI.MUTED)
+ act_hint=UI.label(self,"ACT  /  E",Vector2(1110,696),16,UI.MUTED)
 func set_objective(text:String, x:float) -> void:
  objective_text=text
  target_x=x
@@ -288,7 +288,7 @@ func paint_prompt(c:Node2D) -> void:
  var accent=spot_accent(spot.id)
  var font=ThemeDB.fallback_font
  var words=str(spot.label)
- var fs=19
+ var fs=21
  var size=font.get_string_size(words,HORIZONTAL_ALIGNMENT_LEFT,-1,fs)
  var w=size.x+84.0+(46.0 if spot.kind=="channel" else 0.0)
  var h=44.0
@@ -327,8 +327,8 @@ func paint_hud(c:Node2D) -> void:
    c.draw_colored_polygon(PackedVector2Array([Vector2(sx,262+bob),Vector2(sx+13,244+bob),Vector2(sx,226+bob),Vector2(sx-13,244+bob)]),UI.GOLD)
    var meters=str(int(absf(px-target_x)/12.0))+" M"
    var font=ThemeDB.fallback_font
-   c.draw_string_outline(font,Vector2(sx-40,214+bob),meters,HORIZONTAL_ALIGNMENT_CENTER,80,15,5,Color(0,0,0,0.85))
-   c.draw_string(font,Vector2(sx-40,214+bob),meters,HORIZONTAL_ALIGNMENT_CENTER,80,15,UI.GOLD)
+   c.draw_string_outline(font,Vector2(sx-40,214+bob),meters,HORIZONTAL_ALIGNMENT_CENTER,80,17,5,Color(0,0,0,0.85))
+   c.draw_string(font,Vector2(sx-40,214+bob),meters,HORIZONTAL_ALIGNMENT_CENTER,80,17,UI.GOLD)
   else:
    var left=sx<=60
    var ex=34.0 if left else 1246.0

@@ -108,11 +108,11 @@ func show_home() -> void:
  screen.add_child(rail)
  UI.label(screen,"S O U L",Vector2(31,19),22,Color.WHITE)
  UI.label(screen,"A S C E N S I O N",Vector2(30,46),17,UI.GOLD)
- UI.label(screen,"THE UNBOUND CHRONICLES",Vector2(31,76),11,UI.MUTED)
+ UI.label(screen,"THE UNBOUND CHRONICLES",Vector2(31,76),13,UI.MUTED)
  UI.panel(screen,Rect2(242,23,287,59),Color(0.035,0.05,0.11,0.7))
  UI.label(screen,"LV. "+str(Profile.data.level),Vector2(256,34),24,UI.GOLD)
  UI.label(screen,Profile.data.name,Vector2(340,28),18)
- UI.label(screen,"POWER  "+str(HeroData.power(int(Profile.data.level))),Vector2(340,53),12,UI.MUTED)
+ UI.label(screen,"POWER  "+str(HeroData.power(int(Profile.data.level))),Vector2(340,53),14,UI.MUTED)
  currency_label=UI.label(screen,"",Vector2(566,38),19,Color("e7def6"))
  UI.button(screen,"SETTINGS",Rect2(1106,24,150,58),show_settings)
  refresh_profile()
@@ -123,32 +123,30 @@ Without limits.",Vector2(30,160),39,Color.WHITE)
 An entire world listening.",Vector2(32,282),17,Color("c2c5d8"))
  UI.panel(screen,Rect2(30,342,292,153),Color(0.025,0.035,0.08,0.92),Color(UI.GOLD,0.4))
  UI.trim(screen,Rect2(30,342,292,153),UI.GOLD)
- UI.label(screen,"STORY  /  CHAPTER 01",Vector2(47,358),12,UI.VIOLET)
+ UI.label(screen,"STORY  /  CHAPTER 01",Vector2(47,358),14,UI.VIOLET)
  UI.label(screen,"NEON DISTRICT",Vector2(47,382),25)
  UI.label(screen,"EPISODE 1   A spark in the static",Vector2(47,422),15,UI.MUTED)
- UI.label(screen,"EXPLORE FREE  ·  6 ENERGY FOR THE BOSS" if not Profile.data.completed.has("1-1") else "CLEARED  ·  REPLAY +55 XP  ·  +100 GOLD",Vector2(47,462),12,UI.GOLD)
+ UI.label(screen,"EXPLORE FREE  ·  6 ENERGY FOR THE BOSS" if not Profile.data.completed.has("1-1") else "CLEARED  ·  REPLAY +55 XP  ·  +100 GOLD",Vector2(47,462),14,UI.GOLD)
  UI.button(screen,"PLAY EPISODE 1",Rect2(30,510,292,79),show_mission,true)
  UI.button(screen,"MISSIONS",Rect2(30,604,139,66),show_missions)
  UI.button(screen,"UPGRADE",Rect2(183,604,139,66),show_upgrade)
  UI.panel(screen,Rect2(996,132,260,93),Color(0.025,0.035,0.08,0.92),Color(UI.GOLD,0.4))
  UI.trim(screen,Rect2(996,132,260,93),UI.GOLD)
- UI.label(screen,"DEVELOPMENT BUILD",Vector2(1013,147),12,UI.GOLD)
+ UI.label(screen,"NOW PLAYING",Vector2(1013,147),14,UI.GOLD)
  UI.label(screen,"EPISODE 1  /  FIRST AWAKENING",Vector2(1013,173),13)
- UI.label(screen,"Offline · no purchases",Vector2(1013,199),12,UI.MUTED)
+ UI.label(screen,"Plays offline  ·  no purchases",Vector2(1013,199),14,UI.MUTED)
  UI.button(screen,"HEROES    /    01",Rect2(996,244,260,65),show_hero)
- UI.button(screen,"SUMMON    /    PHASE 03",Rect2(996,320,260,65),func(): planned("SUMMON","Phase 3: hero banners, published odds, rarity guarantees, pity tracking, duplicate shards and summon history. No summons are available in this build."))
- UI.button(screen,"SHOP    /    PHASE 03",Rect2(996,396,260,65),func(): planned("SHOP","Phase 3: clearly itemized power packs, Crystal purchases and monthly membership. This prototype has no purchase connection or paid items."))
- UI.button(screen,"EVENTS    /    PHASE 04",Rect2(996,472,260,65),func(): planned("EVENTS","Seasonal stories, rotating challenges and limited bosses are planned for Phase 4. There are no active offers or countdown timers."))
- UI.button(screen,"BATTLE PASS",Rect2(996,548,260,65),func(): planned("BATTLE PASS","Phase 3: free and premium reward tracks. Rewards, prices and progression are not implemented yet."))
- UI.button(screen,"VIP",Rect2(996,624,260,46),func(): planned("VIP 0—15","Phase 3: purchase-based VIP progression with explicit power and farming benefits. You are VIP 0. No purchases can be made in this build."))
+ UI.button(screen,"SUMMON    /    SOON",Rect2(996,320,260,65),func(): planned("SUMMON","Coming soon: hero banners with published odds, rarity guarantees and summon history. Nothing can be summoned yet."))
+ UI.button(screen,"SHOP    /    SOON",Rect2(996,396,260,65),func(): planned("SHOP","Coming soon: clearly itemized power packs and Crystal purchases. There are no paid items in this version."))
+ UI.button(screen,"EVENTS    /    SOON",Rect2(996,472,260,65),func(): planned("EVENTS","Coming soon: seasonal stories, rotating challenges and limited bosses. There are no active offers or countdown timers."))
+ UI.button(screen,"BATTLE PASS",Rect2(996,548,260,65),func(): planned("BATTLE PASS","Coming soon: free and premium reward tracks. There is nothing to claim yet."))
+ UI.button(screen,"VIP",Rect2(996,624,260,46),func(): planned("VIP 0—15","Coming soon: purchase-based VIP progression with clear benefits. You are VIP 0. No purchases can be made in this version."))
  UI.panel(screen,Rect2(434,569,412,99),Color(0.025,0.035,0.075,0.85),Color("77618c"))
  UI.trim(screen,Rect2(434,569,412,99),UI.VIOLET)
  UI.label(screen,"E C H O   /   S T R I K E R",Vector2(459,582),13,UI.VIOLET)
  UI.label(screen,"THE UNBOUND",Vector2(457,605),28)
- UI.label(screen,"BASE FORM     •     EVOLUTION UNKNOWN",Vector2(459,644),11,UI.MUTED)
- notice=UI.label(screen,"PHASE 1 PROTOTYPE  ·  Original generated key art / placeholder combat rigs",Vector2(31,692),11,UI.MUTED)
- if Profile.data.body=="female":
-  notice.text="PHASE 1 PROTOTYPE  ·  Female combat rig selected / male key art is a placeholder"
+ UI.label(screen,"BASE FORM     •     EVOLUTION UNKNOWN",Vector2(459,644),13,UI.MUTED)
+ notice=UI.label(screen,"Progress is saved on this device.",Vector2(31,692),13,UI.MUTED)
  refresh_profile()
 func refresh_profile() -> void:
  if is_instance_valid(currency_label):
@@ -215,7 +213,7 @@ func show_ending() -> void:
 func start_battle(from_episode:bool=false) -> bool:
  if not Profile.begin_run("1-1"):
   if not from_episode:
-   planned("ENERGY RECHARGING","Missions require 6 energy. One energy regenerates every five minutes, including while the game is closed. Paid refills are not available in Phase 1.")
+   planned("ENERGY RECHARGING","Missions require 6 energy. One energy regenerates every five minutes, including while the game is closed. Paid refills are not available.")
   return false
  close_modal()
  clear_screen()
@@ -278,7 +276,7 @@ Defense    "+str(stats.defense)+"
 Speed      "+str(stats.speed)+"
 Critical   12% / 160%",Vector2(530,250),22,Color("cbd0e2"))
  UI.label(node,"A quiet Aether signature with limitless evolutionary potential.",Vector2(294,464),19,UI.MUTED,680)
- UI.label(node,"Placeholder rig · Gear, stars and transformations arrive in later phases.",Vector2(294,520),14,UI.MUTED,680)
+ UI.label(node,"Gear, stars and transformations arrive in later episodes.",Vector2(294,520),14,UI.MUTED,680)
  UI.button(node,"TURN",Rect2(294,568,110,58),func(): rig.facing*=-1)
  UI.button(node,"AETHER POSE",Rect2(416,568,210,58),func(): rig.swing=1.0;rig.invincible=1.0;Sound.play("special"))
  UI.button(node,"CODEX",Rect2(638,568,170,58),show_codex)
@@ -300,7 +298,7 @@ func show_upgrade() -> void:
  var xp=UI.bar(node,Rect2(294,407,660,17),UI.VIOLET,Progression.required(int(Profile.data.level)))
  xp.value=Profile.data.xp
  UI.label(node,str(Profile.data.xp)+" / "+str(Progression.required(int(Profile.data.level)))+" XP",Vector2(294,441),20)
- UI.label(node,"Gear and skill material upgrades are planned for Phase 2.",Vector2(294,500),17,UI.MUTED,674)
+ UI.label(node,"Gear and skill material upgrades arrive in later episodes.",Vector2(294,500),17,UI.MUTED,674)
 func show_missions() -> void:
  var node=new_modal("NEON DISTRICT","CHAPTER 01  /  EPISODE 1 PLAYABLE  /  EPISODE 2 NEXT")
  for i in range(10):
@@ -309,7 +307,7 @@ func show_missions() -> void:
   var row=i%5
   var title=mission.id+"  "+mission.title
   UI.label(node,title,Vector2(294+col*350,208+row*63),16,Color.WHITE if i==0 else UI.MUTED,320)
-  UI.label(node,("CLEARED · REPLAY AVAILABLE" if Profile.data.completed.has("1-1") else "EPISODE 1 · PLAYABLE") if i==0 else ("EPISODE 2 · UP NEXT" if i==1 else "PLANNED"),Vector2(294+col*350,233+row*63),11,UI.GOLD if i==0 else Color("68738c"))
+  UI.label(node,("CLEARED · REPLAY AVAILABLE" if Profile.data.completed.has("1-1") else "EPISODE 1 · PLAYABLE") if i==0 else ("EPISODE 2 · UP NEXT" if i==1 else "PLANNED"),Vector2(294+col*350,233+row*63),13,UI.GOLD if i==0 else Color("68738c"))
  UI.button(node,"PLAY EPISODE 1",Rect2(294,568,310,58),show_mission,true)
 func show_settings() -> void:
  var node=new_modal("SETTINGS","SAVED ON THIS DEVICE")
@@ -324,8 +322,8 @@ func show_settings() -> void:
   check.button_pressed=Profile.data.settings.get(key,false)
   node.add_child(check)
   check.toggled.connect(func(value): Profile.data.settings[key]=value;Profile.persist())
- UI.label(node,"Local save with backup. Cloud accounts are planned.
-No analytics, ads, API keys or payment services are connected.",Vector2(294,478),17,UI.MUTED,676)
+ UI.label(node,"Saved on this device with a backup copy.
+No analytics, ads or payment services are connected.",Vector2(294,478),17,UI.MUTED,676)
 func onboarding() -> void:
  var node=new_modal("YOUR SIGNAL HAS AWAKENED","SOUL ASCENSION  /  THE FIRST FRACTURE")
  # The onboarding panel cannot be dismissed before choosing an identity.
@@ -333,26 +331,18 @@ func onboarding() -> void:
   if child is Button: child.queue_free()
  UI.label(node,"Aether changed the world. Yours barely registers.
 Tonight, the city will learn what that means.",Vector2(294,198),23,Color("cbd0e2"),680)
- UI.label(node,"CHOOSE YOUR NAME",Vector2(294,291),12,UI.GOLD)
+ UI.label(node,"CHOOSE YOUR NAME",Vector2(294,306),14,UI.GOLD)
  var field=LineEdit.new()
- field.position=Vector2(294,317)
+ field.position=Vector2(294,334)
  field.size=Vector2(652,56)
  field.max_length=18
  field.text="Ascendant"
  field.add_theme_font_size_override("font_size",24)
  node.add_child(field)
- var selection=OptionButton.new()
- selection.position=Vector2(294,396)
- selection.size=Vector2(652,59)
- selection.add_item("Male fighter")
- selection.add_item("Female fighter")
- selection.add_theme_font_size_override("font_size",22)
- node.add_child(selection)
- UI.label(node,"Both share the same abilities. Character art is a prototype placeholder.",Vector2(294,478),15,UI.MUTED,669)
- UI.button(node,"BEGIN YOUR AWAKENING",Rect2(294,553,652,73),func():
+ UI.button(node,"BEGIN YOUR AWAKENING",Rect2(294,440,652,80),func():
   var chosen=field.text.strip_edges()
   Profile.data.name="Ascendant" if chosen.is_empty() else chosen
-  Profile.data.body="male" if selection.selected==0 else "female"
+  Profile.data.body="male"
   Profile.data.onboarded=true
   Profile.persist()
   show_home()
