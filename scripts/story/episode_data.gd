@@ -8,8 +8,6 @@ const SPEAKERS = {
  "MIRA":{"name":"MIRA VEY","color":Color("ffd86b"),"portrait":"mira"},
  "ENFORCER":{"name":"MERIDIAN ENFORCER","color":Color("fa6f82"),"portrait":"enforcer"}
 }
-const TITLE = "A SPARK IN THE STATIC"
-const SEASON = "SEASON 01  /  THE FRACTURE"
 const INTRO = [
  {"who":"NARRATOR","text":"Twenty-one years ago, the sky fractured. The light it left behind rewrote what people could become. They called it Aether."},
  {"who":"NARRATOR","text":"Tonight, a storm has shut down the tram network across Neon District. Meridian scanners are sweeping the lower bridges."},
@@ -50,8 +48,6 @@ const OUTRO = [
  {"who":"SYSTEM","text":"Beyond the atmosphere, a second signal answers. Source unknown. Distance: impossible."},
  {"who":"MIRA","text":"Meridian will come looking for you now. We should move before the rain does."}
 ]
-const NEXT_TITLE = "UNDER THE VIOLET RAIN"
-const NEXT_NUMBER = "EPISODE 2"
 const MURAL = [
  {"who":"NARRATOR","text":"A hand-painted mural: a ring of lanterns around a sleeping city. Beneath it, in careful letters: 'WHEN THE SKY GOES DARK, WE KEEP THE LIGHT.'"},
  {"who":"PLAYER","text":"Lantern Circuit. Mira's people. Hidden in plain sight, just like the rest of us."}

@@ -62,3 +62,6 @@ Rewards (proposal): first clear 150 XP and 300 gold, replay 65 XP and 120 gold, 
 - Is the Vaust "Resonance Amnesty" cliffhanger acceptable canon?
 - Will you supply a Hollow Cantor sprite sheet, or approve the interim reuse of the Shade sprite?
 - Are the reward numbers acceptable, and should Episode 2 unlock only after Episode 1 is cleared (my recommendation)?
+
+## M1 status (data extraction, done on this branch)
+`scripts/missions/mission_defs.gd` (`MissionDefs`) now holds mission data; Episode 1 behaviour is pinned by `tests/golden/episode1_trace.json`, recorded from the locked commit `80f54c3` with `tests/support/episode1_trace.gd` and checked by `tests/test_episode_defs.gd`. Mission 1-2 exists as data (unlock requires 1-1, rewards 150/300 first and 65/120 replay, Codex ids), still `playable: false` with no scenes.

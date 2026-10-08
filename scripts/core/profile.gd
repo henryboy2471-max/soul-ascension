@@ -35,10 +35,11 @@ func unlock_codex(id:String) -> bool:
  persist()
  return true
 func begin_run(id:String) -> bool:
- if active_run!="" or id!="1-1":
+ # Any defined mission whose unlock requirement is met can be started; the UI only offers missions marked playable.
+ if active_run!="" or not MissionDefs.has_mission(id) or not MissionDefs.is_unlocked(id,data.completed):
   return false
  Economy.regenerate(data,int(Time.get_unix_time_from_system()))
- if not Economy.spend(data,"energy",6):
+ if not Economy.spend(data,"energy",MissionDefs.energy_cost(id)):
   return false
  active_run=id
  persist()
@@ -48,11 +49,12 @@ func finish_run(won:bool) -> Dictionary:
   return {}
  var id=active_run
  active_run=""
- var reward={"xp":0,"gold":0,"levels":0,"first":false}
+ var reward={"xp":0,"gold":0,"levels":0,"first":false,"id":id}
  if won:
   reward.first=not data.completed.has(id)
-  reward.xp=120 if reward.first else 55
-  reward.gold=250 if reward.first else 100
+  var amounts=MissionDefs.reward(id,reward.first)
+  reward.xp=amounts.xp
+  reward.gold=amounts.gold
   data.gold+=reward.gold
   reward.levels=Progression.grant(data,reward.xp)
   data.heroes.echo.level=data.level

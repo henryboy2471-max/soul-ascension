@@ -4,6 +4,10 @@ var modal:Control
 var currency_label:Label
 var notice:Label
 var scene_name="home"
+var current_mission="1-1"
+# The mission the home screen advertises. Episode 1 for now; later milestones point this at the next playable mission.
+func home_mission() -> String:
+ return "1-1"
 var rotate_overlay:Control
 var orientation_timer=0.0
 func _process(delta:float) -> void:
@@ -124,10 +128,12 @@ An entire world listening.",Vector2(32,282),17,Color("c2c5d8"))
  UI.panel(screen,Rect2(30,342,292,153),Color(0.025,0.035,0.08,0.92),Color(UI.GOLD,0.4))
  UI.trim(screen,Rect2(30,342,292,153),UI.GOLD)
  UI.label(screen,"STORY  /  CHAPTER 01",Vector2(47,358),14,UI.VIOLET)
- UI.label(screen,"NEON DISTRICT",Vector2(47,382),25)
- UI.label(screen,"EPISODE 1   A spark in the static",Vector2(47,422),15,UI.MUTED)
- UI.label(screen,"EXPLORE FREE  ·  6 ENERGY FOR THE BOSS" if not Profile.data.completed.has("1-1") else "CLEARED  ·  REPLAY +55 XP  ·  +100 GOLD",Vector2(47,462),14,UI.GOLD)
- UI.button(screen,"PLAY EPISODE 1",Rect2(30,510,292,79),show_mission,true)
+ var home_def=MissionDefs.get_def(home_mission())
+ var replay=MissionDefs.reward(home_def.id,false)
+ UI.label(screen,home_def.region,Vector2(47,382),25)
+ UI.label(screen,home_def.number+"   "+home_def.title_case,Vector2(47,422),15,UI.MUTED)
+ UI.label(screen,"EXPLORE FREE  ·  %d ENERGY FOR THE BOSS" % home_def.energy if not Profile.data.completed.has(home_def.id) else "CLEARED  ·  REPLAY +%d XP  ·  +%d GOLD" % [replay.xp,replay.gold],Vector2(47,462),14,UI.GOLD)
+ UI.button(screen,"PLAY "+home_def.number,Rect2(30,510,292,79),show_mission,true)
  UI.button(screen,"MISSIONS",Rect2(30,604,139,66),show_missions)
  UI.button(screen,"UPGRADE",Rect2(183,604,139,66),show_upgrade)
  UI.panel(screen,Rect2(996,132,260,93),Color(0.025,0.035,0.08,0.92),Color(UI.GOLD,0.4))
@@ -182,21 +188,24 @@ func planned(title:String, copy:String, sub:String="COMING SOON", footer:String=
  if footer!="":
   UI.label(node,footer,Vector2(294,476),17,UI.GOLD,658)
 func show_mission() -> void:
- var node=new_modal("A SPARK IN THE STATIC","STORY 01—01  /  NEON DISTRICT")
- UI.label(node,MissionData.STORY[0].description,Vector2(294,208),23,Color("cbd0e2"),677)
- UI.label(node,"Explore, investigate the relay, and survive the Soul Realm.",Vector2(294,334),23,UI.GOLD)
+ var mission=MissionDefs.get_def(home_mission())
+ var node=new_modal(mission.title,mission.modal_sub)
+ UI.label(node,mission.description,Vector2(294,208),23,Color("cbd0e2"),677)
+ UI.label(node,mission.tagline,Vector2(294,334),23,UI.GOLD)
  UI.label(node,"Explore: WASD / arrows / left stick, E to act
 Strike: J   Heavy: K   Dodge: Space   Block: hold L
 Pulse: Q   Rift: E   Mend: R   Ultimate: F
 On a phone, use the matching touch buttons.",Vector2(294,383),17,UI.MUTED,690)
- UI.button(node,"BEGIN EPISODE 1",Rect2(294,551,348,75),start_episode,true)
- UI.button(node,"BATTLE ONLY",Rect2(656,568,170,58),func(): start_battle(false))
-func start_episode() -> void:
+ UI.button(node,"BEGIN "+mission.number,Rect2(294,551,348,75),func(): start_episode(mission.id),true)
+ UI.button(node,"BATTLE ONLY",Rect2(656,568,170,58),func(): start_battle(false,mission.id))
+func start_episode(mission_id:String="1-1") -> void:
  close_modal()
  clear_screen()
  scene_name="episode"
+ current_mission=mission_id
  var episode=Episode.new()
- episode.request_battle=func(): return start_battle(true)
+ episode.mission_id=mission_id
+ episode.request_battle=func(): return start_battle(true,mission_id)
  episode.exit_requested.connect(show_home)
  screen.add_child(episode)
 func on_battle_finished(won:bool, from_episode:bool) -> void:
@@ -208,18 +217,22 @@ func show_ending() -> void:
  clear_screen()
  scene_name="ending"
  var episode=Episode.new()
+ episode.mission_id=current_mission
  episode.phase="ending"
  episode.completed.connect(func(): show_result(true))
  screen.add_child(episode)
-func start_battle(from_episode:bool=false) -> bool:
- if not Profile.begin_run("1-1"):
+func start_battle(from_episode:bool=false, mission_id:String="1-1") -> bool:
+ if not Profile.begin_run(mission_id):
   if not from_episode:
-   planned("ENERGY RECHARGING","Missions require 6 energy. One energy regenerates every five minutes, including while the game is closed. Paid refills are not available.","MISSIONS  /  6 ENERGY","")
+   var cost=MissionDefs.energy_cost(mission_id)
+   planned("ENERGY RECHARGING","Missions require %d energy. One energy regenerates every five minutes, including while the game is closed. Paid refills are not available." % cost,"MISSIONS  /  %d ENERGY" % cost,"")
   return false
+ current_mission=mission_id
  close_modal()
  clear_screen()
  scene_name="battle"
  var battle=Battle.new()
+ battle.mission_id=mission_id
  battle.boss_mode=from_episode
  screen.add_child(battle)
  battle.finished.connect(on_battle_finished.bind(from_episode))
@@ -236,8 +249,9 @@ func show_result(won:bool) -> void:
  UI.panel(screen,Rect2(283,84,714,552),Color(0.025,0.035,0.075,0.96),Color(tone,0.7))
  UI.trim(screen,Rect2(283,84,714,552),tone)
  UI.chip(screen,"MISSION COMPLETE" if won else "SIGNAL LOST",Rect2(325,120,190,26),tone,13)
- UI.label(screen,"ASCENSION BEGINS" if won else "RISE. TRY AGAIN.",Vector2(324,160),44)
- UI.label(screen,"Neon District  /  A spark in the static",Vector2(326,226),19,UI.MUTED)
+ var texts=MissionDefs.get_def(reward.id).result
+ UI.label(screen,texts.won_title if won else texts.lost_title,Vector2(324,160),44)
+ UI.label(screen,texts.subtitle,Vector2(326,226),19,UI.MUTED)
  var rule=ColorRect.new()
  rule.color=Color(tone,0.35)
  rule.position=Vector2(326,268)
@@ -291,7 +305,8 @@ func show_codex() -> void:
   var x=294+col*350
   var y=200+row*118
   UI.label(node,entry.title if found else "UNDISCOVERED",Vector2(x,y),17,UI.GOLD if found else Color("68738c"),330)
-  UI.label(node,entry.text if found else "Explore Episode 1 to uncover this entry.",Vector2(x,y+26),13,Color("cbd0e2") if found else Color("68738c"),330)
+  var source=MissionDefs.mission_for_codex(entry.id)
+  UI.label(node,entry.text if found else "Explore Episode %d to uncover this entry." % int(source.get("episode",1)),Vector2(x,y+26),13,Color("cbd0e2") if found else Color("68738c"),330)
 func show_upgrade() -> void:
  var node=new_modal("GROW YOUR AETHER","LEVELS INCREASE YOUR COMBAT STATS")
  UI.label(node,"Level "+str(Profile.data.level)+"   →   "+str(mini(100,Profile.data.level+1)),Vector2(294,221),37,UI.GOLD)
@@ -301,15 +316,28 @@ func show_upgrade() -> void:
  UI.label(node,str(Profile.data.xp)+" / "+str(Progression.required(int(Profile.data.level)))+" XP",Vector2(294,441),20)
  UI.label(node,"Gear and skill material upgrades arrive in later episodes.",Vector2(294,500),17,UI.MUTED,674)
 func show_missions() -> void:
- var node=new_modal("NEON DISTRICT","CHAPTER 01  /  EPISODE 1 PLAYABLE  /  EPISODE 2 NEXT")
+ var mission_def=MissionDefs.get_def(home_mission())
+ var node=new_modal(mission_def.region,mission_def.missions_sub)
+ var story=MissionData.story()
  for i in range(10):
-  var mission=MissionData.STORY[i]
+  var mission=story[i]
   var col=i/5
   var row=i%5
   var title=mission.id+"  "+mission.title
   UI.label(node,title,Vector2(294+col*350,208+row*63),16,Color.WHITE if i==0 else UI.MUTED,320)
-  UI.label(node,("CLEARED · REPLAY AVAILABLE" if Profile.data.completed.has("1-1") else "EPISODE 1 · PLAYABLE") if i==0 else ("EPISODE 2 · UP NEXT" if i==1 else "PLANNED"),Vector2(294+col*350,233+row*63),13,UI.GOLD if i==0 else Color("68738c"))
- UI.button(node,"PLAY EPISODE 1",Rect2(294,568,310,58),show_mission,true)
+  UI.label(node,mission_status(mission.id),Vector2(294+col*350,233+row*63),13,UI.GOLD if i==0 else Color("68738c"))
+ UI.button(node,"PLAY "+mission_def.number,Rect2(294,568,310,58),show_mission,true)
+func mission_status(id:String) -> String:
+ var d=MissionDefs.get_def(id)
+ if d.is_empty():
+  return "PLANNED"
+ if Profile.data.completed.has(id):
+  return "CLEARED · REPLAY AVAILABLE"
+ if d.playable and MissionDefs.is_unlocked(id,Profile.data.completed):
+  return d.number+" · PLAYABLE"
+ if d.playable:
+  return d.number+" · LOCKED"
+ return d.number+" · UP NEXT"
 func show_settings() -> void:
  var node=new_modal("SETTINGS","SAVED ON THIS DEVICE")
  var options=[["sound","Sound effects"],["shake","Screen shake"],["reduced_motion","Reduced background motion"]]

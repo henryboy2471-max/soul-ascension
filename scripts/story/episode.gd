@@ -5,11 +5,14 @@ class_name Episode
 signal exit_requested
 signal completed
 var phase="intro"
+var mission_id="1-1"
+var mission:Dictionary={}
 var request_battle:Callable
 var explore:Explore
 var step=0
 var busy=false
 func _ready() -> void:
+ mission=MissionDefs.get_def(mission_id)
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  mouse_filter=Control.MOUSE_FILTER_IGNORE
  if phase=="ending":
@@ -47,7 +50,7 @@ func make_backdrop() -> TextureRect:
  add_child(art)
  return art
 func run_intro() -> void:
- await card("EPISODE 1  /  "+EpisodeData.SEASON,EpisodeData.TITLE,"NEON DISTRICT  /  SKYBRIDGE 09",true,3.6)
+ await card(mission.number+"  /  "+mission.season,mission.title,mission.card_location,true,mission.intro_card_length)
  var backdrop=make_backdrop()
  await say(EpisodeData.INTRO)
  backdrop.queue_free()
@@ -60,16 +63,16 @@ func begin_explore() -> void:
  set_step(0)
 func set_step(n:int) -> void:
  step=n
+ # Objective text and waypoint come from the mission definition; what each step unlocks stays here (Episode 1 flow).
+ var objective=mission.objectives[n]
  match n:
   0:
    explore.enabled.mira=true
-   explore.set_objective("Find Mira Vey at the tram",560.0)
   1:
    explore.enabled.terminal=true
-   explore.set_objective("Reboot the relay terminal",1560.0)
   2:
    explore.open_breach()
-   explore.set_objective("Enter the Soul Realm breach",2200.0)
+ explore.set_objective(objective.text,objective.x)
 func on_interact(id:String) -> void:
  if busy:
   return
@@ -101,7 +104,8 @@ func on_interact(id:String) -> void:
    if step==2:
     await say(EpisodeData.BREACH)
     unlock("breach")
-    await card("SOUL REALM  /  MISSION ZONE 01","THE RESONANT BRIDGE","SURVIVE THE SUPPRESSION CONSTRUCT",false,2.0)
+    var breach=mission.breach_card
+    await card(breach.kicker,breach.title,breach.subtitle,false,breach.length)
     var ok=false
     if request_battle.is_valid():
      ok=request_battle.call()
@@ -112,9 +116,12 @@ func on_interact(id:String) -> void:
   explore.act_block=0.45
   explore.locked=false
 func run_ending() -> void:
- Profile.unlock_codex("enforcer")
+ var ending=mission.ending
+ for id in ending.codex:
+  Profile.unlock_codex(id)
  var backdrop=make_backdrop()
- await say(EpisodeData.OUTRO)
+ await say(ending.lines)
  backdrop.queue_free()
- await card("NEXT EPISODE",EpisodeData.NEXT_NUMBER+"  /  "+EpisodeData.NEXT_TITLE,"TO BE CONTINUED...",true,4.0)
+ var teaser=ending.teaser
+ await card(teaser.kicker,teaser.number+"  /  "+teaser.title,teaser.subtitle,true,teaser.length)
  completed.emit()

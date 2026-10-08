@@ -31,6 +31,7 @@ var telegraph_len=0.8
 var recovery=1.0
 var phase=1
 var boss_mode=false
+var mission_id="1-1"
 var target=Vector2.ZERO
 var ended=false
 var intro=0.8
@@ -121,7 +122,7 @@ func _ready() -> void:
  wave_chip=UI.chip(self,"WAVE 1/"+str(waves.size()) if boss_mode else "STAGE 1",Rect2(1148,30,92,26),foe_accent(waves[0]),16)
  enemy_hp=UI.hud_bar(self,Rect2(868,92,372,28),foe_accent(waves[0]),foe.max_health)
  enemy_hp.readout_size=17
- var stage=UI.label(self,"SOUL REALM  /  RESONANT BRIDGE" if boss_mode else "01—01  /  SKYBRIDGE 09",Vector2(440,30),17,UI.GOLD,400)
+ var stage=UI.label(self,MissionDefs.get_def(mission_id).stage_label if boss_mode else MissionDefs.get_def(mission_id).battle_stage_label,Vector2(440,30),17,UI.GOLD,400)
  stage.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  UI.outline(stage,5)
  retreat_button=UI.button(self,"RETREAT",Rect2(576,66,128,42),request_retreat)
@@ -227,12 +228,8 @@ func cinematic_bars(hold:float) -> void:
  tween.chain().tween_property(bar_top,"position:y",-22.0,0.3)
  tween.parallel().tween_property(bar_bottom,"position:y",720.0,0.3)
 func wave_defs() -> Array:
- if boss_mode:
-  return [
-   {"name":"RESONANCE SHADE","sub":"SOUL REALM ECHO","hp":240.0,"atk":20.0,"def":3.0,"look":"shade","accent":Color("6fd7e4"),"scale":1.0,"boss":false,"card":"RESONANCE SHADE","card_sub":"AN ECHO OF THE SUPPRESSION SCAN  /  CLEAR IT"},
-   {"name":"MERIDIAN ENFORCER","sub":"SOUL-WARPED CONSTRUCT","hp":820.0,"atk":28.0,"def":6.0,"look":"warped","accent":Color("c27bff"),"scale":1.2,"boss":true,"card":"SOUL-WARPED ENFORCER","card_sub":"A MERIDIAN CONSTRUCT TWISTED BY YOUR ECHO  /  SURVIVE IT"}
-  ]
- return [{"name":"MERIDIAN ENFORCER","sub":"SUPPRESSION CLASS","hp":650.0,"atk":28.0,"def":6.0,"look":"enforcer","accent":Color(0,0,0,0),"scale":1.0,"boss":false,"card":"MERIDIAN ENFORCER","card_sub":"SUPPRESSION CLASS  /  SKYBRIDGE 09  /  SURVIVE THE SCAN"}]
+ # Wave definitions live in MissionDefs: the story waves (boss mode) or the mission's battle-only replay wave.
+ return MissionDefs.waves(mission_id,boss_mode)
 func spawn_foe(def:Dictionary) -> void:
  foe=Fighter.new()
  foe.enemy=true
