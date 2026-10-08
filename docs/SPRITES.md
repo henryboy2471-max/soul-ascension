@@ -81,3 +81,21 @@ A 1774x887 production-style alpha sheet (one source scale, `--scale-fixed 1.0`).
 | finisher, jump, land | FLAGGED | Full-bleed scenes / nothing identifiable. |
 
 Scale: world height 185 makes the Shade's standing figure 163.2 px against the Hero's 148.0 px in battle (ratio 1.10): taller and heavier, not oversized. The old procedural Shade remains as the fallback if `frames.tres` is missing.
+
+## Soul-Warped Enforcer import report (enforcer_sprite_sheet.png)
+
+A 1774x887 alpha sheet with a heavy orange fire haze (alpha median 148), one source scale (`--scale-fixed 1.0`). The haze needs `--alpha-min 200` to separate frames. Reproduce with `tools/import_enforcer.sh`.
+
+| Animation | Status | Notes |
+| --- | --- | --- |
+| idle | exported, 8 frames | Row 1 frames 1-8, front-facing, clean gaps. |
+| walk | exported, 4 frames | Row 1 frames 11-14 (side-on stride). **Inferred label:** frames 9-10 are a turn into the lean and are skipped (frame 10 stands noticeably taller and would pop in a loop). |
+| run | exported, 6 frames | Row 2 frames 1-6 (side-view lean). **Inferred label.** Available via the animation map; the game currently moves the Enforcer with walk (`run_speed_threshold` is 0 for foes). |
+| dash | FLAGGED | Row 2 frames 7-11 (spear-thrust lunge): fire trails fuse them into one blob. |
+| hurt | FLAGGED | Bottom rows mix recoil, lunge and falling poses without labels. White hit flash over idle is used. |
+| defeat | FLAGGED | Stagger/prone frames overlap each other and the full-bleed scenes. Code-drawn dissolve over the frozen sprite is used. |
+| attack1-3 | FLAGGED | Row 3: slash crescents fuse into blobs (alpha 200 gives one 1750 px run). Orange code-drawn slash arc over the idle sprite. |
+| skill | FLAGGED | Row 4: orbs, beams and rings fuse. |
+| finisher, jump, land | FLAGGED | Full-bleed rock/fire scenes, nothing identifiable. The game's code-drawn cinematic finisher plays instead. |
+
+Scale: world height 180 x boss node scale 1.2 gives a 195.8 px standing figure vs the Hero's 148.0 px (1.32x) and the Shade's 163.2 px (1.20x). The procedural Enforcer remains as the fallback if `frames.tres` is missing, and the battle-only Enforcer (look "enforcer") stays procedural.

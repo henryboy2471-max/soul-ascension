@@ -222,6 +222,9 @@ func spawn_foe(def:Dictionary) -> void:
  if def.look=="shade":
   # Sprite art when present (world height 185 = about 10% taller than the Hero); the procedural rig stays as fallback.
   foe.load_sprite_set("res://assets/enemies/resonance_shade/frames.tres",185.0,Color("b46bff"))
+ elif def.look=="warped":
+  # Soul-Warped Enforcer sprite art; world height 180 x node scale 1.2 stands about 1.3x the Hero. Orange fire VFX for missing attack frames.
+  foe.load_sprite_set("res://assets/enemies/enforcer/frames.tres",180.0,Color("ff8a2a"))
  foe.position=Vector2(850,450)
  foe.facing=-1
  arena.add_child(foe)

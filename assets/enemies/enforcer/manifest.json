@@ -1,0 +1,352 @@
+{
+ "animations": {
+  "attack1": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "enforcer_sprite_sheet.png",
+   "warnings": [
+    "Row 3: slash crescents and fire arcs fuse frames together; cannot be separated."
+   ]
+  },
+  "attack2": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "enforcer_sprite_sheet.png",
+   "warnings": [
+    "Row 3: same as attack1."
+   ]
+  },
+  "attack3": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "enforcer_sprite_sheet.png",
+   "warnings": [
+    "Row 3: same as attack1."
+   ]
+  },
+  "dash": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "enforcer_sprite_sheet.png",
+   "warnings": [
+    "Row 2 frames 7-11 (spear-thrust lunge) fuse with their neighbours through the fire trails; not separable."
+   ]
+  },
+  "defeat": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "enforcer_sprite_sheet.png",
+   "warnings": [
+    "Lower rows contain stagger/prone/collapse frames that overlap each other and the full-bleed scenes. Game fades the idle sprite with a code-drawn dissolve."
+   ]
+  },
+  "finisher": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "enforcer_sprite_sheet.png",
+   "warnings": [
+    "Bottom rows: full-bleed rock/fire scenes with no separable character."
+   ]
+  },
+  "hurt": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "enforcer_sprite_sheet.png",
+   "warnings": [
+    "Lower rows mix recoil, lunge and falling poses with no labels; assigning a hit-reaction would be a guess. Game uses a white hit flash over idle."
+   ]
+  },
+  "idle": {
+   "background": "none",
+   "flagged": false,
+   "fps": 8.0,
+   "frames": [
+    {
+     "bottom": 148,
+     "file": "idle_00.png",
+     "foot_x": 62.5,
+     "h": 148,
+     "head_w": 38,
+     "w": 110
+    },
+    {
+     "bottom": 144,
+     "file": "idle_01.png",
+     "foot_x": 57.44444444444444,
+     "h": 144,
+     "head_w": 35,
+     "w": 106
+    },
+    {
+     "bottom": 145,
+     "file": "idle_02.png",
+     "foot_x": 53.470588235294116,
+     "h": 145,
+     "head_w": 34,
+     "w": 102
+    },
+    {
+     "bottom": 145,
+     "file": "idle_03.png",
+     "foot_x": 54.88235294117647,
+     "h": 145,
+     "head_w": 33,
+     "w": 99
+    },
+    {
+     "bottom": 145,
+     "file": "idle_04.png",
+     "foot_x": 54.642857142857146,
+     "h": 145,
+     "head_w": 36,
+     "w": 97
+    },
+    {
+     "bottom": 146,
+     "file": "idle_05.png",
+     "foot_x": 54.77777777777778,
+     "h": 146,
+     "head_w": 37,
+     "w": 100
+    },
+    {
+     "bottom": 148,
+     "file": "idle_06.png",
+     "foot_x": 52.68421052631579,
+     "h": 148,
+     "head_w": 37,
+     "w": 98
+    },
+    {
+     "bottom": 145,
+     "file": "idle_07.png",
+     "foot_x": 56.66216216216216,
+     "h": 145,
+     "head_w": 34,
+     "w": 100
+    }
+   ],
+   "frames_out": [
+    "idle_00.png",
+    "idle_01.png",
+    "idle_02.png",
+    "idle_03.png",
+    "idle_04.png",
+    "idle_05.png",
+    "idle_06.png",
+    "idle_07.png"
+   ],
+   "ground": "frame",
+   "loop": true,
+   "scale": 1.0,
+   "scale_fixed": 1.0,
+   "scale_like": null,
+   "source": "enforcer_sprite_sheet.png",
+   "warnings": []
+  },
+  "jump": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "enforcer_sprite_sheet.png",
+   "warnings": [
+    "No jump/land frames identifiable on the sheet."
+   ]
+  },
+  "land": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "enforcer_sprite_sheet.png",
+   "warnings": [
+    "No jump/land frames identifiable on the sheet."
+   ]
+  },
+  "run": {
+   "background": "none",
+   "flagged": false,
+   "fps": 11.0,
+   "frames": [
+    {
+     "bottom": 124,
+     "file": "run_00.png",
+     "foot_x": 79.92857142857143,
+     "h": 124,
+     "head_w": 54,
+     "w": 132
+    },
+    {
+     "bottom": 119,
+     "file": "run_01.png",
+     "foot_x": 77.25,
+     "h": 119,
+     "head_w": 50,
+     "w": 130
+    },
+    {
+     "bottom": 123,
+     "file": "run_02.png",
+     "foot_x": 27.0,
+     "h": 123,
+     "head_w": 54,
+     "w": 124
+    },
+    {
+     "bottom": 124,
+     "file": "run_03.png",
+     "foot_x": 21.5,
+     "h": 124,
+     "head_w": 56,
+     "w": 132
+    },
+    {
+     "bottom": 116,
+     "file": "run_04.png",
+     "foot_x": 21.5,
+     "h": 116,
+     "head_w": 64,
+     "w": 134
+    },
+    {
+     "bottom": 123,
+     "file": "run_05.png",
+     "foot_x": 10.5,
+     "h": 123,
+     "head_w": 59,
+     "w": 125
+    }
+   ],
+   "frames_out": [
+    "run_00.png",
+    "run_01.png",
+    "run_02.png",
+    "run_03.png",
+    "run_04.png",
+    "run_05.png"
+   ],
+   "ground": "frame",
+   "loop": true,
+   "scale": 1.0,
+   "scale_fixed": 1.0,
+   "scale_like": null,
+   "source": "enforcer_sprite_sheet.png",
+   "warnings": []
+  },
+  "skill": {
+   "background": "n/a",
+   "flagged": true,
+   "fps": 10.0,
+   "frames": [],
+   "ground": "frame",
+   "loop": true,
+   "scale_like": null,
+   "source": "enforcer_sprite_sheet.png",
+   "warnings": [
+    "Row 4: orbs, beams and flame rings fuse into merged blobs."
+   ]
+  },
+  "walk": {
+   "background": "none",
+   "flagged": false,
+   "fps": 9.0,
+   "frames": [
+    {
+     "bottom": 135,
+     "file": "walk_00.png",
+     "foot_x": 39.0,
+     "h": 135,
+     "head_w": 51,
+     "w": 124
+    },
+    {
+     "bottom": 132,
+     "file": "walk_01.png",
+     "foot_x": 56.97826086956522,
+     "h": 132,
+     "head_w": 63,
+     "w": 124
+    },
+    {
+     "bottom": 131,
+     "file": "walk_02.png",
+     "foot_x": 72.5,
+     "h": 131,
+     "head_w": 56,
+     "w": 132
+    },
+    {
+     "bottom": 130,
+     "file": "walk_03.png",
+     "foot_x": 29.0,
+     "h": 130,
+     "head_w": 62,
+     "w": 148
+    }
+   ],
+   "frames_out": [
+    "walk_00.png",
+    "walk_01.png",
+    "walk_02.png",
+    "walk_03.png"
+   ],
+   "ground": "frame",
+   "loop": true,
+   "scale": 1.0,
+   "scale_fixed": 1.0,
+   "scale_like": null,
+   "source": "enforcer_sprite_sheet.png",
+   "warnings": []
+  }
+ },
+ "canvas": [
+  250,
+  160
+ ],
+ "character": "enforcer",
+ "ground_row": 154,
+ "pad": 6,
+ "ref_anim": ""
+}
