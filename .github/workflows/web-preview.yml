@@ -69,6 +69,7 @@ jobs:
           godot --headless --script res://tests/test_episode3.gd
           godot --headless --script res://tests/test_episode4.gd
           godot --headless --script res://tests/test_cantor_sprites.gd
+          godot --headless --script res://tests/test_explore_motion.gd
           godot --headless --script res://tests/test_layout_overflow.gd
 
       - name: Sprite pipeline tests

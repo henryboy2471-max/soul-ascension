@@ -5,8 +5,13 @@ signal interact(id:String)
 signal exit_requested
 const WORLD_W = 2500.0
 const SPEED = 300.0
+const ACCEL = 2600.0
+const DECEL = 3600.0
+const LOOK_AHEAD = 70.0
 const CHANNEL_SECONDS = 1.4
 var cam=0.0
+var vel=Vector2.ZERO
+var lead=0.0
 var px=140.0
 var py=548.0
 var locked=false
@@ -251,7 +256,7 @@ func move_input() -> Vector2:
  if Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN): move.y+=1
  return move.limit_length()
 func update_positions(blend:float) -> void:
- var goal=clampf(px-640.0,0.0,world_w-1280.0)
+ var goal=clampf(px-640.0+(lead if blend<1.0 else 0.0),0.0,world_w-1280.0)
  cam=goal if blend>=1.0 else lerpf(cam,goal,blend)
  for layer in layers:
   layer.position.x=-cam*layer.get_meta("factor")
@@ -283,14 +288,10 @@ func _process(delta:float) -> void:
  var move=Vector2.ZERO
  if not locked:
   move=move_input()
-  var max_x=world_w-80.0
-  if gate_locked and gate_x>0.0:
-   max_x=minf(max_x,gate_x-40.0)
-  px=clampf(px+move.x*SPEED*delta,80.0,max_x)
-  py=clampf(py+move.y*SPEED*0.55*delta,515.0,585.0)
-  if absf(move.x)>0.1:
-   player.facing=1 if move.x>0 else -1
- player.moving=move.length()>0.1
+ advance_motion(move,delta)
+ if absf(move.x)>0.1:
+  player.facing=1 if move.x>0 else -1
+ player.moving=vel.length()>25.0
  if player.moving:
   step_timer-=delta
   if step_timer<=0:
@@ -344,6 +345,28 @@ func _process(delta:float) -> void:
  else:
   dist_label.text=""
  hud_node.queue_redraw()
+# Eased walking: speed ramps up in ~0.12 s and stops in ~0.08 s instead of snapping, and the camera leads slightly in the facing direction.
+func advance_motion(move:Vector2, delta:float) -> void:
+ if locked:
+  vel=Vector2.ZERO
+  lead=lerpf(lead,0.0,1.0-exp(-delta*6.0))
+  return
+ var goal=Vector2(move.x*SPEED,move.y*SPEED*0.55)
+ var rate=ACCEL if goal.length()>vel.length()*0.98 and goal.length()>1.0 else DECEL
+ vel=vel.move_toward(goal,rate*delta)
+ var max_x=world_w-80.0
+ if gate_locked and gate_x>0.0:
+  max_x=minf(max_x,gate_x-40.0)
+ var nx=clampf(px+vel.x*delta,80.0,max_x)
+ if nx!=px+vel.x*delta:
+  vel.x=0.0
+ px=nx
+ var ny=clampf(py+vel.y*delta,515.0,585.0)
+ if ny!=py+vel.y*delta:
+  vel.y=0.0
+ py=ny
+ var want=clampf(vel.x/SPEED,-1.0,1.0)*LOOK_AHEAD
+ lead=lerpf(lead,want,1.0-exp(-delta*3.5))
 func spot_accent(id:String) -> Color:
  match id:
   "terminal","res_a","res_b","res_c": return Color("6fd7e4")
