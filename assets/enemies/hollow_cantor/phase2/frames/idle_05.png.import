@@ -3,19 +3,21 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cbvbr7lq8xchc"
-path="res://.godot/imported/idle_05.png-cae4f0b59a71bfec566cd9215f4d1cab.ctex"
+path.s3tc="res://.godot/imported/idle_05.png-cae4f0b59a71bfec566cd9215f4d1cab.s3tc.ctex"
+path.etc2="res://.godot/imported/idle_05.png-cae4f0b59a71bfec566cd9215f4d1cab.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/enemies/hollow_cantor/phase2/frames/idle_05.png"
-dest_files=["res://.godot/imported/idle_05.png-cae4f0b59a71bfec566cd9215f4d1cab.ctex"]
+dest_files=["res://.godot/imported/idle_05.png-cae4f0b59a71bfec566cd9215f4d1cab.s3tc.ctex", "res://.godot/imported/idle_05.png-cae4f0b59a71bfec566cd9215f4d1cab.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1

@@ -3,19 +3,21 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://duvg0rta5eqsc"
-path="res://.godot/imported/hurt_00.png-be47b1b7e96a672fff1ccfc89ff5b35c.ctex"
+path.s3tc="res://.godot/imported/hurt_00.png-be47b1b7e96a672fff1ccfc89ff5b35c.s3tc.ctex"
+path.etc2="res://.godot/imported/hurt_00.png-be47b1b7e96a672fff1ccfc89ff5b35c.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/enemies/hollow_cantor/frames/hurt_00.png"
-dest_files=["res://.godot/imported/hurt_00.png-be47b1b7e96a672fff1ccfc89ff5b35c.ctex"]
+dest_files=["res://.godot/imported/hurt_00.png-be47b1b7e96a672fff1ccfc89ff5b35c.s3tc.ctex", "res://.godot/imported/hurt_00.png-be47b1b7e96a672fff1ccfc89ff5b35c.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1

@@ -3,19 +3,21 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dfv4lyx1ojw0p"
-path="res://.godot/imported/walk_00.png-6c2325e6e5a8805ecb7b5f02cd234455.ctex"
+path.s3tc="res://.godot/imported/walk_00.png-6c2325e6e5a8805ecb7b5f02cd234455.s3tc.ctex"
+path.etc2="res://.godot/imported/walk_00.png-6c2325e6e5a8805ecb7b5f02cd234455.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/enemies/hollow_cantor/phase2/frames/walk_00.png"
-dest_files=["res://.godot/imported/walk_00.png-6c2325e6e5a8805ecb7b5f02cd234455.ctex"]
+dest_files=["res://.godot/imported/walk_00.png-6c2325e6e5a8805ecb7b5f02cd234455.s3tc.ctex", "res://.godot/imported/walk_00.png-6c2325e6e5a8805ecb7b5f02cd234455.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1

@@ -3,19 +3,21 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dg6kyrkpg66c7"
-path="res://.godot/imported/attack1_04.png-26a9ea03d4c3d53b34d4b3c0d96e2a7e.ctex"
+path.s3tc="res://.godot/imported/attack1_04.png-26a9ea03d4c3d53b34d4b3c0d96e2a7e.s3tc.ctex"
+path.etc2="res://.godot/imported/attack1_04.png-26a9ea03d4c3d53b34d4b3c0d96e2a7e.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/enemies/hollow_cantor/frames/attack1_04.png"
-dest_files=["res://.godot/imported/attack1_04.png-26a9ea03d4c3d53b34d4b3c0d96e2a7e.ctex"]
+dest_files=["res://.godot/imported/attack1_04.png-26a9ea03d4c3d53b34d4b3c0d96e2a7e.s3tc.ctex", "res://.godot/imported/attack1_04.png-26a9ea03d4c3d53b34d4b3c0d96e2a7e.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1

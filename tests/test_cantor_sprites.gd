@@ -13,9 +13,14 @@ func check(ok:bool, name:String) -> void:
 func _initialize() -> void:
  call_deferred("run")
  create_timer(100.0).timeout.connect(func(): print("FAIL: test timed out");quit(2))
+# Cantor frames are VRAM-compressed (Android/web memory budget): decompress before reading pixels.
+func pixels(tex:Texture2D) -> Image:
+ var img=tex.get_image()
+ if img.is_compressed(): img.decompress()
+ return img
 # bounding box of pixels above the alpha threshold: Rect2i(x,y,w,h) and the pixel count
 func solid(tex:Texture2D, threshold:float=0.35) -> Dictionary:
- var img=tex.get_image()
+ var img=pixels(tex)
  var x0=9999
  var x1=-1
  var y0=9999
@@ -32,7 +37,7 @@ func solid(tex:Texture2D, threshold:float=0.35) -> Dictionary:
  return {"rect":Rect2i(x0,y0,x1-x0+1,y1-y0+1),"count":count}
 # smallest distance (px) from any pixel above `threshold` alpha to each canvas edge: [top, left, right, bottom]
 func margins(tex:Texture2D, threshold:float=0.004) -> Array:
- var img=tex.get_image()
+ var img=pixels(tex)
  var w=img.get_width()
  var h=img.get_height()
  var top=h
@@ -48,7 +53,7 @@ func margins(tex:Texture2D, threshold:float=0.004) -> Array:
     right=mini(right,w-1-x)
  return [top,left,right,bottom]
 func solid_bottom_margin(tex:Texture2D) -> int:
- var img=tex.get_image()
+ var img=pixels(tex)
  var h=img.get_height()
  var best=h
  for y in range(h):
@@ -109,7 +114,7 @@ func run() -> void:
  # mean width of the occupied rows relative to the figure height: the Cantor is a thin vertical figure
  var thin=func(f):
   var tex=f.sprite_frames.get_frame_texture("idle",0)
-  var img=tex.get_image()
+  var img=pixels(tex)
   var rows=0.0
   var used=0
   for y in range(img.get_height()):
