@@ -604,7 +604,7 @@ func qa_state() -> Dictionary:
  var p=stage.player if stage else null
  var sp=stage.nearest_spot() if stage else {}
  return {"scene":"demo","where":where,"px":p.wx if p else 0.0,"pz":p.z if p else 0.0,"dir":p.dir if p else "","cam":stage.cam_c.x if stage else 0.0,"zoom":stage.zoom if stage else 1.0,
-  "obj":objective,"locked":locked,"dlg":dlg!=null,"spot":sp.get("id",""),"flags":flags,"seq":seq,"peds":stage.peds.size() if stage else 0,"veh":stage.vehicles.size() if stage else 0}
+  "fps":Engine.get_frames_per_second(),"obj":objective,"locked":locked,"dlg":dlg!=null,"spot":sp.get("id",""),"flags":flags,"seq":seq,"peds":stage.peds.size() if stage else 0,"veh":stage.vehicles.size() if stage else 0}
 func publish_qa() -> void:
  JavaScriptBridge.eval("window.__qa="+JSON.stringify(qa_state()))
 func perf_snapshot() -> Dictionary:
