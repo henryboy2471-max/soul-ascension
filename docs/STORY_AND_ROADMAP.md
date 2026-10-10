@@ -64,6 +64,8 @@ Project structure, home UI, profile and currencies, player, enemy, basic combat,
 
 ### Phase 3 — economy and monetization, not implemented
 
+> **SUPERSEDED (owner direction, October 2026):** the lines below describing paid power, summons/banners, pity, energy refills and accelerated progression no longer apply. The current direction is cosmetic-only, no pay-to-win, no randomized paid rewards; see `docs/MONETIZATION_PLAN.md`. Kept only as history.
+
 The intended design permits paid power and accelerated progression. No prices, banner rates or purchasing behavior are active in this prototype.
 
 - Gold stays earnable in combat; Crystals become purchasable only through supported platform billing with verified receipts and idempotent grants.
