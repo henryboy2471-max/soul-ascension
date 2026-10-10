@@ -56,3 +56,11 @@ Episode 3 implementation (its design lives in `docs/STORY_AND_ROADMAP.md`; the h
 3. Writing capacity: choices/side missions need approved dialogue; I can draft, you approve tone.
 4. Audio: current sound is synthesized; any music/SFX pack needs a licence you approve.
 5. Real-device testing (Android) needs your device or a device farm; I cannot measure it here.
+
+## Owner decisions, update 2 (recorded)
+- Web build = lossless Cantor textures; Android = ETC2 (VRAM); both stay selectable (`tools/set_cantor_textures.sh`, Pages workflow `cantor_textures` input). Android ETC2 remains untested on a device.
+- `_trimmed` pipeline folders verified unreferenced by the game and excluded from exports (export file set identical to a clean checkout).
+- Season 1 = exactly 10 episodes. Seven-array storyline stays the proposed direction; Episode 3 story and new characters are in `docs/EPISODE3_STORY_PROPOSAL.md` awaiting approval before any implementation.
+- Priority emphasis: premium anime adventure (exploration, movement, NPC interaction, story missions, cinematics) over constant fighting.
+- Review samples (not integrated): branch `art/lantern-quarter-mira-samples`, `docs/art/samples/README.md` there.
+- `dev/overnight-stabilize` was merged (fast-forward) into the release-candidate branch after the full regression; `main` is untouched and nothing was deployed.
