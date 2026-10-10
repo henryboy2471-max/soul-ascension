@@ -252,9 +252,10 @@ func run() -> void:
   await process_frame
  check(ex.stick.direction.x>0.7 and ex.px>px0+20.0,"District: dragging the joystick right walks the Hero right")
  touch(1,false,Vector2(200,610))
- await process_frame
- await process_frame
+ var pre_release=ex.px
+ await create_timer(0.3).timeout   # walking eases to a stop in ~0.1 s of real time (headless frames run much faster than real time)
  var pxr=ex.px
+ check(pxr-pre_release<14.0,"District: after release the Hero eases to a stop within a few pixels (%.1f px)" % (pxr-pre_release))
  for i in range(10):
   await process_frame
  check(absf(ex.px-pxr)<0.5,"District: releasing the joystick stops the Hero")
