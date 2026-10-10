@@ -299,6 +299,10 @@ func spawn_foe(def:Dictionary) -> void:
    foe.load_sprite_set(art.path,float(def.get("height",185.0)) if art.temporary else float(def.get("frames_height",def.get("height",185.0))),def.accent)
    if art.temporary and foe.sprite!=null:
     foe.sprite.modulate=def.get("fallback_tint",Color(0.86,0.82,1.12))
+   # Warm the Phase 2 art while the intro card plays: a synchronous load at the transformation costs ~0.2 s on desktop (lossless) and much more on phones.
+   var p2_frames=str(def.get("phase2",{}).get("frames",""))
+   if not art.temporary and p2_frames!="" and ResourceLoader.exists(p2_frames):
+    ResourceLoader.load_threaded_request(p2_frames)
  elif def.look=="warped":
   # Soul-Warped Enforcer sprite art; world height 180 x node scale 1.2 stands about 1.3x the Hero. Orange fire VFX for missing attack frames.
   foe.load_sprite_set("res://assets/enemies/enforcer/frames.tres",180.0,Color("ff8a2a"))
