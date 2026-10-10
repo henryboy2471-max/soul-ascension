@@ -86,9 +86,10 @@ func run() -> void:
  demo.press_breaker("cyan")
  demo.press_breaker("gold")
  demo.press_breaker("violet")
- await shot("n_11_hidden_opening",2.2)
+ await shot("n_11_hidden_opening",1.6)
+ await create_timer(2.2).timeout
  close_dialogs(demo)
- await create_timer(0.8).timeout
+ await create_timer(1.2).timeout
  await shot("n_12_hidden_open",0.4)
  # interiors
  demo.on_spot(st.spot("noodle_door"))

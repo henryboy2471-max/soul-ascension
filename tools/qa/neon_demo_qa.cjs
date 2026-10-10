@@ -29,19 +29,21 @@ const T=MODE==='touch';
  for(let i=0;i<40;i++){ st=await q(); if(!st.locked&&!st.dlg) break; await advance(); await sleep(400); }
  st=await q(); check('Opening cinematic ends and control returns',!st.locked);
  await shot('start');
- // move to the sidewalk first (open space), then test each direction
- await hold('down',900); st=await q(); const z1=st.pz;
- await hold('right',900); let s2=await q(); check('Move right: x increases and Echo faces right',s2.px>st.px+60&&s2.dir==='right',JSON.stringify({dx:Math.round(s2.px-st.px),dir:s2.dir}));
- await hold('left',900); let s3=await q(); check('Move left: x decreases and Echo faces left',s3.px<s2.px-60&&s3.dir==='left',JSON.stringify({dx:Math.round(s3.px-s2.px),dir:s3.dir}));
- await hold('up',500); let s4=await q(); check('Move up (away): depth decreases and back view shows',s4.pz<s3.pz-0.04&&s4.dir==='up',JSON.stringify({dz:+(s4.pz-s3.pz).toFixed(3),dir:s4.dir}));
- await hold('down',700); let s5=await q(); check('Move down (toward camera): depth increases and front view shows',s5.pz>s4.pz+0.04&&s5.dir==='down',JSON.stringify({dz:+(s5.pz-s4.pz).toFixed(3),dir:s5.dir}));
+ // closed-loop helpers: traffic and pedestrians are random, so aim by reading the state instead of timing blindly
+ const gotoZ=async(z)=>{ for(let i=0;i<24;i++){ const c=await q(); if(Math.abs(c.pz-z)<0.035) return; await hold(c.pz<z?'down':'up',Math.min(500,Math.abs(c.pz-z)*264/150*1000+60)); } };
+ const gotoX=async(x)=>{ for(let i=0;i<40;i++){ const c=await q(); if(Math.abs(c.px-x)<25) return; await hold(c.px<x?'right':'left',Math.min(700,Math.abs(c.px-x)/235*1000+60)); } };
+ await gotoZ(0.36); st=await q();
+ await hold('left',1100); st=await q();
+ await hold('right',700); let s2=await q(); check('Move right: x increases and Echo faces right',s2.px>st.px+60&&s2.dir==='right',JSON.stringify({dx:Math.round(s2.px-st.px),dir:s2.dir}));
+ await hold('left',700); let s3=await q(); check('Move left: x decreases and Echo faces left',s3.px<s2.px-60&&s3.dir==='left',JSON.stringify({dx:Math.round(s3.px-s2.px),dir:s3.dir}));
+ await hold('up',300); let s4=await q(); check('Move up (away): depth decreases and back view shows',s4.pz<s3.pz-0.03&&s4.dir==='up',JSON.stringify({dz:+(s4.pz-s3.pz).toFixed(3),dir:s4.dir}));
+ await hold('down',400); let s5=await q(); check('Move down (toward camera): depth increases and front view shows',s5.pz>s4.pz+0.03&&s5.dir==='down',JSON.stringify({dz:+(s5.pz-s4.pz).toFixed(3),dir:s5.dir}));
  await shot('walk');
  // camera follows
- const c0=(await q()).cam; await hold('right',1600); const c1=(await q()).cam; check('Camera tracks the player',c1>c0+150,JSON.stringify({cam0:Math.round(c0),cam1:Math.round(c1)}));
+ await gotoZ(0.36); await gotoX(300); await sleep(900); const c0=(await q()).cam; await gotoX(1150); await sleep(900); const c1=(await q()).cam; check('Camera tracks the player',c1>c0+300,JSON.stringify({cam0:Math.round(c0),cam1:Math.round(c1)}));
  // walk to Kofi's stall (x~560) and test collision with the stall
- let cur=await q(); let guard=0;
- while(Math.abs(cur.px-560)>25&&guard++<40){ await hold(cur.px<560?'right':'left',Math.min(700,Math.abs(cur.px-560)/235*1000+80)); cur=await q(); }
- for(let i=0;i<5;i++){ await hold('up',700); }
+ await gotoZ(0.36); await gotoX(560); let cur=await q();
+ for(let i=0;i<3;i++){ await hold('up',700); }
  cur=await q(); check('Stall blocks walking through it (z stays in front)',cur.pz>0.22,JSON.stringify({pz:+cur.pz.toFixed(3),spot:cur.spot}));
  check('Kofi becomes interactable at the stall',cur.spot==='kofi',JSON.stringify({spot:cur.spot}));
  await act(); await sleep(600); st=await q(); check('ACT opens a dialogue and locks movement',st.dlg&&st.locked); await shot('dialogue');

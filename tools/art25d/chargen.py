@@ -659,13 +659,13 @@ def body_front(cv, ch, cx, P, back=False):
     out = ch['outfit']
     glow = hexc(ch['glow'])
     legs_y = 164 + by
-    lift_l = max(0.0, s) * 9
-    lift_r = max(0.0, -s) * 9
+    lift_l = max(0.0, s) * 15
+    lift_r = max(0.0, -s) * 15
     # legs
     for sd, lift in ((-1, lift_l), (1, lift_r)):
         hx = cx + sd * 11.5
-        kx, ky = hx + sd * 0.8, 216 + by - lift * 0.55
-        ax, ay = hx + sd * 0.4, 266 - lift
+        kx, ky = hx + sd * 0.8, 216 + by - lift * 0.6
+        ax, ay = hx + sd * 0.4 - sd * lift * 0.12, 266 - lift
         m = cv.mask()
         cv.mlimb(m, (hx, legs_y), (kx, ky), 19, 15.5)
         cv.mlimb(m, (kx, ky), (ax, ay), 15.5, 12.0)
@@ -795,7 +795,7 @@ def body_front(cv, ch, cx, P, back=False):
     # arms
     for sd in (-1, 1):
         shx = cx + sd * (sw - 2)
-        swing = s * 7 * (-sd)
+        swing = s * 10 * (-sd)
         ex, ey = shx + sd * 3.5, 140 + by + swing * 0.3
         wx, wy = ex + sd * 1.5, 178 + by + swing
         m = cv.mask()
@@ -855,13 +855,13 @@ def body_side(cv, ch, cx, P):
     hipx, hipy = cx - 1, 164 + by
     th = 24.0   # thigh len
     sh = 24.0
-    ang = s * 0.52   # rad swing
+    ang = s * 0.40   # rad swing (gentler stride: reads as a walk, not a crouch)
     legs = []
     for ph in (0, 1):   # 0 = far leg, 1 = near leg
         a = ang * (1 if ph else -1)
         kneex = hipx + math.sin(a) * th
         kneey = hipy + math.cos(a) * th
-        bend = max(0.0, -a) * 0.9 if a < 0 else 0.0
+        bend = max(0.0, -a) * 0.7 if a < 0 else 0.0
         a2 = a - bend
         ankx = kneex + math.sin(a2) * sh
         anky = kneey + math.cos(a2) * sh
@@ -972,7 +972,7 @@ def arm_pts(ch, view, cx, P):
     sw = 29 * ch['sw']
     out = {}
     for sd in (-1, 1):
-        out[sd] = (cx + sd * (sw + 3.0), 178 + by + s * 7 * (-sd))
+        out[sd] = (cx + sd * (sw + 3.0), 178 + by + s * 10 * (-sd))
     return out
 
 
@@ -1182,6 +1182,8 @@ def render_frame(ch, view, phase, idle, ss=3):
         head_side(cv, ch, cx, cy)
         acc_head(cv, ch, view, cx, cy)
     img = cv.out()
+    if view in ('front', 'back') and not idle:
+        img = ImageChops.offset(img, int(round(P['s'] * 1.6)), 0)   # weight shift while stepping
     # scale for character height (kids/tall), feet stay on the baseline
     hs = ch['h']
     if abs(hs - 1.0) > 0.005:
@@ -1224,10 +1226,13 @@ if __name__ == '__main__':
     out = sys.argv[1] if len(sys.argv) > 1 else 'assets/demo25d/chars'
     names = [a for a in sys.argv[2:] if not a.startswith('--')] or list(CHARS)
     only_portraits = '--portraits' in sys.argv
+    only_side = '--side' in sys.argv
+    only_fb = '--fb' in sys.argv
     os.makedirs(out, exist_ok=True)
     for n in names:
         ch = CHARS[n]
-        for v in ([] if only_portraits else ('front', 'side', 'back')):
+        for v in ([] if only_portraits else (('side',) if only_side else (('front', 'back') if only_fb else ('front', 'side', 'back')))):
             render_strip(ch, v).save(f'{out}/{n}_{v}.png')
-        render_portrait(ch).save(f'{out}/{n}_portrait.png')
+        if not only_side and not only_fb:
+            render_portrait(ch).save(f'{out}/{n}_portrait.png')
         print('rendered', n)
