@@ -207,7 +207,8 @@ On a phone, use the matching touch buttons.",Vector2(294,383),17,UI.MUTED,690)
   UI.button(node,"BATTLE ONLY",Rect2(656,568,170,58),func(): start_battle(false,mission.id))
 func start_episode(mission_id:String="1-1") -> void:
  close_modal()
- if not MissionDefs.is_unlocked(mission_id,Profile.data.completed) or not MissionDefs.is_playable(mission_id):
+ var dev_unlock=bool(Profile.data.settings.get("dev_unlock",false))   # development/QA only: lets work-in-progress episodes start
+ if not dev_unlock and (not MissionDefs.is_unlocked(mission_id,Profile.data.completed) or not MissionDefs.is_playable(mission_id)):
   # A locked (or unfinished) episode never starts; the player stays on the menu.
   var locked=MissionDefs.get_def(mission_id)
   planned("EPISODE LOCKED","Clear the previous episode to unlock "+str(locked.get("number","this episode")).capitalize()+": "+str(locked.get("title_case","")),"LOCKED","")
@@ -219,7 +220,8 @@ func start_episode(mission_id:String="1-1") -> void:
   return
  clear_screen()
  scene_name="episode"
- var episode=LanternEpisode.new() if MissionDefs.get_def(mission_id).get("flow","district")=="lantern" else Episode.new()
+ var flow=MissionDefs.get_def(mission_id).get("flow","district")
+ var episode=LanternEpisode.new() if flow=="lantern" else (RelayEpisode.new() if flow=="relay" else Episode.new())
  episode.mission_id=mission_id
  episode.request_battle=func(): return start_battle(true,mission_id)
  episode.exit_requested.connect(show_home)

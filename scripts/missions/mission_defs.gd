@@ -82,6 +82,24 @@ static func defs() -> Dictionary:
    "story_flags":{"cantor_defeated":true,"ending_seen":true,"arrays_remaining":6,"amnesty_declared":true},
    "ending":{"lines":[],"codex":["hollow_cantor"],"teaser":{"kicker":"NEXT EPISODE","number":"EPISODE 3","title":"THE RELAY KEEPER","subtitle":"SIX ARRAYS REMAIN","length":4.4}},
    "result":{"won_title":"THE CHORUS FALLS SILENT","lost_title":"RISE. TRY AGAIN.","subtitle":"Lantern Quarter  /  Under the violet rain"}
+  },
+  "1-3":{
+   "id":"1-3","episode":3,"number":"EPISODE 3","season":"SEASON 01  /  THE FRACTURE",
+   "title":"THE RELAY KEEPER","title_case":"The relay keeper",
+   "location":"LANTERN QUARTER / THE RELAY NETWORK","card_location":"LANTERN QUARTER  /  THE RELAY NETWORK","region":"LANTERN QUARTER",
+   "description":"Voices are coming from the abandoned relay towers. Find out who is speaking.",
+   "tagline":"Listen to the relays.","modal_sub":"STORY 01—03  /  LANTERN QUARTER",
+   "missions_sub":"CHAPTER 01  /  EPISODE 3",
+   "flow":"relay",
+   "energy":0,"playable":false,
+   "unlock":{"requires":["1-2"]},
+   "rewards":{"first":{"xp":180,"gold":340},"replay":{"xp":80,"gold":150}},
+   "codex":[],
+   "intro_card_length":3.6,
+   "objectives":[{"text":"Explore Lantern Market","x":1000.0}],
+   "waves":[],"battle_only_waves":[],"story_flags":{},
+   "ending":{"lines":[],"codex":[],"teaser":{"kicker":"NEXT EPISODE","number":"EPISODE 4","title":"THE FIRST ECHO","subtitle":"TO BE CONTINUED...","length":4.0}},
+   "result":{"won_title":"THE RELAY KEEPER","lost_title":"RISE. TRY AGAIN.","subtitle":"Lantern Quarter  /  The relay network"}
   }
  }
 static func has_mission(id:String) -> bool:

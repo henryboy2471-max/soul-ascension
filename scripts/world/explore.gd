@@ -25,6 +25,7 @@ var act_button:TouchAction
 var hud_node:Hud
 # Optional per-mission setup (set before the node enters the tree). Defaults reproduce the Episode 1 district exactly.
 # Keys: world_w, start_px, art (WorldArt script), npc_x, walker_count, sleepers [{x,facing}], spots, enabled, gate_x.
+# Episode 3 keys: npcs [{id,x,facing,scale,tint}] (extra standing NPCs), companion (bool: the default NPC follows the player), no_default_npc (bool), no_walkers (bool).
 var config:Dictionary={}
 var world_w=WORLD_W
 var npc_x=560.0
@@ -65,6 +66,8 @@ var time=0.0
 var lift=0.0
 var floor_fill:ColorRect
 var hud_nodes:Array=[]
+var extra_npcs:Array=[]
+var companion=false
 func _ready() -> void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -95,7 +98,7 @@ func _ready() -> void:
  add_child(props)
  var rng=RandomNumberGenerator.new()
  rng.seed=9
- for i in range(int(config.get("walker_count",5))):
+ for i in range(0 if bool(config.get("no_walkers",false)) else int(config.get("walker_count",5))):
   var walker=Fighter.new()
   walker.look="ped"
   walker.armed=false
@@ -133,6 +136,24 @@ func _ready() -> void:
  npc.load_sprite_set("res://assets/characters/mira/frames.tres",155.0,Color("c27bff"))
  npc.scale=Vector2(1.2,1.2)
  add_child(npc)
+ companion=bool(config.get("companion",false))
+ npc.visible=not bool(config.get("no_default_npc",false))
+ if companion:
+  npc_x=float(config.get("start_px",px))-90.0
+ for n in config.get("npcs",[]):
+  var extra=Fighter.new()
+  extra.look="ped"
+  extra.armed=false
+  var tint:Color=n.get("tint",Color.from_hsv(float(n.get("hue",0.6)),0.35,0.3))
+  extra.coat_color=tint
+  extra.accent=n.get("accent",Color.from_hsv(float(n.get("hue",0.6)),0.5,0.85))
+  extra.hair_color=Color.from_hsv(float(n.get("hue",0.6))+0.1,0.3,0.4)
+  extra.skin_color=Color("8a6a58")
+  extra.facing=int(n.get("facing",-1))
+  var sc=float(n.get("scale",1.05))
+  extra.scale=Vector2(sc,sc)
+  add_child(extra)
+  extra_npcs.append({"id":n.id,"x":float(n.x),"node":extra})
  player=Fighter.new()
  player.body=Profile.data.body
  player.scale=Vector2(1.2,1.2)
@@ -266,6 +287,8 @@ func update_positions(blend:float) -> void:
   layer.position.y=lift
  props.position.y=lift
  npc.position=Vector2(npc_x-cam,548.0+lift)
+ for e in extra_npcs:
+  e.node.position=Vector2(e.x-cam,548.0+lift)
  for w in walkers:
   w.node.position=Vector2(w.x-cam,516.0+lift)
  player.position=Vector2(px-cam,py+lift)
@@ -297,7 +320,16 @@ func _process(delta:float) -> void:
   if step_timer<=0:
    Sound.play("step")
    step_timer=0.28
- npc.facing=1 if px>npc_x else -1
+ if companion:
+  # the companion trails the player at a short distance on the side the player came from, easing so it never snaps
+  var want=px-float(player.facing)*90.0
+  npc_x=lerpf(npc_x,clampf(want,80.0,world_w-80.0),1.0-exp(-delta*4.5))
+  npc.facing=player.facing if absf(npc_x-px)>60.0 else (1 if px>npc_x else -1)
+  npc.moving=absf(want-npc_x)>14.0
+ else:
+  npc.facing=1 if px>npc_x else -1
+ for e in extra_npcs:
+  e.node.facing=1 if px>e.x else -1
  lift=lerpf(lift,-125.0 if locked else 0.0,1.0-exp(-delta*8.0))
  # touch controls step aside while a conversation is open, so nothing sits on top of the dialogue box
  for node in [stick,act_button,move_hint,act_hint]:
