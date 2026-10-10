@@ -59,6 +59,7 @@ var time=0.0
 var perf:Dictionary={}
 var frame_ms:Array=[]
 var qa_enabled=false
+var intro_running=false
 func _ready() -> void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -156,6 +157,7 @@ func show_card(title:String, sub:String, hold:float=2.0) -> void:
  await tw.finished
 # ------------------------------------------------------------------ scenes
 func intro() -> void:
+ intro_running=true
  locked=true
  bars(true,0.1)
  await get_tree().create_timer(0.1).timeout
@@ -164,6 +166,7 @@ func intro() -> void:
  await say([{"who":"ECHO","text":"Rain on neon. The whole district hums like it's holding its breath."}])
  bars(false)
  locked=false
+ intro_running=false
 func enter_stage(kind:String, at:Vector2, d:String="right") -> void:
  if stage!=null and stage!=street:
   stage.queue_free()

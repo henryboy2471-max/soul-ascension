@@ -351,7 +351,8 @@ func tick_ped(a:SpriteActor, delta:float) -> void:
 func tick_vehicle(v:Vehicle25, delta:float) -> void:
  # yield to anyone standing in the lane ahead (crosswalk behaviour), then drive on and wrap around the street
  var want=v.top_speed
- var ahead=Rect2(v.wx+(v.dir*135.0)-(0.0 if v.dir>0 else 140.0),v.z*DEPTH-26.0,140.0,52.0)
+ var look=70.0+v.speed*v.speed/420.0   # braking distance at 260 px/s^2 plus a margin
+ var ahead=Rect2(v.wx+(95.0 if v.dir>0 else -95.0-look),v.z*DEPTH-26.0,look,52.0)
  for a in actors:
   if ahead.intersects(rect_of(a)):
    want=0.0
@@ -420,7 +421,7 @@ func draw_ripples(c:CanvasItem) -> void:
   return
  var left=cam_c.x-700.0
  var r=NeonArt.rng_for(9)
- for i in range(26):
+ for i in range(14):
   var rx=left+fmod(r.randf()*1400.0+i*53.0,1400.0)
   var ry=lerpf(NeonArt.Y_BACK+30.0,NeonArt.Y_FRONT,r.randf())
   var ph=fmod(time*0.9+r.randf()*3.0,1.0)

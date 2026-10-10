@@ -5,7 +5,7 @@ class_name SpriteActor
 signal footstep
 const FRAME_W = 144
 const FRAME_H = 288
-const BASE_SCALE = 0.86
+const BASE_SCALE = 1.0
 const VIEWS = {"down":"front","up":"back","left":"side","right":"side"}
 static var tex_cache:Dictionary = {}
 var char_id="echo"
@@ -66,6 +66,10 @@ func setup(id:String) -> SpriteActor:
  reflect.scale=Vector2(1,-0.55)
  reflect.modulate=Color(0.55,0.5,1.0,0.2)
  reflect.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+ var shadow=Sprite2D.new()
+ shadow.texture=make_shadow_tex()
+ shadow.scale=Vector2(1.5,0.42)
+ add_child(shadow)
  add_child(reflect)
  add_child(sprite)
  set_dir("down")
@@ -77,12 +81,21 @@ func set_dir(d:String) -> void:
  reflect.texture=t
  sprite.flip_h=d=="left"
  reflect.flip_h=d=="left"
-func _draw() -> void:
- # soft contact shadow
- draw_set_transform(Vector2.ZERO,0,Vector2(1,0.28))
- for i in range(4):
-  draw_circle(Vector2.ZERO,34-i*6,Color(0,0,0,0.10))
- draw_set_transform(Vector2.ZERO,0,Vector2.ONE)
+static var shadow_tex:Texture2D
+static func make_shadow_tex() -> Texture2D:
+ if shadow_tex==null:
+  var g=GradientTexture2D.new()
+  var grad=Gradient.new()
+  grad.set_color(0,Color(0,0,0,0.5))
+  grad.set_color(1,Color(0,0,0,0.0))
+  g.gradient=grad
+  g.fill=GradientTexture2D.FILL_RADIAL
+  g.fill_from=Vector2(0.5,0.5)
+  g.fill_to=Vector2(1.0,0.5)
+  g.width=64
+  g.height=64
+  shadow_tex=g
+ return shadow_tex
 # advance the walk cycle; emits `footstep` on the two contact frames
 func animate(delta:float, is_moving:bool, rate:float=1.0) -> void:
  life+=delta
