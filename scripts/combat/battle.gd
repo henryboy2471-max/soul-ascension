@@ -582,7 +582,8 @@ func _process(delta:float) -> void:
  combo_timer=maxf(0,combo_timer-delta)
  if combo_timer==0:
   combo=0
- combo_label.text=str(combo)+" HIT" if combo>1 else ""
+ # the combo counter keeps counting, but its text yields the centre of the screen to an intro card / Phase 2 banner so the two never overlap
+ combo_label.text=str(combo)+" HIT" if combo>1 and intro_card.modulate.a<0.05 and intro_sub.modulate.a<0.05 else ""
  shake=maxf(0,shake-delta*30)
  arena.position=Vector2(randf_range(-shake,shake),randf_range(-shake,shake)) if Profile.data.settings.get("shake",true) else Vector2.ZERO
  if intro>0:
