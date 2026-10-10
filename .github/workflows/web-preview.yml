@@ -7,6 +7,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      cantor_textures:
+        description: "Hollow Cantor texture variant for this web build (both stay in the repo for comparison)"
+        type: choice
+        default: lossless
+        options: [lossless, vram]
 
 permissions:
   contents: read
@@ -72,11 +78,13 @@ jobs:
           GODOT=godot tools/test_pipeline.sh
           rm -rf tests/fixtures/_pipeline
 
-      - name: Web build uses lossless Cantor frames
-        # Cantor frames are VRAM-compressed in the repo (Android keeps ETC2, ~4x less GPU memory). A web build that ships only
-        # S3TC can lose textures on mobile browsers without S3TC, so the Pages build switches those frames back to lossless.
+      - name: Cantor textures for the web build
+        # Frames are VRAM-compressed in the repo (Android keeps ETC2, ~4x less GPU memory). A web build that ships only S3TC may lose
+        # textures on mobile browsers without S3TC, so the default web build uses lossless; run the workflow manually with
+        # cantor_textures=vram to publish the compressed variant for comparison. Nothing is removed from the repo either way.
+        if: ${{ inputs.cantor_textures != 'vram' }}
         run: |
-          find assets/enemies/hollow_cantor -name '*.png.import' -exec sed -i 's/compress\/mode=2/compress\/mode=0/' {} +
+          tools/set_cantor_textures.sh lossless
           godot --headless --editor --import --quit
 
       - name: Export web build
