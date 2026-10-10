@@ -1,4 +1,13 @@
-# Next adventure milestone - development roadmap (PROPOSAL, awaiting owner approval)
+# Next adventure milestone - development roadmap (APPROVED by the owner; priority order A -> E)
+
+## Owner decisions on record
+- Priority order: A movement/exploration/connected zones, B interactive environments + NPC conversations + puzzles + non-combat missions, C premium anime cinematics/dialogue/cutscenes, D character development/progression/abilities/upgrades, E consistent premium anime artwork + optimization + release readiness.
+- Direction: SOUL ASCENSION is an anime ADVENTURE game, not primarily a fighting game: premium anime-illustration characters, detailed environments, responsive movement, interactive NPCs, exploration, mysteries, story missions, dramatic boss encounters, cinematic storytelling - "an anime series the player can explore and participate in".
+- Season 1 contains exactly 10 episodes (1-1 ... 1-10 in `docs/STORY_AND_ROADMAP.md`); no expansion to 12+ without owner approval.
+- Major new character/NPC/environment artwork is NOT generated or commissioned until the owner approves a visual direction proposal (`docs/VISUAL_DIRECTION_PROPOSAL.md`).
+- Do not start Episode 3 until told. Web graphics: both Cantor texture variants stay available (see `docs/WEB_TEXTURE_COMPARISON.md`) until the owner decides.
+- Platform claims: a device/browser test is reported as passed only if it actually ran.
+
 
 Goal: finish a polished, playable anime adventure in the approved v2.1 style, not keep redesigning one boss. Combat stays as it is (frozen); this milestone is about everything around it. Episode 3 implementation does NOT start until this roadmap is approved.
 
