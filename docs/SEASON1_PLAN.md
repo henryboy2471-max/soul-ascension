@@ -1,4 +1,7 @@
-# Season 1 - "The Fracture" - exactly 10 episodes (planning document)
+# Season 1 - "The Fracture" - exactly 10 episodes (Claude's planning DRAFT, NON-CANONICAL)
+
+> **Status:** Episodes 1-2 below are established, implemented story. Episodes 3-10 are only Claude's earlier proposals; the OFFICIAL Season 1 story and episode plans are being written by ChatGPT and will replace them once the owner approves each plan (`docs/WORKFLOW.md`). Do not implement Episodes 3-10 from this file.
+
 
 Status: planning only. Episodes 1 and 2 are implemented and approved. Episodes 3-10 are proposals built on the established story (`docs/STORY_AND_ROADMAP.md`, `scripts/story/episode_data.gd`, `scripts/story/episode2_data.gd`, `docs/EPISODE2_PLAN.md`). Tags: **[established]** = already in the game or an approved design doc; **[proposed]** = new detail awaiting owner approval. Season 1 stays at exactly 10 episodes; ideas beyond that go to Season 2 (`Crown of Frequencies`) in the backlog.
 

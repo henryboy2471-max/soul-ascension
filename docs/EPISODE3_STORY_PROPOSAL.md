@@ -1,4 +1,7 @@
-# Episode 3 - "The Relay Keeper" - story and new characters (PROPOSAL for owner approval; nothing is implemented)
+# Episode 3 - "The Relay Keeper" - Claude's early story DRAFT (NON-CANONICAL, superseded by the workflow in `docs/WORKFLOW.md`)
+
+> **Status: not approved and not canon.** Official episode stories and plans are written by ChatGPT and approved by the owner. This draft is kept only as reference material (titles, characters and beats may be reused ONLY if the official plan adopts them). Do not implement from this file.
+
 
 Season 1 stays at exactly 10 episodes; this is episode 3 of 10, the first of six "array" episodes (Rain Array 7 fell in Episode 2; **six arrays remain**, so Episodes 3-8 each silence one). Direction: adventure first - roughly three quarters of the episode is exploration, conversation, a routing puzzle, a stealth stretch and a cinematic; combat is the Soul Realm boss at the end.
 Technical plan and checklist: `docs/EPISODE3_PREP.md`. Season context: `docs/SEASON1_PLAN.md`.
