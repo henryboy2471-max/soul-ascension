@@ -293,10 +293,10 @@ func _process(delta:float) -> void:
   player.facing=1 if move.x>0 else -1
  player.moving=vel.length()>25.0
  if player.moving:
-  step_timer-=delta
+  step_timer-=delta*clampf(vel.length()/190.0,0.55,1.3)
   if step_timer<=0:
-   Sound.play("step")
-   step_timer=0.28
+   Sound.footstep("wet",clampf(vel.length()/230.0,0.5,1.0))
+   step_timer=0.30
  npc.facing=1 if px>npc_x else -1
  lift=lerpf(lift,-125.0 if locked else 0.0,1.0-exp(-delta*8.0))
  # touch controls step aside while a conversation is open, so nothing sits on top of the dialogue box

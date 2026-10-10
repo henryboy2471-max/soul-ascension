@@ -45,6 +45,9 @@ func set_portrait_hint(portrait:bool) -> void:
 func _ready() -> void:
  Profile.changed.connect(refresh_profile)
  show_home()
+ if demo_requested():
+  call_deferred("start_neon_demo")
+  return
  if not Profile.data.onboarded and not OS.get_cmdline_user_args().has("--capture-home"):
   onboarding()
  if OS.get_cmdline_user_args().has("--capture-home"):
@@ -53,6 +56,22 @@ func _ready() -> void:
   if modal: modal.queue_free();modal=null
   start_battle()
   capture("battle")
+# The 2.5D Neon District demonstration is a separate, non-canon sandbox: it never touches saves or episode progress.
+# Start it with the command-line flag --demo-neon, or on the web with ?demo=neon.
+func demo_requested() -> bool:
+ if OS.get_cmdline_user_args().has("--demo-neon"):
+  return true
+ if OS.has_feature("web"):
+  var q=JavaScriptBridge.eval("window.location.search",true)
+  return q is String and q.contains("demo=neon")
+ return false
+func start_neon_demo() -> void:
+ close_modal()
+ clear_screen()
+ scene_name="neon_demo"
+ var demo=NeonDemo.new()
+ demo.exit_requested.connect(show_home)
+ screen.add_child(demo)
 func capture(kind:String) -> void:
  await get_tree().create_timer(1.0).timeout
  var img=get_viewport().get_texture().get_image()

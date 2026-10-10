@@ -3,6 +3,10 @@ var clips={}
 var loops={}
 var loop_player:AudioStreamPlayer
 var loop_kind=""
+const STEP_SURFACES = ["wet","wood","metal"]
+var step_clips:Dictionary={}
+var step_pool:Array=[]
+var step_last:Dictionary={}
 func _ready() -> void:
  for kind in ["tap","hit","special","win","hurt"]:
   var stream=AudioStreamWAV.new()
@@ -20,6 +24,15 @@ func _ready() -> void:
   stream.data=samples
   clips[kind]=stream
  clips["step"]=make_step()
+ for surface in STEP_SURFACES:
+  step_clips[surface]=[]
+  for v in range(5):
+   step_clips[surface].append(make_footstep(surface,v))
+ for i in range(4):
+  var sp=AudioStreamPlayer.new()
+  sp.volume_db=-7.0
+  add_child(sp)
+  step_pool.append(sp)
  loops["city"]=make_loop(false)
  loops["realm"]=make_loop(true)
  loop_player=AudioStreamPlayer.new()
@@ -27,6 +40,9 @@ func _ready() -> void:
  add_child(loop_player)
 func play(kind:String) -> void:
  if not Profile.data.settings.get("sound",true):
+  return
+ if kind=="step":
+  footstep("wet")
   return
  var player=AudioStreamPlayer.new()
  add_child(player)
@@ -100,3 +116,67 @@ func stop_loop() -> void:
  loop_kind=""
  if is_instance_valid(loop_player):
   loop_player.stop()
+
+# Footsteps: a heel thump (low-passed noise + a short body resonance) and a softer toe tap ~70 ms later, with a surface layer (wet-street splash,
+# wood knock or metal clink). Five variants per surface, picked at random without immediate repeats, with slight pitch/volume jitter.
+func make_footstep(surface:String, variant:int) -> AudioStreamWAV:
+ var rate=22050
+ var n=int(rate*0.26)
+ var rng=RandomNumberGenerator.new()
+ rng.seed=100+variant*7+STEP_SURFACES.find(surface)*31
+ var buf=PackedFloat32Array()
+ buf.resize(n)
+ var f_body={"wet":110.0,"wood":170.0,"metal":240.0}[surface]*rng.randf_range(0.9,1.12)
+ var toe_at=int(rate*rng.randf_range(0.055,0.085))
+ for contact in range(2):
+  var start=0 if contact==0 else toe_at
+  var amp=1.0 if contact==0 else rng.randf_range(0.35,0.5)
+  var low=0.0
+  var hp_prev=0.0
+  var lp_prev=0.0
+  for i in range(n-start):
+   var t=float(i)/rate
+   var noise=rng.randf_range(-1.0,1.0)
+   low=low*0.86+noise*0.14
+   var env_thump=exp(-t*52.0)
+   var s_i=low*env_thump*0.9+sin(TAU*f_body*t)*exp(-t*38.0)*0.5
+   match surface:
+    "wet":
+     # splash/scuff: high-passed noise with a quick attack and a longer tail
+     var hp=noise-hp_prev
+     hp_prev=noise*0.6+hp_prev*0.4
+     lp_prev=lp_prev*0.55+hp*0.45
+     s_i+=lp_prev*minf(1.0,t*320.0)*exp(-t*16.0)*0.55
+    "wood":
+     s_i+=sin(TAU*f_body*2.4*t)*exp(-t*55.0)*0.28+sin(TAU*f_body*3.7*t)*exp(-t*70.0)*0.16
+    "metal":
+     s_i+=(sin(TAU*f_body*3.1*t)*0.3+sin(TAU*f_body*5.3*t)*0.18)*exp(-t*30.0)
+   buf[start+i]+=s_i*amp*(minf(1.0,t*900.0))
+ var stream=AudioStreamWAV.new()
+ stream.format=AudioStreamWAV.FORMAT_16_BITS
+ stream.mix_rate=rate
+ var bytes=PackedByteArray()
+ bytes.resize(n*2)
+ for i in range(n):
+  bytes.encode_s16(i*2,int(clampf(buf[i]*0.42,-1.0,1.0)*32767.0))
+ stream.data=bytes
+ return stream
+func footstep(surface:String="wet", loudness:float=1.0) -> void:
+ if not Profile.data.settings.get("sound",true) or step_pool.is_empty() or not step_clips.has(surface):
+  return
+ var list:Array=step_clips[surface]
+ var pick=randi()%list.size()
+ if pick==step_last.get(surface,-1):
+  pick=(pick+1+randi()%(list.size()-1))%list.size()
+ step_last[surface]=pick
+ var player:AudioStreamPlayer=null
+ for sp in step_pool:
+  if not sp.playing:
+   player=sp
+   break
+ if player==null:
+  player=step_pool[0]
+ player.stream=list[pick]
+ player.pitch_scale=randf_range(0.93,1.07)
+ player.volume_db=-9.0+linear_to_db(clampf(loudness,0.05,1.5))+randf_range(-1.5,1.0)
+ player.play()

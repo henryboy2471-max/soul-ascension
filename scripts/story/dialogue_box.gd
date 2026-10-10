@@ -20,6 +20,7 @@ var portrait_ring:Panel
 var name_plate:Panel
 var counter:Label
 var pulse_t=0.0
+var speakers:Dictionary={}   # optional extra speakers (the 2.5D demo cast); falls back to EpisodeData.SPEAKERS
 func setup(list:Array, hero_name:String) -> void:
  lines=list
  player_name=hero_name
@@ -91,7 +92,7 @@ func next_line() -> void:
   finish_all()
   return
  var line=lines[index]
- var speaker=EpisodeData.SPEAKERS.get(line.who,EpisodeData.SPEAKERS.NARRATOR)
+ var speaker=speakers.get(line.who,EpisodeData.SPEAKERS.get(line.who,EpisodeData.SPEAKERS.NARRATOR))
  var display=speaker.name
  if line.who=="PLAYER":
   display=player_name.to_upper()
@@ -153,6 +154,22 @@ func set_portrait(kind:String) -> void:
   art.mouse_filter=Control.MOUSE_FILTER_IGNORE
   portrait_frame.add_child(art)
   portrait_node=art
+ elif kind.begins_with("tex:"):
+  # Crisp vector-rendered portrait (mipmapped, so it stays sharp when scaled down into the frame)
+  var bgc=ColorRect.new()
+  bgc.color=Color("141a30")
+  bgc.size=Vector2(172,172)
+  bgc.mouse_filter=Control.MOUSE_FILTER_IGNORE
+  portrait_frame.add_child(bgc)
+  var face=TextureRect.new()
+  face.texture=SpriteActor.portrait_mip(kind.substr(4))
+  face.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+  face.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+  face.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
+  face.size=Vector2(172,172)
+  face.mouse_filter=Control.MOUSE_FILTER_IGNORE
+  portrait_frame.add_child(face)
+  portrait_node=bgc
  elif kind!="none":
   var bg=ColorRect.new()
   bg.color=Color("141a30")
