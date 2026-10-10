@@ -72,6 +72,13 @@ jobs:
           GODOT=godot tools/test_pipeline.sh
           rm -rf tests/fixtures/_pipeline
 
+      - name: Web build uses lossless Cantor frames
+        # Cantor frames are VRAM-compressed in the repo (Android keeps ETC2, ~4x less GPU memory). A web build that ships only
+        # S3TC can lose textures on mobile browsers without S3TC, so the Pages build switches those frames back to lossless.
+        run: |
+          find assets/enemies/hollow_cantor -name '*.png.import' -exec sed -i 's/compress\/mode=2/compress\/mode=0/' {} +
+          godot --headless --editor --import --quit
+
       - name: Export web build
         run: |
           mkdir -p build/web
