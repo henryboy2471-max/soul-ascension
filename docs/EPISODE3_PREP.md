@@ -1,6 +1,6 @@
 # Episode 3 preparation - "The Relay Keeper" (NOT authorized for implementation; planning only)
 
-No Episode 3 code, data, art or tests have been written. This document is the technical plan, reuse map, asset list and checklist so implementation can start the moment you approve it. Story context: `docs/SEASON1_PLAN.md` (Episode 3 = mission `1-3`, the second-to-last number in the design doc's table is untouched).
+No Episode 3 code, data, art or tests have been written. This document is the technical plan, reuse map, asset list and checklist so implementation can start the moment you approve it. Story context: `docs/SEASON1_PLAN.md` (Episode 3 = mission `1-3` in the design doc table).
 
 ## 1. Outline under review (from the design doc and the Episode 2 teaser: "THE RELAY KEEPER / SIX ARRAYS REMAIN")
 Restore the tram network (design doc: objective "Restore the tram network", mini-boss "Relay Warden"). Proposed shape: find the missing relay keeper -> restore three track junctions -> silence Array 6 in the relay core -> breach -> Relay Warden -> aftermath with a sealed cargo labeled ECHO.
