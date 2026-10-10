@@ -10,3 +10,5 @@ __pycache__/
 *.pyc
 assets/characters/*/_trimmed/
 assets/enemies/*/_trimmed/
+docs/**/*.import
+tools/qa/**/*.import
