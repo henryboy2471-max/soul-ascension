@@ -20,3 +20,8 @@ Candidate = `main` after the RC commit. Everything below was run against local b
 - Phone text is readable but small at ~0.5x canvas scale; a true adaptive HUD scale is future work.
 - Browser touch tests are single-finger (CDP cannot release one finger of several); multi-finger is covered by the engine-level test.
 - Audio is verified by state (loop on/off, settings saved), not by ear.
+
+## Update: Cantor art, texture variants and testing since this report
+- The interim Shade stand-in for the Hollow Cantor has been replaced by the approved v2.1 art (see `docs/ART_V2_1.md`). Open question about the sprite sheet is closed.
+- Browser matrix (Episode 1 and 2 at 1280x720 / 844x390 / 667x375), texture variant comparison and the Android checklist: `docs/WEB_TEXTURE_COMPARISON.md`, `docs/DEVICE_TEST_CHECKLIST.md`, `tools/qa/`.
+- Android and physical-device tests have NOT been run (no SDK/device in the sandbox).

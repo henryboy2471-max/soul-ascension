@@ -79,3 +79,6 @@ Rewards (proposal): first clear 150 XP and 300 gold, replay 65 XP and 120 gold, 
 
 ### Hollow Cantor art v2 (branch `art/hollow-cantor-v2`)
 Same character, same animation set and timing; rendered at 1.5x resolution with ink outlines, cel shading, rim light, fabric grain, brocade, silver trim and gems, a cape for mass, volumetric rays and bloom. Phase 2 adds a double bell halo, energy wings, shockwave rings, a blazing eye and many more orbiting bells. `frames_height` / `phase2.height` are now 213.46 (= 185 x 300/260) because the top padding grew to 40 units. Fighter: the code-drawn halo is drawn only for the interim Shade sprite (the dedicated art has its own), and the Phase 2 charge-up/burst gained converging motes and a pillar of light. Comparisons: `docs/art/hollow_cantor_v2/`.
+
+## Status update (after the Cantor art passes)
+The "Hollow Cantor borrows the Shade sprite" limitation above is obsolete: the Cantor now has its own approved v2.1 sprite sets (Phase 1 and Phase 2, 64 frames, `assets/enemies/hollow_cantor`, VRAM-compressed; v2 kept at `assets/enemies/hollow_cantor_v2`), with the Shade fallback kept for a missing resource. See `docs/ART_V2_1.md` and `docs/WEB_TEXTURE_COMPARISON.md`. Mira in the calm Soul Realm remains a tinted projection of her approved sprite.
