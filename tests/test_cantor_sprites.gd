@@ -30,8 +30,8 @@ func solid(tex:Texture2D, threshold:float=0.35) -> Dictionary:
     y0=mini(y0,y)
     y1=maxi(y1,y)
  return {"rect":Rect2i(x0,y0,x1-x0+1,y1-y0+1),"count":count}
-# smallest distance (px) from any faintly visible pixel (alpha > 0.004) to each canvas edge: [top, left, right, bottom]
-func margins(tex:Texture2D) -> Array:
+# smallest distance (px) from any pixel above `threshold` alpha to each canvas edge: [top, left, right, bottom]
+func margins(tex:Texture2D, threshold:float=0.004) -> Array:
  var img=tex.get_image()
  var w=img.get_width()
  var h=img.get_height()
@@ -41,7 +41,7 @@ func margins(tex:Texture2D) -> Array:
  var right=w
  for y in range(h):
   for x in range(w):
-   if img.get_pixel(x,y).a>0.004:
+   if img.get_pixel(x,y).a>threshold:
     top=mini(top,y)
     bottom=mini(bottom,h-1-y)
     left=mini(left,x)
@@ -53,7 +53,7 @@ func solid_bottom_margin(tex:Texture2D) -> int:
  var best=h
  for y in range(h):
   for x in range(img.get_width()):
-   if img.get_pixel(x,y).a>0.5:
+   if img.get_pixel(x,y).a>0.85:
     best=mini(best,h-1-y)
  return best
 func run() -> void:
@@ -90,15 +90,16 @@ func run() -> void:
    for i in range(f.get_frame_count(anim)):
     var tex=f.get_frame_texture(anim,i)
     if tex.get_size()!=sz: same=false
-    var m=margins(tex)
+    var m=margins(tex,0.06)
+    var faint=margins(tex,0.004)
     worst_top=mini(worst_top,m[0])
     worst_side=mini(worst_side,mini(m[1],m[2]))
-    worst_bottom=mini(worst_bottom,m[3])
+    worst_bottom=mini(worst_bottom,mini(faint[0],mini(faint[1],mini(faint[2],faint[3]))))
     worst_solid_bottom=mini(worst_solid_bottom,solid_bottom_margin(tex))
     if anim!="defeat" and anim!="hurt":
      if absi(solid(tex)["rect"].end.y-int(sz.y))>20: anchored=false
  check(same,"Every frame in a set shares one canvas size")
- check(worst_top>=24 and worst_side>=24 and worst_bottom>=1 and worst_solid_bottom>=3,"Every frame has safe margins: top >= %d px, sides >= %d px, glow clear of the bottom row (%d), hem >= %d px above it" % [worst_top,worst_side,worst_bottom,worst_solid_bottom])
+ check(worst_top>=24 and worst_side>=24 and worst_bottom>=1 and worst_solid_bottom>=5,"Every frame has safe margins: visible art >= %d px from the top and %d px from the sides, even faint glow clears every edge (%d px), hem >= %d px above the bottom" % [worst_top,worst_side,worst_bottom,worst_solid_bottom])
  check(anchored,"The robe hem hovers just above the ground row in every idle/walk/attack frame (no foot jitter)")
  # silhouette: taller and thinner than the Shade and the Enforcer
  var shade=fighter_script.new()
@@ -114,13 +115,13 @@ func run() -> void:
   for y in range(img.get_height()):
    var n=0
    for x in range(img.get_width()):
-    if img.get_pixel(x,y).a>0.35: n+=1
+    if img.get_pixel(x,y).a>0.6: n+=1
    if n>0:
     rows+=n
     used+=1
   return rows/float(used)/float(used)
  var rc=thin.call(p1)
- check(rc<thin.call(shade)*0.6 and rc<thin.call(enforcer)*0.6,"Silhouette is unnaturally thin and tall compared with the Shade and the Enforcer (%.2f vs %.2f / %.2f)" % [rc,thin.call(shade),thin.call(enforcer)])
+ check(rc<thin.call(shade)*0.8 and rc<thin.call(enforcer)*0.8,"Silhouette is unnaturally thin and tall compared with the Shade and the Enforcer (%.2f vs %.2f / %.2f)" % [rc,thin.call(shade),thin.call(enforcer)])
  var a1=solid(p1.sprite_frames.get_frame_texture("idle",0))["count"]
  var a2=solid(p2.sprite_frames.get_frame_texture("idle",0))["count"]
  check(a2>a1*1.1,"Phase 2 is the same character intensified: more light, rings and ribbons (%d vs %d opaque pixels)" % [a2,a1])

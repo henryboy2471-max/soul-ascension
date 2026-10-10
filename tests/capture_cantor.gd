@@ -45,7 +45,9 @@ func run() -> void:
  await shot("hurt",0.02)
  b.hero.health=b.hero.max_health*0.5
  b.foe.health=b.foe.max_health*0.49
- await shot("phase2_banner",0.5)
+ await shot("phase2_charge",0.12)
+ await shot("phase2_burst",0.35)
+ await shot("phase2_banner",0.35)
  await shot("phase2_radio",2.3)
  b.foe.swing=0.4
  b.target=b.hero.position

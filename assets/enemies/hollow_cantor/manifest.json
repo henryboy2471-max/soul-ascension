@@ -6,52 +6,52 @@
    "fps": 20.0,
    "frames": [
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "attack1_00.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "attack1_01.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "attack1_02.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "attack1_03.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "attack1_04.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "attack1_05.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "attack1_06.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "attack1_07.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     }
    ],
    "frames_out": [
@@ -76,52 +76,52 @@
    "fps": 9.0,
    "frames": [
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "defeat_00.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "defeat_01.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "defeat_02.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "defeat_03.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "defeat_04.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "defeat_05.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "defeat_06.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "defeat_07.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     }
    ],
    "frames_out": [
@@ -146,16 +146,16 @@
    "fps": 14.0,
    "frames": [
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "hurt_00.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "hurt_01.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     }
    ],
    "frames_out": [
@@ -174,52 +174,52 @@
    "fps": 8.0,
    "frames": [
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "idle_00.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "idle_01.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "idle_02.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "idle_03.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "idle_04.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "idle_05.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "idle_06.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "idle_07.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     }
    ],
    "frames_out": [
@@ -244,40 +244,40 @@
    "fps": 9.0,
    "frames": [
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "walk_00.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "walk_01.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "walk_02.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "walk_03.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "walk_04.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     },
     {
-     "bottom": 292,
+     "bottom": 450,
      "file": "walk_05.png",
-     "h": 292,
-     "w": 360
+     "h": 450,
+     "w": 495
     }
    ],
    "frames_out": [
@@ -296,11 +296,11 @@
   }
  },
  "canvas": [
-  360,
-  292
+  495,
+  450
  ],
  "character": "hollow_cantor",
- "ground_row": 292,
+ "ground_row": 450,
  "pad": 0,
  "ref_anim": "idle"
 }
