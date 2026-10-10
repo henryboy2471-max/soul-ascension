@@ -191,6 +191,19 @@ Gates that must exist and be tested **before** any social feature is enabled [Ow
 
 Leaderboards are **achievement-based and fair**: e.g., exploration completion, codex completion, challenge clears, active-day streak-free totals. They never rank by spending, never rank by prestige purchases, and use per-episode or seasonal boards so new players can compete. No spending-based status.
 
+### 6.5 Hall of Legends milestones [Design; each needs owner approval; none starts before the Episode 3 milestones allow]
+
+| ID | Scope |
+|---|---|
+| HL-0 | This specification, data structure and interface concept (**done**) |
+| HL-1 | Art direction samples for the Hall (concept only; approval before any art batch) |
+| HL-2 | Personal Hall, local only: display slots over existing inventory/achievements/prestige, layout save, privacy defaults private; tests |
+| HL-3 | Earned Hall upgrades (cosmetic) tied to milestones, prestige and exploration sets |
+| HL-4 | Social gates: safe display names, privacy controls, server-side anti-cheat, moderation/reporting — all tested **before** HL-5 |
+| HL-5 | Friends' profiles (opt-in) and fair achievement-based leaderboards — **requires approval** |
+
+Season 1 stays exactly 10 episodes; Hall exploration stats count only released, approved episodes.
+
 ## 7. Season Pass (cosmetic only)
 
 Season Pass $14.99, Deluxe $24.99 (planning). Pass XP comes from **play**, never from spending. Free track and premium track both cosmetic; Deluxe adds extra cosmetics only; no tier-skipping with money [Design]. Non-consumable; restorable. (Implemented in `ShopService` for test data.)
