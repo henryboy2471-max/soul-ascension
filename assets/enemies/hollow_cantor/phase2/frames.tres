@@ -1,0 +1,158 @@
+[gd_resource type="SpriteFrames" load_steps=33 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/attack1_00.png" id="1_05ypq"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/attack1_01.png" id="2_5oyyk"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/attack1_02.png" id="3_w0rdv"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/attack1_03.png" id="4_jj1pj"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/attack1_04.png" id="5_qtnv8"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/attack1_05.png" id="6_dxtfj"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/attack1_06.png" id="7_arb1d"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/attack1_07.png" id="8_xr7fb"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/defeat_00.png" id="9_8ywc0"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/defeat_01.png" id="10_qn725"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/defeat_02.png" id="11_2nlw7"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/defeat_03.png" id="12_1jurc"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/defeat_04.png" id="13_kjfrs"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/defeat_05.png" id="14_iypsc"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/defeat_06.png" id="15_iuvpi"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/defeat_07.png" id="16_kd1gl"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/hurt_00.png" id="17_n70ep"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/hurt_01.png" id="18_ou3gt"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/idle_00.png" id="19_433sd"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/idle_01.png" id="20_m5tt4"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/idle_02.png" id="21_gko88"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/idle_03.png" id="22_podne"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/idle_04.png" id="23_kenx3"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/idle_05.png" id="24_mtyu6"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/idle_06.png" id="25_t7w7l"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/idle_07.png" id="26_vrkyh"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/walk_00.png" id="27_uqpud"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/walk_01.png" id="28_q14qw"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/walk_02.png" id="29_ip25x"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/walk_03.png" id="30_y8itu"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/walk_04.png" id="31_l5jc2"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor/phase2/frames/walk_05.png" id="32_f3n8h"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_05ypq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_5oyyk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_w0rdv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_jj1pj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_qtnv8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_dxtfj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_arb1d")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_xr7fb")
+}],
+"loop": false,
+"name": &"attack1",
+"speed": 20.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_8ywc0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_qn725")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_2nlw7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_1jurc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_kjfrs")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_iypsc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_iuvpi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_kd1gl")
+}],
+"loop": false,
+"name": &"defeat",
+"speed": 9.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("17_n70ep")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_ou3gt")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 14.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("19_433sd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_m5tt4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_gko88")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_podne")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_kenx3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_mtyu6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("25_t7w7l")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_vrkyh")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("27_uqpud")
+}, {
+"duration": 1.0,
+"texture": ExtResource("28_q14qw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("29_ip25x")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_y8itu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("31_l5jc2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("32_f3n8h")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 9.0
+}]

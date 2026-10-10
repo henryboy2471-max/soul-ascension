@@ -1,0 +1,158 @@
+[gd_resource type="SpriteFrames" load_steps=33 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/attack1_00.png" id="1_j07ed"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/attack1_01.png" id="2_oivkn"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/attack1_02.png" id="3_wmtnc"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/attack1_03.png" id="4_7osg2"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/attack1_04.png" id="5_nlqit"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/attack1_05.png" id="6_6cbs6"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/attack1_06.png" id="7_jaq3m"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/attack1_07.png" id="8_63dj6"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/defeat_00.png" id="9_kogck"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/defeat_01.png" id="10_qsw0n"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/defeat_02.png" id="11_aaphl"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/defeat_03.png" id="12_dkpnm"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/defeat_04.png" id="13_gsvwc"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/defeat_05.png" id="14_8cpug"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/defeat_06.png" id="15_pbeee"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/defeat_07.png" id="16_740pm"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/hurt_00.png" id="17_ecypd"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/hurt_01.png" id="18_scchq"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/idle_00.png" id="19_1h2wp"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/idle_01.png" id="20_vac17"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/idle_02.png" id="21_orvk5"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/idle_03.png" id="22_tcds8"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/idle_04.png" id="23_6ncmr"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/idle_05.png" id="24_ya54h"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/idle_06.png" id="25_yym7w"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/idle_07.png" id="26_6c8eq"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/walk_00.png" id="27_tsqwn"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/walk_01.png" id="28_vgyg3"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/walk_02.png" id="29_mbgdm"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/walk_03.png" id="30_t5lif"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/walk_04.png" id="31_uoan2"]
+[ext_resource type="Texture2D" path="res://assets/enemies/hollow_cantor_v2/phase2/frames/walk_05.png" id="32_hqvsv"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_j07ed")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_oivkn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_wmtnc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_7osg2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_nlqit")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_6cbs6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_jaq3m")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_63dj6")
+}],
+"loop": false,
+"name": &"attack1",
+"speed": 20.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_kogck")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_qsw0n")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_aaphl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_dkpnm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_gsvwc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_8cpug")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_pbeee")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_740pm")
+}],
+"loop": false,
+"name": &"defeat",
+"speed": 9.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("17_ecypd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_scchq")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 14.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("19_1h2wp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_vac17")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_orvk5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_tcds8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_6ncmr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_ya54h")
+}, {
+"duration": 1.0,
+"texture": ExtResource("25_yym7w")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_6c8eq")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("27_tsqwn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("28_vgyg3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("29_mbgdm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_t5lif")
+}, {
+"duration": 1.0,
+"texture": ExtResource("31_uoan2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("32_hqvsv")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 9.0
+}]

@@ -295,7 +295,8 @@ func spawn_foe(def:Dictionary) -> void:
   foe.cantor=true
   foe.temp_art=art.temporary
   if art.path!="":
-   foe.load_sprite_set(art.path,float(def.get("height",185.0)),def.accent)
+   # dedicated frames carry transparent safety padding, so their world height is stated separately (the Shade fallback keeps "height")
+   foe.load_sprite_set(art.path,float(def.get("height",185.0)) if art.temporary else float(def.get("frames_height",def.get("height",185.0))),def.accent)
    if art.temporary and foe.sprite!=null:
     foe.sprite.modulate=def.get("fallback_tint",Color(0.86,0.82,1.12))
  elif def.look=="warped":
@@ -435,7 +436,7 @@ func update_transform(delta:float) -> void:
    var tint=phase2_def.get("tint",Color(1.12,0.58,0.55))
    if phase2_def.has("tint") and not f.temp_art:
     tint=Color.WHITE
-   f.set_boss_form(str(phase2_def.get("frames",boss_frames_path)),180.0,tint)
+   f.set_boss_form(str(phase2_def.get("frames",boss_frames_path)),float(phase2_def.get("height",180.0)),tint)
    f.burst_t=1.0
    f.scale=Vector2(f.scale.x*0.95,f.scale.y*0.95)
    var end_scale=float(phase2_def.get("scale",boss_scale))

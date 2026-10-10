@@ -352,22 +352,37 @@ func draw_cantor_vfx(color:Color) -> void:
  var t=Time.get_ticks_msec()/1000.0
  var pale=Color("e9e2ff")
  var accent_c=form_color if (boss_form or form_t>0.0) else Color("b9a4ff")
- var halo=Vector2(0,-212)
- var r=30.0+16.0*k
- draw_arc(halo,r,0,TAU,40,Color(pale,0.85),3)
- draw_arc(halo,r+8.0+sin(t*3.0)*2.0,0,TAU,40,Color(accent_c,0.45),2)
- for i in range(8):
-  var a=i*TAU/8.0+t*(0.9+1.2*k)
-  draw_circle(halo+Vector2.from_angle(a)*r,2.4,Color(pale,0.9))
- # bell hanging in the halo
- draw_colored_polygon(PackedVector2Array([halo+Vector2(-9,6),halo+Vector2(-6,-8),halo+Vector2(0,-13),halo+Vector2(6,-8),halo+Vector2(9,6)]),Color(pale,0.9))
- draw_circle(halo+Vector2(0,9+sin(t*5.0)*2.0),2.6,Color(accent_c,0.95))
+ # The halo and bell are part of the dedicated art (its own bell-shaped halo); they are only drawn here for the interim Shade sprite.
+ if temp_art:
+  var halo=Vector2(0,-212)
+  var r=30.0+16.0*k
+  draw_arc(halo,r,0,TAU,40,Color(pale,0.85),3)
+  draw_arc(halo,r+8.0+sin(t*3.0)*2.0,0,TAU,40,Color(accent_c,0.45),2)
+  for i in range(8):
+   var a=i*TAU/8.0+t*(0.9+1.2*k)
+   draw_circle(halo+Vector2.from_angle(a)*r,2.4,Color(pale,0.9))
+  # bell hanging in the halo
+  draw_colored_polygon(PackedVector2Array([halo+Vector2(-9,6),halo+Vector2(-6,-8),halo+Vector2(0,-13),halo+Vector2(6,-8),halo+Vector2(9,6)]),Color(pale,0.9))
+  draw_circle(halo+Vector2(0,9+sin(t*5.0)*2.0),2.6,Color(accent_c,0.95))
  # bell-toll rings, one every ~1.6 s (faster in Phase 2)
  var period=1.6-0.7*k
  var rings=2+int(k*2.0)
  for i in range(rings):
   var u=fposmod(t/period+float(i)/float(rings),1.0)
   draw_arc(Vector2(0,-95),30.0+u*(120.0+40.0*k),0,TAU,48,Color(pale if i%2==0 else accent_c,0.55*(1.0-u)),3.0+3.0*(1.0-u))
+ if form_t>0.0 and not boss_form:
+  # Phase 2 charge-up: resonance gathers into the figure from every side
+  for i in range(30):
+   var ang=i*TAU/30.0+t*2.2
+   var rr=(1.0-form_t)*210.0+24.0
+   var p0=Vector2(0,-95)+Vector2(cos(ang)*rr,sin(ang)*rr*1.15)
+   var p1=Vector2(0,-95)+Vector2(cos(ang)*(rr+26.0),sin(ang)*(rr+26.0)*1.15)
+   draw_line(p0,p1,Color(pale,0.7*form_t),2.0)
+   draw_circle(p0,3.0,Color(accent_c,0.9*form_t))
+ if burst_t>0.0:
+  # the reveal: a pillar of light through the halo
+  draw_rect(Rect2(-34,-430,68,430),Color(accent_c,0.35*burst_t))
+  draw_rect(Rect2(-13,-430,26,430),Color(1,1,1,0.65*burst_t))
  if k>0.0:
   for i in range(5):
    var x=-92.0+i*46.0
