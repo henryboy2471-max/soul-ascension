@@ -2,7 +2,7 @@
 
 ## 0. Input status and validation (what I actually checked)
 - **No new image files arrived with this request.** The four files in the uploads folder are byte-identical (SHA-256 prefixes `3a1052594b70`, `fc8758cf8c5c`, `8f4c435de72e`, `20a9758fa564`) to the candidate already staged at `assets/approved_anime/preview/hero_turnaround_candidate/`. I therefore validated those. If the owner's "approved" four-view art is a different/corrected set, send it and I will re-run the checks.
-- **Design question still open:** this candidate differs from approved reference 01 (red lining, white tee, brown belts, bandages, ponytail/undercut, circle-crosshair back emblem, per-view eye colour; see `HERO_TURNAROUND_REVIEW.md`). The owner's message calls the art "approved", which I take as approval of the candidate as the Hero design, **but please confirm in one line that reference 01 is superseded for the Hero**. The plan below assumes the candidate.
+- **Design question RESOLVED (owner, later in this session): the candidate is the official Hero; reference 01 is superseded for the Hero. See `HERO_DESIGN_LOCK_AND_PRODUCTION_SPEC.md`. (Original note:)** this candidate differs from approved reference 01 (red lining, white tee, brown belts, bandages, ponytail/undercut, circle-crosshair back emblem, per-view eye colour; see `HERO_TURNAROUND_REVIEW.md`). The owner's message calls the art "approved", which I take as approval of the candidate as the Hero design, **but please confirm in one line that reference 01 is superseded for the Hero**. The plan below assumes the candidate.
 
 ### Measured results (per view)
 | View | Size / mode | Alpha | Height | Lowest solid px | Sole x-ranges | Silhouette centre x |

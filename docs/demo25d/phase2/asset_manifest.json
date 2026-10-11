@@ -1,6 +1,6 @@
 {
  "branch": "chatgpt/approved-anime-art-integration",
- "revision": 2,
+ "revision": 3,
  "spec": "docs/demo25d/phase2/PRODUCTION_ASSET_MANIFEST.md",
  "frame_canvas": [
   576,
@@ -19,15 +19,15 @@
  "mirror_allowed": false,
  "walk_frames_per_view": 6,
  "idle_frames_per_view": 2,
- "next_deliverable": "hero_turnaround_clean_4view (reference 01) - owner approval required before rigging",
+ "next_deliverable": "hero_turnaround_{front,right,back,left}_native.png (+ face and costume detail sheets) - owner approval before rigging",
  "assets": [
   {
    "id": "hero_turnaround_clean_4view",
-   "path": "source/hero_turnaround_{front,right,back,left}.png",
+   "path": "source/hero/hero_turnaround_{front,right,back,left}_native.png",
    "size": "1152x2304+",
    "status": "MISSING",
    "priority": 1,
-   "note": "flat #00FF00 key background; strictly from reference 01; needs owner approval before rigging"
+   "note": "native resolution, clean matte, based on the approved candidate; owner approval before rigging; status stays MISSING"
   },
   {
    "id": "hero_rig_parts_4view",
@@ -404,6 +404,15 @@
    "status": "UNASSIGNED",
    "priority": 99,
    "note": "identities not approved; do not produce"
+  },
+  {
+   "id": "hero_detail_sheets",
+   "path": "source/hero/hero_{face,costume}_detail_sheet.png",
+   "size": "2048+",
+   "status": "MISSING",
+   "priority": 1,
+   "note": "identity lock"
   }
- ]
+ ],
+ "hero_design": "official: assets/approved_anime/preview/hero_turnaround_candidate/ (visual reference only); reference 01 superseded for the Hero"
 }

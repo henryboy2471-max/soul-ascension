@@ -6,7 +6,7 @@ import json, shutil, sys, tempfile
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 import validate_approved_art as v
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 
 def frame(shape="right", color=(200, 160, 40, 255)):
     im = Image.new("RGBA", (v.FRAME_W, v.FRAME_H), (0, 0, 0, 0))
@@ -90,6 +90,7 @@ def main():
                 for i in range(n):
                     ImageOps.mirror(Image.open(H(r) / f"frames/right_{kind}_{i:02d}.png")).save(H(r) / f"frames/left_{kind}_{i:02d}.png")
         mutate("mirrored left frames are rejected", mirror_left, "exact mirror")
+        mutate("soft blurred edges are rejected", lambda r: frame().filter(ImageFilter.GaussianBlur(7)).save(H(r) / "frames/front_idle_01.png"), "soft/fringed edge")
         mutate("small portrait is rejected", lambda r: Image.new("RGBA", (600, 600), (0, 0, 0, 0)).save(H(r) / "portrait.png"), "portrait smaller")
         mutate("missing mid tile is rejected", lambda r: (E(r) / "mid_buildings_1.png").unlink(), "missing mid_buildings_1.png")
         mutate("wrong tile size is rejected", lambda r: Image.new("RGBA", (3000, 784), (0, 0, 0, 0)).save(E(r) / "mid_buildings_0.png"), "must be exactly 3200x784")
