@@ -423,5 +423,6 @@
   "assets/approved_anime/reference/hero_reference_pack_v2/",
   "assets/approved_anime/preview/hero_turnaround_candidate/",
   "hero panel of assets/approved_anime/reference/03_overview_mockup_hero_npc_environment_with_hud.png"
- ]
+ ],
+ "front_view_readiness": "round-2 front (530x887) is REFERENCE ONLY: 2.31x short of native, clipped hem, soft edges, eye colour; see ECHO_V2_FRONT_PRODUCTION_READINESS_REPORT.md"
 }
