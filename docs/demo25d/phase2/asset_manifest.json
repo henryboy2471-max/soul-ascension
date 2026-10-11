@@ -1,0 +1,313 @@
+{
+ "branch": "chatgpt/approved-anime-art-integration",
+ "base": "17dbb0b",
+ "spec": "docs/demo25d/phase2/PRODUCTION_ASSET_MANIFEST.md",
+ "frame_canvas": [
+  576,
+  1152
+ ],
+ "anchor": {
+  "x": 288,
+  "baseline_y": 1088
+ },
+ "walk_frames_per_view": 6,
+ "idle_frames_per_view": 2,
+ "assets": [
+  {
+   "id": "hero_turnaround_clean",
+   "path": "source/hero_turnaround_{front,side,back}.png",
+   "size": "1152x2304+",
+   "status": "MISSING",
+   "priority": 1,
+   "note": "flat #00FF00 key background; staged outside final assets"
+  },
+  {
+   "id": "hero_parts_or_key_poses",
+   "path": "source/hero_parts/",
+   "size": "per part",
+   "status": "MISSING",
+   "priority": 2,
+   "note": "rig parts preferred"
+  },
+  {
+   "id": "hero_front_idle",
+   "path": "assets/approved_anime/characters/hero/frames/front_idle_00..01.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "hero_front_walk",
+   "path": "assets/approved_anime/characters/hero/frames/front_walk_00..05.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "hero_side_idle",
+   "path": "assets/approved_anime/characters/hero/frames/side_idle_00..01.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "hero_side_walk",
+   "path": "assets/approved_anime/characters/hero/frames/side_walk_00..05.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "hero_back_idle",
+   "path": "assets/approved_anime/characters/hero/frames/back_idle_00..01.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "hero_back_walk",
+   "path": "assets/approved_anime/characters/hero/frames/back_walk_00..05.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "hero_portrait",
+   "path": "assets/approved_anime/characters/hero/portrait.png",
+   "size": "1024x1024",
+   "status": "MISSING",
+   "priority": 4,
+   "note": ""
+  },
+  {
+   "id": "hero_expressions",
+   "path": "assets/approved_anime/characters/hero/portrait_<expression>.png",
+   "size": "1024x1024 x5",
+   "status": "MISSING",
+   "priority": 4,
+   "note": ""
+  },
+  {
+   "id": "hero_manifest",
+   "path": "assets/approved_anime/characters/hero/manifest.json + anchor.json",
+   "size": "json",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "height_px=1000, anchor_x=288, baseline_y=1088"
+  },
+  {
+   "id": "imani_turnaround_clean",
+   "path": "source/imani_turnaround_{front,side,back}.png",
+   "size": "1152x2304+",
+   "status": "MISSING",
+   "priority": 3,
+   "note": "flat #00FF00 key background; staged outside final assets"
+  },
+  {
+   "id": "imani_parts_or_key_poses",
+   "path": "source/imani_parts/",
+   "size": "per part",
+   "status": "MISSING",
+   "priority": 3,
+   "note": "rig parts preferred"
+  },
+  {
+   "id": "imani_front_idle",
+   "path": "assets/approved_anime/characters/imani/frames/front_idle_00..01.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "imani_front_walk",
+   "path": "assets/approved_anime/characters/imani/frames/front_walk_00..05.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "imani_side_idle",
+   "path": "assets/approved_anime/characters/imani/frames/side_idle_00..01.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "imani_side_walk",
+   "path": "assets/approved_anime/characters/imani/frames/side_walk_00..05.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "imani_back_idle",
+   "path": "assets/approved_anime/characters/imani/frames/back_idle_00..01.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "imani_back_walk",
+   "path": "assets/approved_anime/characters/imani/frames/back_walk_00..05.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "imani_portrait",
+   "path": "assets/approved_anime/characters/imani/portrait.png",
+   "size": "1024x1024",
+   "status": "MISSING",
+   "priority": 4,
+   "note": ""
+  },
+  {
+   "id": "imani_expressions",
+   "path": "assets/approved_anime/characters/imani/portrait_<expression>.png",
+   "size": "1024x1024 x5",
+   "status": "MISSING",
+   "priority": 4,
+   "note": ""
+  },
+  {
+   "id": "imani_manifest",
+   "path": "assets/approved_anime/characters/imani/manifest.json + anchor.json",
+   "size": "json",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "height_px=940, anchor_x=288, baseline_y=1088"
+  },
+  {
+   "id": "npc_a1_tram_technician",
+   "path": "assets/approved_anime/characters/npc_a1_tram_technician/",
+   "size": "576x1152 frames",
+   "status": "MISSING",
+   "priority": 6,
+   "note": "tier A; owner names TBD"
+  },
+  {
+   "id": "npc_a2_courier",
+   "path": "assets/approved_anime/characters/npc_a2_courier/",
+   "size": "576x1152 frames",
+   "status": "MISSING",
+   "priority": 6,
+   "note": "tier A; owner names TBD"
+  },
+  {
+   "id": "npc_a3_grey_hoodie",
+   "path": "assets/approved_anime/characters/npc_a3_grey_hoodie/",
+   "size": "576x1152 frames",
+   "status": "MISSING",
+   "priority": 6,
+   "note": "tier A; owner names TBD"
+  },
+  {
+   "id": "npc_b01_b10",
+   "path": "assets/approved_anime/characters/npc_b*/",
+   "size": "560-tall class",
+   "status": "MISSING",
+   "priority": 6,
+   "note": "tier B crowd"
+  },
+  {
+   "id": "env_sky",
+   "path": "assets/approved_anime/environments/neon_district/sky.png",
+   "size": "2560x1440",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_far_skyline",
+   "path": "assets/approved_anime/environments/neon_district/far_skyline.png",
+   "size": "4608x900",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_mid_buildings_0",
+   "path": "assets/approved_anime/environments/neon_district/mid_buildings_0..2.png",
+   "size": "3200x760 x3",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_street_floor_0",
+   "path": "assets/approved_anime/environments/neon_district/street_floor_0..2.png",
+   "size": "3200x656 x3",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_reflection_plate",
+   "path": "assets/approved_anime/environments/neon_district/reflection_plate.png",
+   "size": "9600x400",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_foreground tiles",
+   "path": "assets/approved_anime/environments/neon_district/foreground tiles",
+   "size": "3200x1440 x3",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_props_x",
+   "path": "assets/approved_anime/environments/neon_district/props/*.png",
+   "size": "per prop",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_occluders_x",
+   "path": "assets/approved_anime/environments/neon_district/occluders/*.png",
+   "size": "per prop",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_light_masks_x",
+   "path": "assets/approved_anime/environments/neon_district/light_masks/*.png",
+   "size": "per mask",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_collision_mask",
+   "path": "assets/approved_anime/environments/neon_district/collision_mask.png",
+   "size": "4800x360",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "cast_portrait_c1_c4",
+   "path": "reference/02_cast_portrait_montage_2x2.png",
+   "size": "n/a",
+   "status": "UNASSIGNED",
+   "priority": 99,
+   "note": "identities not approved; do not produce"
+  }
+ ]
+}
