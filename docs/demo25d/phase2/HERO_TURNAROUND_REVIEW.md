@@ -1,5 +1,8 @@
 # Hero four-view turnaround candidate — Claude review (not an approval)
 
+> **DESIGN AUTHORITY UPDATE:** Echo V2 is now the official protagonist design (`ECHO_V2_DESIGN_AUTHORITY.md`). Everything in this document describing Hero pack v2, the preview candidate, reference 01 or the white-twist Echo is **SUPERSEDED FOR ECHO** and kept only as a historical record.
+
+
 Staged at `assets/approved_anime/preview/hero_turnaround_candidate/` (preview only). Supplied by ChatGPT as `hero_*_turnaround_preview.png` + `preparation_metadata.json` + README. Source: one 1774x887 composite, color-keyed, cropped and enlarged; the package itself says it is *visual preparation only, not production-ready, no separated rig parts*.
 
 ## Verdict

@@ -1,3 +1,5 @@
+> **SUPERSEDED FOR ECHO:** files 01 (Main Hero sheet) and the hero panel of 03 are historical records; the authoritative protagonist design is Echo V2 (`../review/echo_v2_review/`, `docs/demo25d/phase2/ECHO_V2_DESIGN_AUTHORITY.md`). Files 02, 04, 05 are unchanged.
+
 # Approved anime reference art — inventory (REFERENCE ONLY, none are game-ready assets)
 
 All five are flat RGB images (no alpha). Provenance: ChatGPT-generated concept art approved by the owner, supplied via chat; method/prompts not recorded in the repo (record before any production use).

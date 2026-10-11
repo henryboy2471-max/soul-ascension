@@ -1,6 +1,6 @@
 {
  "branch": "chatgpt/approved-anime-art-integration",
- "revision": 4,
+ "revision": 5,
  "spec": "docs/demo25d/phase2/PRODUCTION_ASSET_MANIFEST.md",
  "frame_canvas": [
   576,
@@ -19,7 +19,7 @@
  "mirror_allowed": false,
  "walk_frames_per_view": 6,
  "idle_frames_per_view": 2,
- "next_deliverable": "hero_turnaround_{front,right,back,left}_native.png at 1152x2304 (figure 2000px) + face/costume detail sheets - owner approval before rigging",
+ "next_deliverable": "echo (hero) native turnaround hero_turnaround_{front,right,back,left}_native.png 1152x2304 + face and costume detail sheets - no rigging until G2 approval",
  "assets": [
   {
    "id": "hero_turnaround_clean_4view",
@@ -414,5 +414,14 @@
    "note": "identity lock"
   }
  ],
- "hero_design": "official reference: assets/approved_anime/reference/hero_reference_pack_v2/ (REFERENCE ONLY, not native); earlier preview candidate and reference 01 superseded"
+ "hero_design": "FINAL: Echo V2 - assets/approved_anime/review/echo_v2_review/ (REVIEW ONLY, not native). SUPERSEDED FOR ECHO: reference 01, hero_reference_pack_v2, hero_turnaround_candidate, white-twist Echo art. See docs/demo25d/phase2/ECHO_V2_DESIGN_AUTHORITY.md. Folder/id 'hero' = Echo V2 alias.",
+ "superseded_for_echo": [
+  "assets/echo_key_art.png",
+  "assets/characters/hero/",
+  "assets/_incoming/hero/",
+  "assets/approved_anime/reference/01_main_hero_turnaround_portrait.png",
+  "assets/approved_anime/reference/hero_reference_pack_v2/",
+  "assets/approved_anime/preview/hero_turnaround_candidate/",
+  "hero panel of assets/approved_anime/reference/03_overview_mockup_hero_npc_environment_with_hud.png"
+ ]
 }

@@ -1,5 +1,8 @@
 # Hero — official design lock and production specification
 
+> **DESIGN AUTHORITY UPDATE:** Echo V2 is now the official protagonist design (`ECHO_V2_DESIGN_AUTHORITY.md`). Everything in this document describing Hero pack v2, the preview candidate, reference 01 or the white-twist Echo is **SUPERSEDED FOR ECHO** and kept only as a historical record.
+
+
 **Owner decision (this session):** the four-view Hero candidate (staged at `assets/approved_anime/preview/hero_turnaround_candidate/`, SHA-256 prefixes `3a1052594b70` back, `fc8758cf8c5c` front, `8f4c435de72e` left-facing, `20a9758fa564` right-facing) is the **officially approved Hero design**. Reference 01 is **superseded for the Hero only**. Do not redesign the character. These four images are **visual references, not production sprites**. All production assets stay `MISSING` until genuine artwork is delivered and passes `tools/validate_approved_art.py`, the manual checklist and the owner's visual approval.
 ## REVISION 2 — current approved Hero reference pack (supersedes the earlier preview candidate)
 Owner confirmed (this session) the new four-view pack at `assets/approved_anime/reference/hero_reference_pack_v2/` as the approved Hero reference, labelled **REFERENCE ONLY**. The earlier preview candidate (`assets/approved_anime/preview/hero_turnaround_candidate/`) is now history. Canonical eyes: **warm brown with amber highlights** (owner-stated). Everything in sections 2-3 below describes the *earlier* candidate and is **superseded by this block** wherever they differ.

@@ -1,2 +1,4 @@
+SUPERSEDED FOR ECHO (historical record). See docs/demo25d/phase2/ECHO_V2_DESIGN_AUTHORITY.md.
+
 # Hero turnaround candidate — PREVIEW ONLY (not production, not READY)
 Staged outside `characters/hero/` on purpose so `tools/validate_approved_art.py` stays BLOCKED. Files are named by the direction the character FACES in each image (the four images were attached without filenames; mapping by content). Source composite (1774x887) is not in the repo. See `docs/demo25d/phase2/HERO_TURNAROUND_REVIEW.md` for the review. Not approved; do not rig or integrate.

@@ -1,5 +1,8 @@
 # Hero layered-rig plan (PLAN ONLY — no animation implemented, no artwork created)
 
+> **DESIGN AUTHORITY UPDATE:** Echo V2 is now the official protagonist design (`ECHO_V2_DESIGN_AUTHORITY.md`). Everything in this document describing Hero pack v2, the preview candidate, reference 01 or the white-twist Echo is **SUPERSEDED FOR ECHO** and kept only as a historical record.
+
+
 ## 0. Input status and validation (what I actually checked)
 - **No new image files arrived with this request.** The four files in the uploads folder are byte-identical (SHA-256 prefixes `3a1052594b70`, `fc8758cf8c5c`, `8f4c435de72e`, `20a9758fa564`) to the candidate already staged at `assets/approved_anime/preview/hero_turnaround_candidate/`. I therefore validated those. If the owner's "approved" four-view art is a different/corrected set, send it and I will re-run the checks.
 - **Design question RESOLVED (owner, later in this session): the candidate is the official Hero; reference 01 is superseded for the Hero. See `HERO_DESIGN_LOCK_AND_PRODUCTION_SPEC.md`. (Original note:)** this candidate differs from approved reference 01 (red lining, white tee, brown belts, bandages, ponytail/undercut, circle-crosshair back emblem, per-view eye colour; see `HERO_TURNAROUND_REVIEW.md`). The owner's message calls the art "approved", which I take as approval of the candidate as the Hero design, **but please confirm in one line that reference 01 is superseded for the Hero**. The plan below assumes the candidate.
@@ -51,3 +54,6 @@ G1 owner confirms design -> G2 corrected four-view turnaround visually approved 
 
 ## 6. Status
 No animation implemented, no part extraction attempted (cutting a flat enlarged image would leave missing occlusion areas and soft edges, i.e. substitute-quality art). Stopped here for owner validation.
+
+## Echo V2 addendum (governs where it differs from the text above; rigging still blocked until gate G2)
+Part/secondary-chain changes for Echo V2: replace bandage wraps with the **left-forearm dark band/tattoo** (a baked-in skin detail on the left forearm part, visible in every view where it shows) and gloves with **gold wrist plates**; replace the satchel/pouches with **red belts + gold buckles, red thigh straps, hip gold chains (1-2 pendulum segments)** and the **gold chain + diamond pendant** at the neck (2 segments); add **ponytail with gold band (3-4 segments, bead accents)**, loose forehead locs (2 segments each), **red epaulettes and sleeve diamond patches** on the shoulder/upper-arm parts, **red cuffs with black straps** on the forearms, the **gold winged-diamond emblem** on the coat back panel, red coat lining and red inner collar. Boots: black-and-red with red soles (sole as a separate layer). Everything else (skeleton, animation targets, gates) unchanged. See `ECHO_V2_DESIGN_AUTHORITY.md`.

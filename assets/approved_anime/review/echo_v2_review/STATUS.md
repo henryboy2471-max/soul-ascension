@@ -1,3 +1,5 @@
+AUTHORITATIVE DESIGN REFERENCE FOR ECHO (owner-approved final authority) — but still REVIEW ONLY: these files are not native production art. See docs/demo25d/phase2/ECHO_V2_DESIGN_AUTHORITY.md. (The notes below were written before the decision; the "which design is authoritative" question is settled: Echo V2.)
+
 VISUAL REVIEW ONLY — NOT approved, NOT production, NOT a replacement for hero_reference_pack_v2. Do not run the native/production validators on these. No rigging/animation.
 
 Received so far (3 of 4 views): right profile (405x887), front (crop 480x887 + resized 1000x2000), back (crop 465x887 + resized 1000x2000). **Left view not received.** Note: the resized files are 1000x2000, not the 1152x2304 the README mentions.
