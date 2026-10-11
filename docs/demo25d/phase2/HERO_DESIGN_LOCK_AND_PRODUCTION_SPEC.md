@@ -1,11 +1,55 @@
 # Hero — official design lock and production specification
 
 **Owner decision (this session):** the four-view Hero candidate (staged at `assets/approved_anime/preview/hero_turnaround_candidate/`, SHA-256 prefixes `3a1052594b70` back, `fc8758cf8c5c` front, `8f4c435de72e` left-facing, `20a9758fa564` right-facing) is the **officially approved Hero design**. Reference 01 is **superseded for the Hero only**. Do not redesign the character. These four images are **visual references, not production sprites**. All production assets stay `MISSING` until genuine artwork is delivered and passes `tools/validate_approved_art.py`, the manual checklist and the owner's visual approval.
+## REVISION 2 — current approved Hero reference pack (supersedes the earlier preview candidate)
+Owner confirmed (this session) the new four-view pack at `assets/approved_anime/reference/hero_reference_pack_v2/` as the approved Hero reference, labelled **REFERENCE ONLY**. The earlier preview candidate (`assets/approved_anime/preview/hero_turnaround_candidate/`) is now history. Canonical eyes: **warm brown with amber highlights** (owner-stated). Everything in sections 2-3 below describes the *earlier* candidate and is **superseded by this block** wherever they differ.
+
+### Identity as depicted in pack v2 (do not redesign)
+- Young lean-athletic Black man, dark-brown skin, strong straight brows, composed intense expression; ~7.5 heads.
+- Hair: black locs gathered in a high ponytail/bun with gold wire ties and gold beads/cuffs on loose locs; side undercut with carved line pattern; loose forehead locs.
+- Small gold stud earring; two fine chains with a gold diamond pendant holding a red gem; white t-shirt.
+- Coat: black hooded long coat, red piping, **red lining and red hood interior**, sleeves rolled to the forearm with red cuffs, brown leather harness straps over shoulders/chest with gold buckles, buckled straps on the sleeves (profiles), small gold-and-red patches on the upper sleeves (front).
+- Back: large gold winged-diamond emblem with a red gem and vertical gold line; gold tassel hanging from the belt; split rear vent with red lining.
+- Forearms/hands: white bandage wraps; black fingerless gloves with gold plate details.
+- Belts: several brown leather belts with gold buckles crossing the hips, hanging straps, gold arrowhead charm; cargo trousers with thigh pockets and **red side stripe/piping**, gathered cuffs.
+- Boots: black lace-up boots with brown buckle straps, **red soles/trim**, white socks visible.
+- Palette: black, red, brown leather, gold, white. (Replaces the earlier gold-boot/white-sole/circle-crosshair description.)
+
+### Consistency check of pack v2 (what I verified by inspection)
+Consistent across views: skin tone, build, hair concept (ponytail + undercut), red-lined black coat, brown harness/belts, boots with red soles, left-view being a distinct drawing (not a mirror).
+Inconsistencies/uncertainties the native render must resolve (without redesigning):
+1. **Bandage wraps:** front shows a wrap on one forearm and a gold-plated glove/bracer on the other; the back view shows wraps on both forearms. Decide per arm (recommend: wraps on both forearms, consistent in all views).
+2. **Sleeve details:** front shows small emblem patches on both upper sleeves; the profiles show buckled straps and no patch. Place patch and straps identically in every view.
+3. **Eye hue:** front eyes read red-orange, profiles darker red-brown; native render must use the single canonical warm brown with amber highlights.
+4. **Hair back view:** shows a bun/ponytail top-knot; profiles show a longer ponytail with beads. Same length/volume in all four.
+5. **Pendant/chain** visible only in the front; keep consistent chain visibility (not required in back/profiles).
+6. **Scale/baseline:** the four crops have different scales and baselines (see measurements) and very tight crops.
+
+### Measured properties of pack v2 (Python)
+| View | Size | Standing height | Lowest solid pixel | Head-top clearance | Notes |
+|---|---|---|---|---|---|
+| front | 464x881 | 865 | y=869 | 5 px | feet 54-138 and 365-451 |
+| right (faces right) | 348x887 | 874 | y=879 | 6 px | feet overlap |
+| back | 519x881 | 861 | y=870 | 10 px | feet 122-203 and 339-428 |
+| left (faces left) | 420x887 | 873 | y=874 | 2 px (hair near the crop edge) | feet overlap |
+RGBA with transparent corners and no green residue, **but** alpha never reaches 255 anywhere: about 77-80% of the figure's pixels have alpha 250-254 (the manifest's "99.9% semi-transparent"); true soft/fringed edge pixels (alpha < 250) are a small share. Production art must have fully opaque interiors (alpha = 255). Heights 861-874 px at different scales: the figure is ~865 px of the 887 px source height, i.e. the pack is ~0.43x the 2000 px figure that 1152x2304 production renders require (a 2.3x enlargement would be needed, which is exactly what must not be done).
+
+### What is still needed for clean, separate 1152 x 2304 production renders
+1. Four **native** renders (not enlargements): `hero_turnaround_{front,right,back,left}_native.png`, canvas 1152 x 2304, figure 2000 px tall, feet baseline y=2176 (the 576x1152 master baseline y=1088 x 2), head top y=176, >= 48 px transparent margin on all sides (the pack's 2-10 px margins risk clipping hair), identical scale and the planted-foot midpoint on x=576 in all four.
+2. Clean matte: interior alpha exactly 255; edges <= 1 px anti-aliased; no fringe/spill; no dotted artifacts; no baked shadow/text/borders; deliver #00FF00 originals as well.
+3. Resolve consistency items 1-5 above; one canonical eye colour.
+4. `hero_face_detail_sheet.png` and `hero_costume_detail_sheet.png` (back emblem, sleeve patches/straps, pendant, glove plates, belts, boots).
+5. Only after the owner approves the native renders: layered rig parts (`HERO_RIGGING_PLAN.md`), then animation frames and validation. No rigging or animation before that.
+Validator status: unchanged — BLOCKED (no production assets). The validator's soft-edge check now counts only alpha < 250 so near-opaque interiors are not mistaken for fringes; production art must still be fully opaque.
+
+---
+## (Earlier candidate) sections below — superseded where they conflict with Revision 2
 
 ## 1. Reference status (what is approved and what is not)
 | Reference | Status |
 |---|---|
-| Hero candidate, 4 views (preview folder above) | **APPROVED — official Hero design; visual reference only** |
+| `reference/hero_reference_pack_v2/` (4 views, REFERENCE ONLY) | **APPROVED — current official Hero reference** (supersedes the preview candidate below) |
+| Hero preview candidate (preview folder above) | superseded by pack v2; kept for history |
 | `01_main_hero_turnaround_portrait.png` | **SUPERSEDED for the Hero** (keep for history; do not use as design source; its portrait panel is no longer the Hero's face reference) |
 | `04_imani_black_female_npc_turnaround_portrait.png` | approved visual direction for Imani (unchanged); reference only |
 | `05_neon_district_gameplay_mockup_with_hud.png` | approved look/lighting/signage for the Neon District; reference only; HUD never extracted |

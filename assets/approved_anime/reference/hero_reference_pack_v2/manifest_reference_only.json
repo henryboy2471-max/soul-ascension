@@ -1,0 +1,72 @@
+{
+  "source": "studio_character_turnaround_on_a_transparent_backg.png",
+  "status": "VISUAL_REFERENCE_ONLY_NOT_VALIDATED_PRODUCTION_ART",
+  "design": "approved Hero four-view; warm brown eyes with amber highlights",
+  "views": {
+    "front": {
+      "file": "hero_front_REFERENCE_ONLY.png",
+      "size_px": [
+        464,
+        881
+      ],
+      "semi_transparent_fraction_percent": 99.85,
+      "source_x_range": [
+        0,
+        476
+      ],
+      "source_y_range": [
+        0,
+        887
+      ]
+    },
+    "right": {
+      "file": "hero_right_REFERENCE_ONLY.png",
+      "size_px": [
+        348,
+        887
+      ],
+      "semi_transparent_fraction_percent": 99.91,
+      "source_x_range": [
+        476,
+        824
+      ],
+      "source_y_range": [
+        0,
+        887
+      ]
+    },
+    "back": {
+      "file": "hero_back_REFERENCE_ONLY.png",
+      "size_px": [
+        519,
+        881
+      ],
+      "semi_transparent_fraction_percent": 99.85,
+      "source_x_range": [
+        824,
+        1344
+      ],
+      "source_y_range": [
+        0,
+        887
+      ]
+    },
+    "left": {
+      "file": "hero_left_REFERENCE_ONLY.png",
+      "size_px": [
+        420,
+        887
+      ],
+      "semi_transparent_fraction_percent": 99.9,
+      "source_x_range": [
+        1344,
+        1774
+      ],
+      "source_y_range": [
+        0,
+        887
+      ]
+    }
+  },
+  "restrictions": "Do not use these as native resolution production assets; no rigging or gameplay until proper native renders validate."
+}

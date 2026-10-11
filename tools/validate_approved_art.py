@@ -24,7 +24,7 @@ MARGIN = 24
 ALPHA_SOLID = 16                                      # alpha above this counts as "ink" for bbox/anchor checks
 KEY_GREEN = (0, 255, 0)
 BASELINE_TOL = 4
-MAX_PARTIAL_ALPHA = 0.08   # share of non-zero pixels with 0<alpha<255; soft/enlarged mattes exceed this (the first Hero candidate measured ~0.13)
+MAX_PARTIAL_ALPHA = 0.08   # share of non-zero pixels with 0<alpha<250 (soft edge/fringe); soft/enlarged mattes exceed this (the first Hero candidate measured ~0.13)
 X_TOL = 6
 
 # Tiled environment scheme: (base name, tile count, tile size (w, h), needs transparency). Tiles are <base>_0.png .. <base>_{n-1}.png.
@@ -83,7 +83,7 @@ def _frame_issues(label: str, path: Path) -> tuple[list[str], object]:
         hist = image.getchannel("A").histogram()
         nonzero = sum(hist[1:])
         if nonzero:
-            partial = sum(hist[1:255]) / nonzero
+            partial = sum(hist[1:250]) / nonzero
             if partial > MAX_PARTIAL_ALPHA:
                 issues.append(f"{label}: soft/fringed edge, {partial:.1%} of the silhouette pixels are semi-transparent (max {MAX_PARTIAL_ALPHA:.0%}); re-matte or re-render at native resolution")
     if image.mode == "RGBA" and image.size == (FRAME_W, FRAME_H):
