@@ -120,7 +120,7 @@ func run() -> void:
  await process_frame
  var home_list=[]
  texts(main,home_list)
- check(home_list.has("NOW PLAYING") and not home_list.has("DEVELOPMENT BUILD"),"Home shows NOW PLAYING instead of DEVELOPMENT BUILD")
+ check(home_list.has("PLAY EPISODE") and home_list.has("FIRST AWAKENING") and not home_list.has("DEVELOPMENT BUILD"),"Home shows PLAY EPISODE and the episode name instead of DEVELOPMENT BUILD")
  # --- settings and audio toggles ---
  main.show_settings()
  await process_frame

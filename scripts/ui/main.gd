@@ -48,7 +48,7 @@ func add_temp_notice() -> void:
  var layer=CanvasLayer.new()
  layer.layer=100
  add_child(layer)
- temp_notice=UI.label(layer,"PREVIEW BUILD  /  TEMPORARY CHARACTER ART  /  NOT ECHO V2 PRODUCTION ART",Vector2(240,696),13,Color(0.82,0.84,0.94,0.8),800)
+ temp_notice=UI.label(layer,"PREVIEW BUILD  /  TEMPORARY CHARACTER ART  /  NOT ECHO V2 PRODUCTION ART",Vector2(240,695),14,Color(0.82,0.84,0.94,0.8),800)
  temp_notice.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  temp_notice.mouse_filter=Control.MOUSE_FILTER_IGNORE
 func _ready() -> void:
@@ -133,14 +133,36 @@ func backdrop() -> void:
   fade.mouse_filter=Control.MOUSE_FILTER_IGNORE
   screen.add_child(fade)
  screen.add_child(load("res://scripts/ui/atmosphere.gd").new())
+# An unfinished episode with saved progress offers RESUME as its single primary action.
+func home_resumable(id:String) -> bool:
+ if Profile.data.completed.has(id):
+  return false
+ return Profile.flag(Profile.mission_progress(id),"intro")
+func home_title(def:Dictionary) -> String:
+ return "FIRST AWAKENING" if def.id=="1-1" else str(def.title_case).to_upper()
+func home_resume_note(def:Dictionary) -> String:
+ if def.get("flow","district")!="district":
+  return "Your investigation is saved"
+ var step=Profile.mission_progress(def.id).get("step",0)
+ var index=int(step) if (step is int or step is float) and is_finite(float(step)) and int(step)>=0 and int(step)<def.objectives.size() else 0
+ return "Objective: "+str(def.objectives[index].text)
 func show_home() -> void:
  scene_name="home"
  Sound.stop_loop()
  clear_screen()
  backdrop()
+ # lift the art toward bright electric blue / violet (additive, subtle) so the home screen is not dimmed by the shared backdrop shade
+ var lift_rect=ColorRect.new()
+ lift_rect.color=Color(0.03,0.075,0.2,1.0)
+ lift_rect.size=Vector2(1280,720)
+ lift_rect.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ var lift_material=CanvasItemMaterial.new()
+ lift_material.blend_mode=CanvasItemMaterial.BLEND_MODE_ADD
+ lift_rect.material=lift_material
+ screen.add_child(lift_rect)
  UI.panel(screen,Rect2(0,0,1280,104),Color(0.025,0.035,0.07,0.90),Color("242b41"))
  var rail=ColorRect.new()
- rail.color=Color(UI.GOLD,0.5)
+ rail.color=Color(Color("5fb4ff"),0.55)
  rail.position=Vector2(0,103)
  rail.size=Vector2(1280,1)
  rail.mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -155,39 +177,52 @@ func show_home() -> void:
  currency_label=UI.label(screen,"",Vector2(566,38),19,Color("e7def6"))
  UI.button(screen,"SETTINGS",Rect2(1106,24,150,58),show_settings)
  refresh_profile()
- UI.label(screen,"SEASON 01  /  THE FRACTURE",Vector2(32,131),13,UI.GOLD)
- UI.label(screen,"Your power.
-Without limits.",Vector2(30,160),39,Color.WHITE)
- UI.label(screen,"One quiet spark.
-An entire world listening.",Vector2(32,282),17,Color("c2c5d8"))
- UI.panel(screen,Rect2(30,342,292,153),Color(0.025,0.035,0.08,0.92),Color(UI.GOLD,0.4))
- UI.trim(screen,Rect2(30,342,292,153),UI.GOLD)
- UI.label(screen,"STORY  /  CHAPTER 01",Vector2(47,358),14,UI.VIOLET)
+ # --- Home layout (visual redesign): one primary action (PLAY EPISODE, or RESUME EPISODE n when that episode has saved progress), secondary navigation, SOON items dimmed.
  var home_def=MissionDefs.get_def(home_mission())
  var replay=MissionDefs.reward(home_def.id,false)
- UI.label(screen,home_def.region,Vector2(47,382),25)
- UI.label(screen,home_def.number+"   "+home_def.title_case,Vector2(47,422),15,UI.MUTED)
- UI.label(screen,("INVESTIGATE  ·  NO ENERGY COST" if home_def.get("flow","district")=="lantern" else "EXPLORE FREE  ·  %d ENERGY FOR THE BOSS" % home_def.energy) if not Profile.data.completed.has(home_def.id) else "CLEARED  ·  REPLAY +%d XP  ·  +%d GOLD" % [replay.xp,replay.gold],Vector2(47,462),14,UI.GOLD)
- UI.button(screen,"PLAY "+home_def.number,Rect2(30,510,292,79),show_mission,true)
- UI.button(screen,"MISSIONS",Rect2(30,604,139,66),show_missions)
- UI.button(screen,"UPGRADE",Rect2(183,604,139,66),show_upgrade)
- UI.panel(screen,Rect2(996,132,260,93),Color(0.025,0.035,0.08,0.92),Color(UI.GOLD,0.4))
- UI.trim(screen,Rect2(996,132,260,93),UI.GOLD)
- UI.label(screen,"NOW PLAYING",Vector2(1013,147),14,UI.GOLD)
- UI.label(screen,"EPISODE 1  /  FIRST AWAKENING",Vector2(1013,173),13)
- UI.label(screen,"Plays offline  ·  no purchases",Vector2(1013,199),14,UI.MUTED)
- UI.button(screen,"HEROES    /    01",Rect2(996,244,260,65),show_hero)
- UI.button(screen,"SUMMON    /    SOON",Rect2(996,320,260,65),func(): planned("SUMMON","Coming soon: hero banners with published odds, rarity guarantees and summon history. Nothing can be summoned yet."))
- UI.button(screen,"SHOP    /    SOON",Rect2(996,396,260,65),func(): planned("SHOP","Coming soon: clearly itemized power packs and Crystal purchases. There are no paid items in this version."))
- UI.button(screen,"EVENTS    /    SOON",Rect2(996,472,260,65),func(): planned("EVENTS","Coming soon: seasonal stories, rotating challenges and limited bosses. There are no active offers or countdown timers."))
- UI.button(screen,"BATTLE PASS",Rect2(996,548,260,65),func(): planned("BATTLE PASS","Coming soon: free and premium reward tracks. There is nothing to claim yet."))
- UI.button(screen,"VIP",Rect2(996,624,260,46),func(): planned("VIP 0—15","Coming soon: purchase-based VIP progression with clear benefits. You are VIP 0. No purchases can be made in this version."))
- UI.panel(screen,Rect2(434,569,412,99),Color(0.025,0.035,0.075,0.85),Color("77618c"))
- UI.trim(screen,Rect2(434,569,412,99),UI.VIOLET)
- UI.label(screen,"E C H O   /   S T R I K E R",Vector2(459,582),13,UI.VIOLET)
- UI.label(screen,"THE UNBOUND",Vector2(457,605),28)
- UI.label(screen,"BASE FORM     •     EVOLUTION UNKNOWN",Vector2(459,644),13,UI.MUTED)
- notice=UI.label(screen,"Progress is saved on this device.",Vector2(31,692),13,UI.MUTED)
+ var resuming=home_resumable(home_def.id)
+ var electric=Color("5fb4ff")
+ # soft readability gradient behind the left column (the art stays bright elsewhere)
+ var left_fade=TextureRect.new()
+ var left_gradient=Gradient.new()
+ left_gradient.colors=PackedColorArray([Color(0.02,0.03,0.09,0.86),Color(0.02,0.03,0.09,0.0)])
+ var left_texture=GradientTexture2D.new()
+ left_texture.gradient=left_gradient
+ left_texture.fill_from=Vector2(0,0)
+ left_texture.fill_to=Vector2(1,0)
+ left_fade.texture=left_texture
+ left_fade.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+ left_fade.position=Vector2(0,104)
+ left_fade.size=Vector2(640,616)
+ left_fade.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ screen.add_child(left_fade)
+ UI.label(screen,"SEASON 01  /  THE FRACTURE  /  "+str(home_def.region),Vector2(32,250),17,UI.VIOLET)
+ UI.label(screen,str(home_def.number),Vector2(30,276),46,Color.WHITE)
+ UI.label(screen,home_title(home_def),Vector2(33,336),22,UI.GOLD)
+ if home_title(home_def).to_lower()!=str(home_def.title_case).to_lower():
+  UI.label(screen,str(home_def.title_case),Vector2(33,370),19,Color("c8cdea"))
+ UI.label(screen,("INVESTIGATE  ·  NO ENERGY COST" if home_def.get("flow","district")=="lantern" else "EXPLORE FREE  ·  %d ENERGY FOR THE BOSS" % home_def.energy) if not Profile.data.completed.has(home_def.id) else "CLEARED  ·  REPLAY +%d XP  ·  +%d GOLD" % [replay.xp,replay.gold],Vector2(33,402),17,UI.GOLD)
+ if resuming:
+  UI.panel(screen,Rect2(30,434,520,58),Color(0.02,0.04,0.12,0.92),Color(electric,0.75))
+  UI.label(screen,"SAVED PROGRESS",Vector2(44,437),14,electric)
+  UI.label(screen,home_resume_note(home_def),Vector2(44,456),19,Color.WHITE,500)
+ var primary=UI.button(screen,("RESUME " if resuming else "PLAY ")+("EPISODE "+str(int(home_def.episode)) if resuming else "EPISODE"),Rect2(30,500,520,92),(func(): start_episode(home_def.id)) if resuming else show_mission,true)
+ primary.add_theme_font_size_override("font_size",36)
+ UI.button(screen,"MISSIONS",Rect2(30,608,166,58),show_missions)
+ UI.button(screen,"HEROES",Rect2(207,608,166,58),show_hero)
+ UI.button(screen,"UPGRADE",Rect2(384,608,166,58),show_upgrade)
+ for item in [["SUMMON","Coming soon: hero banners with published odds, rarity guarantees and summon history. Nothing can be summoned yet."],["SHOP","Coming soon: clearly itemized power packs and Crystal purchases. There are no paid items in this version."],["EVENTS","Coming soon: seasonal stories, rotating challenges and limited bosses. There are no active offers or countdown timers."],["BATTLE PASS","Coming soon: free and premium reward tracks. There is nothing to claim yet."],["VIP","Coming soon: purchase-based VIP progression with clear benefits. You are VIP 0. No purchases can be made in this version."]]:
+  var index=["SUMMON","SHOP","EVENTS","BATTLE PASS","VIP"].find(item[0])
+  var soon=UI.button(screen,item[0]+"    /    SOON",Rect2(1000,128+index*54,256,46),func(): planned(item[0] if item[0]!="VIP" else "VIP 0—15",item[1]))
+  soon.add_theme_font_size_override("font_size",16)
+  soon.modulate=Color(1,1,1,0.72)
+ UI.panel(screen,Rect2(1000,420,256,96),Color(0.02,0.035,0.09,0.85),Color(electric,0.55))
+ UI.trim(screen,Rect2(1000,420,256,96),electric)
+ UI.label(screen,"E C H O   /   S T R I K E R",Vector2(1016,429),14,UI.VIOLET)
+ UI.label(screen,"THE UNBOUND",Vector2(1016,452),26)
+ UI.label(screen,"BASE FORM · EVOLUTION UNKNOWN",Vector2(1016,490),13,UI.MUTED)
+ UI.label(screen,"Plays offline  ·  no purchases",Vector2(1002,524),14,UI.MUTED)
+ notice=UI.label(screen,"Progress is saved on this device.",Vector2(31,692),14,UI.MUTED)
  refresh_profile()
 func refresh_profile() -> void:
  if is_instance_valid(currency_label):
