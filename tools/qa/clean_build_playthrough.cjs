@@ -47,7 +47,9 @@ const KEY='/userfs/godot/app_userdata/SOUL ASCENSION/soul_ascension_v1.json';
  let reloaded=false, t0=Date.now(), cycles=0, mode='explore', lastStep=undefined, battleSeen=false;
  while(Date.now()-t0<2400000){
   d=await readSave(); const pr=mp(d);
-  if(d && (d.completed||[]).includes('1-1')) break;
+  if(d && (d.completed||[]).includes('1-1')) { dumpEvent('completed'); break; }
+  if(pr.step!==undefined && lastStep!==pr.step){ if(lastStep===0&&pr.step===1) dumpEvent('mira_done'); if(lastStep===1&&pr.step===2) dumpEvent('relay_done'); lastStep=pr.step; }
+  if(pr.combat_run===true && !battleSeen){ battleSeen=true; dumpEvent('breach_entered'); }
   if(!reloaded && pr.step===1){
    // real-input reload + resume test, right after the Mira conversation
    await sleep(3000); await shot('06_after_mira_talk');
@@ -59,7 +61,7 @@ const KEY='/userfs/godot/app_userdata/SOUL ASCENSION/soul_ascension_v1.json';
   }
   if(pr.combat_run===true){
    if(mode!=='combat'){ mode='combat'; await sleep(1500); await shot('12_soul_realm_battle'); }
-   for(let r=0;r<2;r++){ await walk(120,Math.random()<0.5?1:-1); for(const a of strikes){ if(T) await ttap(a[0],a[1],2,60); else await p.keyboard.press(a); await sleep(70); } }
+   for(let r=0;r<2;r++){ await walk(120,Math.random()<0.5?1:-1); for(const a of strikes){ if(T) await ttap(a[0],a[1],2,60); else await p.keyboard.press(a); await sleep(70); } const dd=await readSave(); if(dd&&(dd.completed||[]).includes('1-1')) break; }
    await advance(); await sleep(400);
    if(cycles++===8) await shot('13_battle_later');
    continue;
