@@ -37,7 +37,6 @@ var counter_done=0
 var counter_total=0
 var obstacles:Array=[]
 var hud_dirty=true
-var temp_art_label:Label
 var spots=[
  {"id":"mira","x":560.0,"label":"TALK  /  MIRA VEY","kind":"talk","range":130.0},
  {"id":"board","x":1050.0,"label":"READ  /  TRAM BOARD","kind":"talk","range":110.0},
@@ -195,9 +194,6 @@ func build_hud() -> void:
  toast_kicker=UI.label(toast_panel,"CODEX UPDATED",Vector2(18,5),16,UI.GOLD)
  toast_label=UI.label(toast_panel,"",Vector2(18,26),21,Color.WHITE,340)
  toast_panel.modulate.a=0.0
- # Temporary-art notice: the Hero/Mira sprites in this build are stand-ins, not Echo V2 production artwork (still pending validation).
- temp_art_label=UI.label(self,"PREVIEW BUILD  /  TEMPORARY CHARACTER ART  /  NOT ECHO V2 PRODUCTION ART",Vector2(240,698),13,Color(UI.MUTED,0.7),800)
- temp_art_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  move_hint=UI.label(self,"MOVE  /  WASD",Vector2(61,696),16,UI.MUTED)
  act_hint=UI.label(self,"ACT  /  E",Vector2(1110,696),16,UI.MUTED)
 # Cutscene mode: the objective panel, EXIT, toasts and touch hints are hidden and the Hero cannot walk (Episode 2 ending).

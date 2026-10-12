@@ -11,6 +11,8 @@ var seen_ids:Array=[]
 func log(line:String) -> void:
  events.append(line)
 func texts(node:Node, out:Array) -> void:
+ if node is CanvasLayer:
+  return   # the global preview-build notice lives on its own layer; the locked golden traces cover story/UI text only
  if node is Label or node is Button or node is CheckButton:
   if node.visible and str(node.text)!="":
    out.append(str(node.text))

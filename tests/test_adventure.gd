@@ -46,6 +46,7 @@ func run() -> void:
  root.add_child(main)
  await process_frame
  main.close_modal()
+ check(main.temp_notice!=null and "TEMPORARY" in main.temp_notice.text and "NOT ECHO V2" in main.temp_notice.text and main.temp_notice.get_parent() is CanvasLayer,"Every screen carries the temporary-art notice (not Echo V2 production art)")
  var energy_before=int(profile.data.energy)
  var gold_before=int(profile.data.gold)
  main.start_episode()

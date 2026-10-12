@@ -134,6 +134,5 @@ func run() -> void:
   ex.advance_motion(Vector2(-1,0),1.0/60.0)
   ex.update_positions(1.0-exp(-9.0/60.0))
  check(ex.cam>=0.0 and ex.layers[4].position.x<=0.0,"Camera stops at the start boundary (cam %.1f)" % ex.cam)
- check(ex.temp_art_label!=null and "TEMPORARY" in ex.temp_art_label.text,"Temporary-art notice is shown in Explore")
  print("RESULT: %d passed / %d failed" % [passed,failed])
  quit(1 if failed>0 else 0)

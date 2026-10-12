@@ -42,8 +42,18 @@ func set_portrait_hint(portrait:bool) -> void:
  elif not portrait and rotate_overlay!=null:
   rotate_overlay.queue_free()
   rotate_overlay=null
+var temp_notice:Label
+# Echo V2 is the approved protagonist, but its native artwork is pending: every screen of this preview build says that the Hero/Echo graphics are temporary.
+func add_temp_notice() -> void:
+ var layer=CanvasLayer.new()
+ layer.layer=100
+ add_child(layer)
+ temp_notice=UI.label(layer,"PREVIEW BUILD  /  TEMPORARY CHARACTER ART  /  NOT ECHO V2 PRODUCTION ART",Vector2(240,696),13,Color(0.82,0.84,0.94,0.8),800)
+ temp_notice.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+ temp_notice.mouse_filter=Control.MOUSE_FILTER_IGNORE
 func _ready() -> void:
  Profile.changed.connect(refresh_profile)
+ add_temp_notice()
  show_home()
  if demo_requested():
   call_deferred("start_neon_demo")
