@@ -9,7 +9,7 @@ Status of every item below: **MISSING**. Nothing here is rigged, animated or pro
 Folder: `assets/approved_anime/source/hero/` (staging, outside final `characters/`).
 | # | File | Size / format | Requirements | Acceptance (checked by `tools/check_hero_turnaround.py` unless "visual") |
 |---|---|---|---|---|
-| 1 | `hero_turnaround_front_native.png` | 1152 x 2304 PNG RGBA | native render (not enlarged), figure 2000 px, head top y=176, soles y=2176, planted-foot midpoint x=576, >= 48 px margin | size exact; interior alpha 255 (>= 90% of silhouette pixels); soft-edge pixels (alpha<250) <= 8%; no #00FF00; corners transparent; head/baseline/margin/foot tolerances; visual: matches Echo V2 |
+| 1 | `hero_turnaround_front_native.png` | 1152 x 2304 PNG RGBA | native render (not enlarged), figure 2000 px, head top y=176, soles y=2176, planted-foot midpoint x=576, >= 24 px margin (owner-approved; was 48) | size exact; interior alpha 255 (>= 90% of silhouette pixels); soft-edge pixels (alpha<250) <= 8%; no #00FF00; corners transparent; head/baseline/margin/foot tolerances; visual: matches Echo V2 |
 | 2 | `hero_turnaround_right_native.png` | same | faces screen-right; feet staggered consistently | same + visual |
 | 3 | `hero_turnaround_back_native.png` | same | shows ponytail/undercut, winged-diamond back emblem, tassel | same + visual |
 | 4 | `hero_turnaround_left_native.png` | same | genuinely drawn left side, **not a mirror** | same + not an exact mirror of right + visual |

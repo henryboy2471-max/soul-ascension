@@ -11,7 +11,7 @@ from PIL import Image, ImageOps
 
 W, H = 1152, 2304
 FIG_H, HEAD_TOP, BASELINE = 2000, 176, 2176
-TOL_TOP, TOL_BASE, MARGIN = 12, 8, 48
+TOL_TOP, TOL_BASE, MARGIN = 12, 8, 24  # side/top margin 48 -> 24 px: owner-approved (front at 2000 px is ~1095 px wide on a 1152 canvas)
 FOOT_MID_X, FOOT_TOL = 576, 90
 OPAQUE_MIN, SOFT_MAX = 0.90, 0.08
 VIEWS = ("front", "right", "back", "left")

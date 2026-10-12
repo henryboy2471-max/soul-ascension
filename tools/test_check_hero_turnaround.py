@@ -26,6 +26,10 @@ def main():
         rc, out = run(t); expect("reference-sized (non-native) render is rejected", rc == 1 and "must be exactly 1152x2304" in out)
         fig(offset=300).save(t / "hero_turnaround_front_native.png")
         rc, out = run(t); expect("off-centre feet / edge clipping is rejected", rc == 1 and ("foot" in out or "edge" in out))
+        fig(w=1102).save(t / "hero_turnaround_front_native.png")
+        rc, out = run(t); expect("exactly 24 px side margin passes", "edge" not in out)
+        fig(w=1106).save(t / "hero_turnaround_front_native.png")
+        rc, out = run(t); expect("23 px side margin is rejected", rc == 1 and "within 24px of the canvas edge" in out)
         fig().save(t / "hero_turnaround_front_native.png"); (t / "hero_face_detail_sheet.png").unlink()
         rc, out = run(t); expect("missing detail sheet is rejected", rc == 1 and "hero_face_detail_sheet" in out)
     finally:
