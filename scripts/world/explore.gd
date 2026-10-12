@@ -274,17 +274,16 @@ func move_input() -> Vector2:
 func update_positions(blend:float) -> void:
  var goal=clampf(px-640.0+(lead if blend<1.0 else 0.0),0.0,world_w-1280.0)
  cam=goal if blend>=1.0 else lerpf(cam,goal,blend)
+ # `cam` stays a smooth float; everything on screen is placed from its whole-pixel value so parallax layers and sprites never shimmer between sub-pixel positions.
+ var view=roundf(cam)
  for layer in layers:
-  layer.position.x=-cam*layer.get_meta("factor")
- props.position.x=-cam
+  layer.position=Vector2(roundf(-view*layer.get_meta("factor")),lift)
+ props.position=Vector2(-view,lift)
  # While a conversation is open the whole street lifts so the dialogue box never covers characters.
- for layer in layers:
-  layer.position.y=lift
- props.position.y=lift
- npc.position=Vector2(npc_x-cam,548.0+lift)
+ npc.position=Vector2(roundf(npc_x)-view,548.0+lift)
  for w in walkers:
-  w.node.position=Vector2(w.x-cam,516.0+lift)
- player.position=Vector2(px-cam,py+lift)
+  w.node.position=Vector2(roundf(w.x)-view,516.0+lift)
+ player.position=Vector2(roundf(px)-view,py+lift)
 func _process(delta:float) -> void:
  time+=delta
  act_block=maxf(0.0,act_block-delta)
@@ -316,8 +315,8 @@ func _process(delta:float) -> void:
  npc.facing=1 if px>npc_x else -1
  lift=lerpf(lift,-125.0 if locked else 0.0,1.0-exp(-delta*8.0))
  # touch controls step aside while a conversation is open, so nothing sits on top of the dialogue box
- for node in [stick,act_button,move_hint,act_hint]:
-  node.visible=not locked
+ for node in [stick,act_button,move_hint,act_hint,exit_button]:
+  node.visible=not locked   # EXIT also steps aside: the dialogue box has its own SKIP button in the same corner
  update_positions(1.0-exp(-delta*9.0))
  # nearest enabled interaction spot
  active_spot={}

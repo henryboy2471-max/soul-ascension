@@ -106,6 +106,34 @@ func run() -> void:
  await process_frame
  await process_frame
  check(ex.player.facing==1,"Hero turns toward the NPC when starting a conversation")
+ # camera: rendered positions are whole pixels, never reverse while walking one way, and respect both world boundaries (variable frame times)
+ ex.locked=false
+ ex.px=300.0
+ ex.py=585.0
+ ex.vel=Vector2.ZERO
+ ex.lead=0.0
+ ex.update_positions(1.0)
+ var dts=[1.0/30.0,1.0/144.0,1.0/60.0,1.0/90.0,1.0/60.0]
+ var last_x=ex.layers[4].position.x
+ var whole=true
+ var reversals=0
+ for i in range(400):
+  var dt=dts[i%dts.size()]
+  ex.advance_motion(Vector2(1,0),dt)
+  ex.update_positions(1.0-exp(-dt*9.0))
+  var lx=ex.layers[4].position.x
+  whole=whole and lx==roundf(lx) and ex.props.position.x==roundf(ex.props.position.x) and ex.player.position.x==roundf(ex.player.position.x)
+  if lx>last_x+0.01:
+   reversals+=1
+  last_x=lx
+ check(whole,"Camera/parallax/sprite positions are whole pixels (no shimmer)")
+ check(reversals==0,"Camera never reverses or stutters back while walking one way (variable frame times)")
+ check(ex.cam>=0.0 and ex.cam<=ex.world_w-1280.0,"Camera stays inside the world boundaries at the far end (cam %.0f)" % ex.cam)
+ ex.px=80.0
+ for i in range(120):
+  ex.advance_motion(Vector2(-1,0),1.0/60.0)
+  ex.update_positions(1.0-exp(-9.0/60.0))
+ check(ex.cam>=0.0 and ex.layers[4].position.x<=0.0,"Camera stops at the start boundary (cam %.1f)" % ex.cam)
  check(ex.temp_art_label!=null and "TEMPORARY" in ex.temp_art_label.text,"Temporary-art notice is shown in Explore")
  print("RESULT: %d passed / %d failed" % [passed,failed])
  quit(1 if failed>0 else 0)
