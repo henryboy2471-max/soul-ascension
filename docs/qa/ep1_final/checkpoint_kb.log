@@ -1,0 +1,23 @@
+PASS: Episode 1 reaches exploration  (boot 3.2 s)
+shot kb_1_explore_start
+layer samples [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-27,-62,-101,-142,-181,-218,-287]
+PASS: Camera tracks the Hero while walking (cam moved)  (0 -> 287)
+PASS: Parallax layer positions are whole pixels  (22 samples)
+PASS: Camera never reverses while walking one way  (reversals 0)
+shot kb_2_mira_collision_or_pass
+PASS: Hero passes Mira without walking through her (eased around)  (px 418 -> 1079)
+shot kb_3_npc_dialogue
+PASS: Mira dialogue opens and locks movement  (MIRA VEY: There you are. Keep your head down, the )
+shot kb_3b_hero_line
+PASS: Dialogue closes and the relay objective unlocks  (step 1)
+shot kb_4_relay_prompt
+shot kb_5_relay_channel
+PASS: Relay hold-to-channel completes and advances to the breach  (step 2)
+shot kb_6_relay_done
+shot kb_7_breach_prompt
+PASS: Breach prompt appears at the breach  (spot breach)
+shot kb_8_breach_entry
+shot kb_9_battle_start
+PASS: Breach entry starts the Soul Realm battle  (scene battle)
+PASS: No console errors  ([])
+SUMMARY kb 11/11

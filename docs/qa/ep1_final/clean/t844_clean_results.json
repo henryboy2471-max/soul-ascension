@@ -1,0 +1,15 @@
+{
+ "tag": "t844",
+ "results": [
+  {
+   "n": "Clean build has no QA telemetry (window.__qa undefined)",
+   "c": true,
+   "d": ""
+  },
+  {
+   "n": "No console errors",
+   "c": true,
+   "d": "[]"
+  }
+ ]
+}

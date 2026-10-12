@@ -1,0 +1,10 @@
+shot home
+shot explore_start
+shot explore_c24_step1
+entered battle {"scene":"battle","energyBefore":60,"energy":54,"steps":[0,1,2,null]}
+shot boss
+shot boss_phase2
+shot boss_defeat
+result {"scene":"result","gold":750,"xp":120,"level":4,"energy":54,"completed":["1-1"],"codex":["mira","board","terminal","mural","breach","enforcer"]}
+shot rewards
+CONSOLE []
