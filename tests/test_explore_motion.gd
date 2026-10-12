@@ -96,6 +96,16 @@ func run() -> void:
  for i in range(60):
   ex.advance_motion(Vector2(1,0),1.0/60.0)
  check(ex.px>ex.npc_x+ex.NPC_HALF_W,"Hero placed inside the NPC footprint can still walk out (px %.0f)" % ex.px)
+ ex.px=ex.npc_x-100.0
+ ex.py=585.0
+ ex.enabled.mira=true
+ ex.player.facing=-1
+ ex.act_edge=true
+ ex.act_block=0.0
+ ex.locked=false
+ await process_frame
+ await process_frame
+ check(ex.player.facing==1,"Hero turns toward the NPC when starting a conversation")
  check(ex.temp_art_label!=null and "TEMPORARY" in ex.temp_art_label.text,"Temporary-art notice is shown in Explore")
  print("RESULT: %d passed / %d failed" % [passed,failed])
  quit(1 if failed>0 else 0)

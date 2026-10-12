@@ -338,6 +338,7 @@ func _process(delta:float) -> void:
   if active_spot.kind=="talk":
    if act_edge:
     act_edge=false
+    player.facing=1 if active_spot.x>=px else -1   # turn toward whoever/whatever is being used
     interact.emit(active_spot.id)
   else:
    var held=Input.is_physical_key_pressed(KEY_E) or Input.is_physical_key_pressed(KEY_ENTER) or act_button.held
@@ -346,6 +347,7 @@ func _process(delta:float) -> void:
     if channel_t>=1.0:
      channel_t=0.0
      act_edge=false
+     player.facing=1 if active_spot.x>=px else -1
      interact.emit(active_spot.id)
    else:
     channel_t=maxf(0.0,channel_t-delta*2.0)
