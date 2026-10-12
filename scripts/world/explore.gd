@@ -9,6 +9,8 @@ const ACCEL = 2600.0
 const DECEL = 3600.0
 const LOOK_AHEAD = 70.0
 const CHANNEL_SECONDS = 1.4
+const NPC_HALF_W = 36.0   # solid footprint around the NPC (x half-width, depth half-height); the Hero walks around, not through
+const NPC_HALF_D = 20.0
 var cam=0.0
 var vel=Vector2.ZERO
 var lead=0.0
@@ -33,6 +35,9 @@ var gate_locked=false
 var objective_targets:Array=[]
 var counter_done=0
 var counter_total=0
+var obstacles:Array=[]
+var hud_dirty=true
+var temp_art_label:Label
 var spots=[
  {"id":"mira","x":560.0,"label":"TALK  /  MIRA VEY","kind":"talk","range":130.0},
  {"id":"board","x":1050.0,"label":"READ  /  TRAM BOARD","kind":"talk","range":110.0},
@@ -72,6 +77,7 @@ func _ready() -> void:
  px=float(config.get("start_px",px))
  npc_x=float(config.get("npc_x",npc_x))
  gate_x=float(config.get("gate_x",gate_x))
+ obstacles=config.get("obstacles",[{"x":npc_x,"y":548.0,"hw":NPC_HALF_W,"hd":NPC_HALF_D}])
  if config.has("spots"):
   spots=config.spots
   enabled=config.enabled
@@ -189,6 +195,9 @@ func build_hud() -> void:
  toast_kicker=UI.label(toast_panel,"CODEX UPDATED",Vector2(18,5),16,UI.GOLD)
  toast_label=UI.label(toast_panel,"",Vector2(18,26),21,Color.WHITE,340)
  toast_panel.modulate.a=0.0
+ # Temporary-art notice: the Hero/Mira sprites in this build are stand-ins, not Echo V2 production artwork (still pending validation).
+ temp_art_label=UI.label(self,"PREVIEW BUILD  /  TEMPORARY CHARACTER ART  /  NOT ECHO V2 PRODUCTION ART",Vector2(240,698),13,Color(UI.MUTED,0.7),800)
+ temp_art_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  move_hint=UI.label(self,"MOVE  /  WASD",Vector2(61,696),16,UI.MUTED)
  act_hint=UI.label(self,"ACT  /  E",Vector2(1110,696),16,UI.MUTED)
 # Cutscene mode: the objective panel, EXIT, toasts and touch hints are hidden and the Hero cannot walk (Episode 2 ending).
@@ -248,6 +257,13 @@ func request_exit() -> void:
 func _unhandled_key_input(event:InputEvent) -> void:
  if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode in [KEY_E,KEY_ENTER,KEY_KP_ENTER] and act_block<=0.0:
   act_edge=true
+func blocker(x:float, y:float) -> Dictionary:
+ for o in obstacles:
+  if absf(x-float(o.x))<float(o.hw) and absf(y-float(o.y))<float(o.hd):
+   return o
+ return {}
+func blocked(x:float, y:float) -> bool:
+ return not blocker(x,y).is_empty()
 func move_input() -> Vector2:
  var move=stick.direction
  if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT): move.x-=1
@@ -344,7 +360,11 @@ func _process(delta:float) -> void:
   dist_label.text=str(int(absf(px-target_x)/12.0))+" M"
  else:
   dist_label.text=""
- hud_node.queue_redraw()
+ # the HUD overlay only needs repainting while it has something to show (plus one final frame to clear it)
+ var hud_active=target_x>=0 or counter_total>0 or not active_spot.is_empty()
+ if hud_active or hud_dirty:
+  hud_node.queue_redraw()
+ hud_dirty=hud_active
 # Eased walking: speed ramps up in ~0.12 s and stops in ~0.08 s instead of snapping, and the camera leads slightly in the facing direction.
 func advance_motion(move:Vector2, delta:float) -> void:
  if locked:
@@ -357,13 +377,24 @@ func advance_motion(move:Vector2, delta:float) -> void:
  var max_x=world_w-80.0
  if gate_locked and gate_x>0.0:
   max_x=minf(max_x,gate_x-40.0)
- var nx=clampf(px+vel.x*delta,80.0,max_x)
- if nx!=px+vel.x*delta:
+ # Axis-separated sliding against the NPC footprint (a Hero already inside it, e.g. after a scripted placement, may still walk out).
+ var inside=blocked(px,py)
+ var want_x=px+vel.x*delta
+ var nx=clampf(want_x,80.0,max_x)
+ var wall=blocker(nx,py) if not inside else {}
+ if nx!=want_x or not wall.is_empty():
   vel.x=0.0
+  if nx==want_x:
+   nx=px
  px=nx
- var ny=clampf(py+vel.y*delta,515.0,585.0)
- if ny!=py+vel.y*delta:
+ var want_y=py+vel.y*delta
+ if not wall.is_empty() and absf(move.x)>0.1 and absf(move.y)<0.1:
+  want_y=py+(1.0 if py>=float(wall.y) else -1.0)*140.0*delta   # walking into someone: ease around them instead of sticking
+ var ny=clampf(want_y,515.0,585.0)
+ if ny!=want_y or (not inside and blocked(px,ny)):
   vel.y=0.0
+  if ny==want_y:
+   ny=py
  py=ny
  var want=clampf(vel.x/SPEED,-1.0,1.0)*LOOK_AHEAD
  lead=lerpf(lead,want,1.0-exp(-delta*3.5))

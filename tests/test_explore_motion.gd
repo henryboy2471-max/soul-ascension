@@ -22,6 +22,7 @@ func run() -> void:
  await process_frame
  ex.locked=false
  ex.px=500.0
+ ex.py=585.0   # front lane: these motion checks walk past Mira's x (she is solid on her own lane, see the NPC checks below)
  ex.vel=Vector2.ZERO
  # ramp-up: not an instant snap, but at full speed within ~0.15 s
  ex.advance_motion(Vector2(1,0),1.0/60.0)
@@ -69,5 +70,32 @@ func run() -> void:
  for i in range(60):
   ex.advance_motion(Vector2(0,1),1.0/60.0)
  check(ex.py<=585.0 and ex.py>=515.0,"Depth lane stays inside its band")
+ # NPC collision: the Hero cannot walk through Mira along her depth lane, can pass in front of her, and can walk out if placed inside
+ ex.vel=Vector2.ZERO
+ ex.px=ex.npc_x-120.0
+ ex.py=548.0
+ var entered=false
+ var held_back=false
+ for i in range(120):
+  ex.advance_motion(Vector2(1,0),1.0/60.0)
+  entered=entered or ex.blocked(ex.px,ex.py)
+  held_back=held_back or (ex.px>ex.npc_x-ex.NPC_HALF_W-4.0 and ex.px<=ex.npc_x-ex.NPC_HALF_W+0.01)
+ check(not entered and held_back,"NPC is solid: the Hero reaches her edge and never enters her footprint")
+ for i in range(120):
+  ex.advance_motion(Vector2(1,0),1.0/60.0)
+ check(ex.px>ex.npc_x+ex.NPC_HALF_W,"Holding right against the NPC eases the Hero around her without a vertical key (px %.0f, py %.0f)" % [ex.px,ex.py])
+ ex.vel=Vector2.ZERO
+ ex.px=ex.npc_x-120.0
+ ex.py=585.0
+ for i in range(120):
+  ex.advance_motion(Vector2(1,0),1.0/60.0)
+ check(ex.px>ex.npc_x+ex.NPC_HALF_W,"Hero can walk past the NPC in the front lane (px %.0f)" % ex.px)
+ ex.vel=Vector2.ZERO
+ ex.px=ex.npc_x+5.0
+ ex.py=548.0
+ for i in range(60):
+  ex.advance_motion(Vector2(1,0),1.0/60.0)
+ check(ex.px>ex.npc_x+ex.NPC_HALF_W,"Hero placed inside the NPC footprint can still walk out (px %.0f)" % ex.px)
+ check(ex.temp_art_label!=null and "TEMPORARY" in ex.temp_art_label.text,"Temporary-art notice is shown in Explore")
  print("RESULT: %d passed / %d failed" % [passed,failed])
  quit(1 if failed>0 else 0)

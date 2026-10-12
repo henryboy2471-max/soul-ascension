@@ -99,7 +99,7 @@ func run() -> void:
  ex.act_button.held=false
  check(ep.busy and t>1.0 and t<3.0,"Terminal needs a sustained hold (not an instant tap)")
  await skip_scenes(ep,func(): return not ep.busy)
- check(ep.step==2 and ex.props.breach_open and ex.enabled.breach,"Terminal reboot opens the Soul Realm breach")
+ check(ep.step==2 and ex.props.breach_open and ex.enabled.breach and not ex.enabled.terminal,"Terminal reboot opens the Soul Realm breach and retires the relay prompt")
  # Not enough energy: stays in the world, no battle
  await create_timer(0.55).timeout
  profile.data.energy=0

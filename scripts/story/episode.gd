@@ -71,6 +71,7 @@ func set_step(n:int) -> void:
   1:
    explore.enabled.terminal=true
   2:
+   explore.enabled.terminal=false   # relay is rebooted; no dead 'HOLD' prompt left behind
    explore.open_breach()
  explore.set_objective(objective.text,objective.x)
 func on_interact(id:String) -> void:
