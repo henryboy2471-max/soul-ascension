@@ -6,7 +6,8 @@ import argparse, json, sys
 from pathlib import Path
 import numpy as np
 from PIL import Image
-S = 1.5                      # delivery scale: 1 logical px = 1.5 delivered px
+S = 1.5                      # delivery scale: 1 logical px = 1.5 delivered px (standard tier); the lower-memory "lite" tier uses 1.0 (--scale 1.0)
+MIP = 4.0 / 3.0              # budget accounting assumes full mipmaps (Godot generates them when used with mipmapped filtering)
 CAM_MAX = 1220.0             # world 2500 - screen 1280
 # name: (factor, logical_w, logical_h, logical_y0, has_alpha)
 PLATES = {
@@ -57,7 +58,9 @@ def _paste_clipped(canvas, im, sx, sy):
     x0, y0 = max(sx, 0), max(sy, 0); x1, y1 = min(sx + im.width, W), min(sy + im.height, H)
     if x1 <= x0 or y1 <= y0: return
     canvas.alpha_composite(im.crop((x0 - sx, y0 - sy, x1 - sx, y1 - sy)), (x0, y0))
-def validate(d, budget_mb=BUDGET_MB):
+def validate(d, budget_mb=BUDGET_MB, scale=None):
+    global S
+    if scale is not None: S = scale
     issues, notes = [], []
     d = Path(d)
     plates = {n: load(d, n) for n in PLATES}
@@ -96,9 +99,9 @@ def validate(d, budget_mb=BUDGET_MB):
         if tram.size != exp: issues.append(f"{PROP_TRAM[0]}: size {tram.size}, expected {exp}")
         budget += tram.width * tram.height * 4
         if not (d / (PROP_TRAM[0] + ".provenance.json")).exists(): issues.append(f"{PROP_TRAM[0]}: provenance file missing")
-    mb = budget / 1048576.0
+    mb = budget * MIP / 1048576.0
     if mb > budget_mb: issues.append(f"texture budget: {mb:.1f} MB decoded RGBA exceeds {budget_mb:.0f} MB")
-    notes.append(f"decoded texture total {mb:.1f} MB (budget {budget_mb:.0f} MB)")
+    notes.append(f"decoded texture total {mb:.1f} MB incl. mipmaps ({budget / 1048576.0:.1f} MB base level), budget {budget_mb:.0f} MB, scale {S}x")
     if issues: return False, issues, notes
     # composite checks
     hist = np.zeros(4); total = 0
@@ -135,8 +138,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dir", default="assets/environment/neon_district")
     ap.add_argument("--budget-mb", type=float, default=BUDGET_MB)
+    ap.add_argument("--scale", type=float, default=1.5, help="1.5 = standard tier (default), 1.0 = lite lower-memory tier")
     a = ap.parse_args()
-    ok, issues, notes = validate(a.dir, a.budget_mb)
+    ok, issues, notes = validate(a.dir, a.budget_mb, a.scale)
     for n in notes: print("note:", n)
     if ok is None:
         print(issues[0]); print("RESULT: BLOCKED"); return 2

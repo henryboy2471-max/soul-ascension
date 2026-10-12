@@ -8,9 +8,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 import validate_env_plates as V
 COL = {"plate_sky": (0.30, 0.25, 0.75), "plate_far": (0.28, 0.24, 0.62), "plate_mid": (0.25, 0.22, 0.55), "plate_near": (0.22, 0.18, 0.50), "plate_street": (0.20, 0.15, 0.50), "plate_foreground": (0.18, 0.15, 0.45)}
-def plate(name, size=None, alpha=None):
+def plate(name, size=None, alpha=None, scale=1.5):
     f, lw, lh, y0, has_alpha = V.PLATES[name]
-    w, h = size or (int(lw * V.S), int(lh * V.S))
+    w, h = size or (int(lw * scale), int(lh * scale))
     rng = np.random.default_rng(1)
     rgb = np.array(COL[name]) * 255 + rng.normal(0, 4, (h, w, 3))
     a = np.full((h, w, 1), 255 if (alpha is None) else alpha, dtype=np.float32)
@@ -50,6 +50,10 @@ def main():
         st = plate("plate_street"); s2 = np.asarray(st).copy(); s2[int((380 - 300) * 1.5):int((380 - 300 + 125) * 1.5), int(1500 * 1.5):int(1620 * 1.5), :3] = 255; d = base / "slot"; write_set(d, plate_street=Image.fromarray(s2, "RGBA"))
         rc, out = run(d); expect("a bright relay slot (competes with the code-drawn prop) is rejected", rc == 1 and "relay slot" in out)
         d = base / "ok"; rc, out = run(d, "--budget-mb", "5"); expect("the texture budget is enforced", rc == 1 and "texture budget" in out)
+        rc, out = run(base / "ok"); expect("the standard 1.5x set stays under the 64 MB ceiling (about 56 MB with mipmaps)", rc == 0 and "scale 1.5x" in out)
+        d = base / "lite"; write_set(d, **{n: plate(n, scale=1.0) for n in V.PLATES})
+        rc, out = run(d, "--scale", "1.0"); expect("the lite (1.0x) lower-memory tier validates at --scale 1.0", rc == 0 and "scale 1.0x" in out)
+        rc, out = run(d); expect("a lite-size set is rejected by the standard tier (exact sizes)", rc == 1 and "expected exactly" in out)
     finally:
         shutil.rmtree(base, ignore_errors=True)
     rc, out = run(ROOT / "assets/environment/neon_district"); expect("repository itself is BLOCKED (no real plates exist yet)", rc == 2)
