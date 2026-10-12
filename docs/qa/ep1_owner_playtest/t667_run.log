@@ -1,0 +1,26 @@
+PASS: Clean build: no QA hook (window.__qa undefined)
+shot t667_01_first_launch
+PASS: Fresh save written after onboarding  (gold 500 energy 60)
+shot t667_02_mission_card_fresh
+shot t667_03_exploration_start
+event mira_done frames 10
+shot t667_06_after_mira_talk
+shot t667_07_reloaded_home
+shot t667_08_mission_card_RESUME
+shot t667_09_resumed_exploration
+PASS: Reload keeps progress: step 1, energy untouched  (step 1 energy 60)
+event relay_done frames 10
+event breach_entered frames 10
+shot t667_12_soul_realm_battle
+event completed frames 10
+PASS: Episode 1 completed with real input (saved completion)  (elapsed 187 s)
+shot t667_14_rewards_screen
+PASS: First-clear rewards saved once: +250 gold, +120 XP (level 1 -> 2 with 20 XP left), energy 60 -> 54  (gold 750 level 2 xp 20 energy 54)
+PASS: Codex has all 6 Episode 1 entries, no duplicates  (["mira","board","terminal","mural","breach","enforcer"])
+PASS: Resume state cleared after completion  ({"flags":{}})
+shot t667_15_home_after_final_reload
+PASS: After reload: same save (gold 750, completed once)  (gold 750)
+shot t667_16_mission_card_after_clear
+PASS: No console errors  ([])
+SUMMARY t667 9/9
+FINISHED

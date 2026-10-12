@@ -44,3 +44,18 @@ What is saved (inside the existing checksummed save, `mission_progress["1-1"]`):
 
 Tests: `tests/test_ep1_resume.gd` (37 checks: reload after Mira / relay / paid fight / pending ending, no second charge, 0-energy resume, no duplicate Codex or rewards, replay rewards unchanged, EXIT, RESUME button, six malformed-progress cases, non-boolean flags, corrupt file and backup, tampered checksum, outdated save) plus all 21 earlier suites: 22/22 suites pass. Browser: `tools/qa/ep1_resume.cjs` (QA-hook build, real page reloads; browser saves persisted) 12/12 at 1280x720 keyboard, 844x390 touch and 667x375 touch; `tools/qa/clean_build_resume.cjs` on the clean build (real input only, `window.__qa` undefined, zero console errors) at the same three viewports, judged from screenshots in `docs/qa/ep1_resume/`.
 Not tested: a real phone, a real browser cache eviction, saving at the exact moment the tab is killed (the harness waits a few seconds so the browser's IndexedDB write completes; an abrupt kill during that write falls back to the previous save or its backup).
+
+## Episode 1 owner playtest checkpoint (clean build)
+Verified on branch `dev/ep1-gameplay-polish` with the CLEAN web export (no QA hook; `window.__qa` undefined). Not merged, not deployed, no authorized public preview exists: run it locally (below).
+
+**Run it locally:** `godot --headless --editor --import --quit`, then `godot --headless --path . --export-release Web build/web/index.html` (Godot 4.4.1 + web export templates), then `python3 -m http.server -d build/web 8000` and open http://localhost:8000/index.html in Chrome/Chromium (needs HTTP, not file://). To test a phone layout use the browser's device toolbar at 844x390 or 667x375 with touch emulation. To start fresh clear the site's storage.
+
+**Real-input smoke test (`tools/qa/clean_build_playthrough.cjs`, no telemetry; it reads the game's own save out of the browser's IndexedDB):** onboarding, opening, exploration, Mira, page reload + RESUME EPISODE 1, relay, breach, Soul Realm battle, ending, rewards, final reload. 9/9 checks at 1280x720 keyboard, 844x390 touch and 667x375 touch: first clear saved once (+250 gold, +120 XP = level 1 to 2 with 20 XP left, energy 60 to 54), 6 Codex entries without duplicates, resume state cleared, identical save after reload, zero console errors. Screenshots (readable full-size frames; selected event frames, see file names) and logs are in `docs/qa/ep1_owner_playtest/`. The blind-input harness hit one test-script defect on the first run (touch strike taps landing on REPLAY BATTLE after the win); the game behaved correctly (the replay cost its 6 energy) and the script was fixed and re-run clean.
+
+Headless regression at this commit: all 22 suites pass.
+
+**Genuine remaining blockers before a public release (none are code defects found in Episode 1):**
+1. Echo V2 is not in the game. The Hero/Echo sprites, the home key art and the Hero's dialogue portrait are temporary and the old white-twist design; the in-game notice says so. A release that presents Echo V2 needs the approved native artwork.
+2. Mira's dialogue portrait is an enlarged small sprite and looks soft; fixing it needs approved art.
+3. No real-device evidence: performance, touch feel, thermals and battery are untested (software GL only), and sound has been checked by state only, never by ear.
+Not blockers but known: the fight itself restarts from wave 1 after a reload (the energy stays paid); Episode 2 and later are out of scope here.
