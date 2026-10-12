@@ -1,4 +1,7 @@
-# Episode 3 preparation - "The Relay Keeper" (NOT authorized for implementation; planning only)
+# Episode 3 preparation (technical groundwork; NOT authorized for implementation)
+
+> The story-specific parts below come from Claude's non-canonical draft. Only the story-agnostic technical content (reuse map, shared-base extraction, test plan, checklist shape) is expected to carry over; everything story-specific waits for the official ChatGPT Episode 3 plan.
+
 
 No Episode 3 code, data, art or tests have been written. This document is the technical plan, reuse map, asset list and checklist so implementation can start the moment you approve it. Story context: `docs/SEASON1_PLAN.md` (Episode 3 = mission `1-3` in the design doc table).
 
