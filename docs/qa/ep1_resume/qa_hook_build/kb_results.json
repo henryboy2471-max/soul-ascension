@@ -1,0 +1,70 @@
+{
+ "tag": "kb",
+ "viewport": [
+  1280,
+  720
+ ],
+ "mode": "key",
+ "results": [
+  {
+   "n": "Fresh start reaches exploration (step 0)",
+   "c": true,
+   "d": ""
+  },
+  {
+   "n": "Mira conversation finished: relay objective active",
+   "c": true,
+   "d": "step 1"
+  },
+  {
+   "n": "After reload the game is on the home screen with energy unchanged",
+   "c": true,
+   "d": "energy 60"
+  },
+  {
+   "n": "Resume #1: straight back in the district at the relay objective (no title card, no intro)",
+   "c": true,
+   "d": "step 1, px 459 (saved 459)"
+  },
+  {
+   "n": "Resume #1: Hero restored near the saved position",
+   "c": true,
+   "d": ""
+  },
+  {
+   "n": "Relay completed: breach objective active",
+   "c": true,
+   "d": "step 2"
+  },
+  {
+   "n": "Resume #2: back at the breach objective with the relay already rebooted",
+   "c": true,
+   "d": "step 2"
+  },
+  {
+   "n": "Breach entry starts the battle and pays 6 energy once",
+   "c": true,
+   "d": "energy 54"
+  },
+  {
+   "n": "Reload mid-battle: back at home, energy stays paid (no refund)",
+   "c": true,
+   "d": "energy 54"
+  },
+  {
+   "n": "Resume #3: district at the open breach",
+   "c": true,
+   "d": "step 2"
+  },
+  {
+   "n": "Resumed breach entry starts the battle WITHOUT charging energy again",
+   "c": true,
+   "d": "energy 54"
+  },
+  {
+   "n": "No console errors",
+   "c": true,
+   "d": "[]"
+  }
+ ]
+}
