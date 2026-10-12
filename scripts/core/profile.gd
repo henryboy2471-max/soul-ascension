@@ -28,6 +28,10 @@ func persist() -> bool:
  save_ok=backend.write_data(data)
  changed.emit()
  return save_ok
+# Strict boolean read for saved flags: only a real `true` counts, so a corrupted value ("yes", 1, [true]) can never mark an attempt paid or an ending pending.
+func flag(d:Dictionary, key:String) -> bool:
+ var v=d.get(key,false)
+ return typeof(v)==TYPE_BOOL and v
 func unlock_codex(id:String) -> bool:
  if data.codex.has(id):
   return false
@@ -48,7 +52,7 @@ func begin_run(id:String) -> bool:
   return false
  Economy.regenerate(data,int(Time.get_unix_time_from_system()))
  var resumable=bool(MissionDefs.get_def(id).get("resume_run",false))
- if resumable and bool(mission_progress(id).get("combat_run",false)):
+ if resumable and flag(mission_progress(id),"combat_run"):
   # The energy for this run was already paid and saved (the app was closed or reloaded mid-run): resume without charging again.
   active_run=id
   return true
@@ -83,12 +87,12 @@ func mark_battle_won(id:String) -> void:
  persist()
 # Reload/resume while the ending is pending: reopens the (already paid) run so finish_run can settle it. Never charges energy.
 func begin_ending(id:String) -> bool:
- if active_run!="" or data.completed.has(id) or not bool(mission_progress(id).get("battle_won",false)):
+ if active_run!="" or data.completed.has(id) or not flag(mission_progress(id),"battle_won"):
   return false
  active_run=id
  return true
 func ending_pending(id:String) -> bool:
- return bool(mission_progress(id).get("battle_won",false)) and not data.completed.has(id)
+ return flag(mission_progress(id),"battle_won") and not data.completed.has(id)
 # Win bookkeeping for story missions that track an ending: the pending flag is consumed and the story flags are recorded.
 func settle_story(id:String) -> void:
  var progress=mission_progress(id).duplicate(true)
@@ -100,6 +104,17 @@ func settle_story(id:String) -> void:
   flags[key]=MissionDefs.get_def(id).story_flags[key]
  progress["flags"]=flags
  data.mission_progress[id]=progress
+# District-flow episodes (Episode 1) save where the player is (intro seen, objective step, position). Finishing the mission clears that so the next
+# play-through starts the story again; Lantern-flow episodes manage their own progress and are left alone.
+func clear_explore_progress(id:String) -> void:
+ if not MissionDefs.has_mission(id) or MissionDefs.get_def(id).get("flow","district")!="district":
+  return
+ var progress=mission_progress(id).duplicate(true)
+ for key in ["intro","step","px"]:
+  progress.erase(key)
+ if not data.get("mission_progress") is Dictionary:
+  data["mission_progress"]={}
+ data.mission_progress[id]=progress
 func finish_run(won:bool) -> Dictionary:
  if active_run=="":
   return {}
@@ -109,6 +124,7 @@ func finish_run(won:bool) -> Dictionary:
  var reward={"xp":0,"gold":0,"levels":0,"first":false,"id":id}
  if won:
   settle_story(id)
+  clear_explore_progress(id)
  if won:
   reward.first=not data.completed.has(id)
   var amounts=MissionDefs.reward(id,reward.first)

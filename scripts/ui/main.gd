@@ -231,7 +231,8 @@ func show_mission(id:String="") -> void:
 Strike: J   Heavy: K   Dodge: Space   Block: hold L
 Pulse: Q   Rift: E   Mend: R   Ultimate: F
 On a phone, use the matching touch buttons.",Vector2(294,383),17,UI.MUTED,690)
- UI.button(node,"BEGIN "+mission.number,Rect2(294,551,348,75),func(): start_episode(mission.id),true)
+ var resuming=mission.get("flow","district")=="district" and Profile.flag(Profile.mission_progress(mission.id),"intro")
+ UI.button(node,("RESUME " if resuming else "BEGIN ")+mission.number,Rect2(294,551,348,75),func(): start_episode(mission.id),true)
  if not mission.battle_only_waves.is_empty():
   UI.button(node,"BATTLE ONLY",Rect2(656,568,170,58),func(): start_battle(false,mission.id))
 func start_episode(mission_id:String="1-1") -> void:
@@ -242,9 +243,12 @@ func start_episode(mission_id:String="1-1") -> void:
   planned("EPISODE LOCKED","Clear the previous episode to unlock "+str(locked.get("number","this episode")).capitalize()+": "+str(locked.get("title_case","")),"LOCKED","")
   return
  current_mission=mission_id
- if MissionDefs.get_def(mission_id).get("flow","district")=="lantern" and Profile.begin_ending(mission_id):
+ if Profile.begin_ending(mission_id):
   # The boss was already beaten and paid for but the ending never finished (reload): resume the ending, no energy, no fight.
-  show_lantern_ending()
+  if MissionDefs.get_def(mission_id).get("flow","district")=="lantern":
+   show_lantern_ending()
+  else:
+   show_ending()
   return
  clear_screen()
  scene_name="episode"
@@ -258,6 +262,7 @@ func on_battle_finished(won:bool, from_episode:bool) -> void:
   Profile.mark_battle_won(current_mission)
   show_lantern_ending()
  elif won and from_episode:
+  Profile.mark_battle_won(current_mission)
   show_ending()
  else:
   show_result(won)

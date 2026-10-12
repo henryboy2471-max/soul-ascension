@@ -13,7 +13,7 @@ static func defs() -> Dictionary:
    "tagline":"Explore, investigate the relay, and survive the Soul Realm.","modal_sub":"STORY 01—01  /  NEON DISTRICT",
    "missions_sub":"CHAPTER 01  /  EPISODE 1 PLAYABLE  /  EPISODE 2 NEXT",
    "flow":"district",
-   "energy":6,"playable":true,
+   "energy":6,"playable":true,"resume_run":true,
    "unlock":{"requires":[]},
    "rewards":{"first":{"xp":120,"gold":250},"replay":{"xp":55,"gold":100}},
    "codex":["mira","board","mural","terminal","breach","enforcer"],

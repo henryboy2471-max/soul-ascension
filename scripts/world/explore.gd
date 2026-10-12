@@ -77,6 +77,10 @@ func _ready() -> void:
  npc_x=float(config.get("npc_x",npc_x))
  gate_x=float(config.get("gate_x",gate_x))
  obstacles=config.get("obstacles",[{"x":npc_x,"y":548.0,"hw":NPC_HALF_W,"hd":NPC_HALF_D}])
+ var wall=blocker(px,py)
+ if not wall.is_empty():
+  # a saved position that lands inside the NPC (resume) is moved to the side the Hero was on
+  px=float(wall.x)+(1.0 if px>=float(wall.x) else -1.0)*(float(wall.hw)+4.0)
  if config.has("spots"):
   spots=config.spots
   enabled=config.enabled
