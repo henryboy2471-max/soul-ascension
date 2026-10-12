@@ -58,6 +58,60 @@ def _paste_clipped(canvas, im, sx, sy):
     x0, y0 = max(sx, 0), max(sy, 0); x1, y1 = min(sx + im.width, W), min(sy + im.height, H)
     if x1 <= x0 or y1 <= y0: return
     canvas.alpha_composite(im.crop((x0 - sx, y0 - sy, x1 - sx, y1 - sy)), (x0, y0))
+SKY_MAX_RESAMPLE = 1.10      # owner policy: only the independent Aether Storm Sky may be resampled up, by at most 10%
+GUTTER_MAX = 4               # a plate may not start or end with more than this many fully empty columns
+def edge_gutters(al):
+    cols = (al > 8).any(axis=0)
+    if not cols.any(): return al.shape[1], al.shape[1]
+    idx = np.nonzero(cols)[0]
+    return int(idx[0]), int(al.shape[1] - 1 - idx[-1])
+def check_provenance(n, pv, size, issues, notes):
+    """Enforces the artwork policy on a plate's provenance. size = delivered (w, h)."""
+    status = str(pv.get("status", "")).upper()
+    if any(t in status for t in ("REVIEW_ONLY", "REFERENCE", "NOT_PRODUCTION", "ASSISTED")):
+        issues.append(f"{n}: provenance status '{pv.get('status')}' is not a production status")
+    if pv.get("independent_plate") is not True or pv.get("method") in (None, "split_from_flat_image") or not pv.get("tool"):
+        issues.append(f"{n}: provenance must state tool, method and independent_plate=true (a plate cut out of a flattened concept is not accepted)")
+    res = pv.get("resolution")
+    orig = pv.get("original_dimensions")
+    W, H = size
+    valid_orig = isinstance(orig, (list, tuple)) and len(orig) == 2 and all(isinstance(v, (int, float)) and v > 0 for v in orig)
+    if res not in ("native", "resampled_up"):
+        issues.append(f"{n}: provenance 'resolution' must be \"native\" (or, for plate_sky only, \"resampled_up\")")
+        return
+    if not valid_orig:
+        issues.append(f"{n}: provenance original_dimensions [width, height] of the generated source is required (it is how native resolution is verified)")
+        return
+    if res == "native":
+        if valid_orig:
+            ow, oh = orig
+            if ow < W or oh < H:
+                issues.append(f"{n}: provenance says native but the source {int(ow)}x{int(oh)} is smaller than the delivered {W}x{H} (upscaling is not native)")
+            elif not _cover_crop_ok(ow, oh, W, H):
+                issues.append(f"{n}: the artwork was stretched or cropped by more than 3% (source {int(ow)}x{int(oh)} -> {W}x{H}); only uniform scaling is allowed")
+        return
+    # resampled_up: only plate_sky, with a full record
+    if n != "plate_sky":
+        issues.append(f"{n}: resampled enlargement is not allowed for this plate (only the independent sky may be resampled; this plate must be native or downscaled)")
+        return
+    need = ["resample_factor", "original_dimensions", "tool", "source"]
+    miss = [k for k in need if not pv.get(k)]
+    if miss: issues.append(f"{n}: resampled sky provenance missing {', '.join(miss)}")
+    if pv.get("owner_approved_resample") is not True: issues.append(f"{n}: resampled sky requires owner_approved_resample=true in its provenance")
+    if miss: return
+    ow, oh = orig
+    f = max(W / ow, H / oh)
+    stated = pv.get("resample_factor")
+    if not isinstance(stated, (int, float)) or abs(stated - f) > 0.005:
+        issues.append(f"{n}: stated resample_factor {stated} does not match the actual factor {f:.4f} ({int(ow)}x{int(oh)} -> {W}x{H})")
+    if f <= 1.0: issues.append(f"{n}: marked resampled_up but the actual factor is {f:.4f} (not an enlargement)")
+    if f > SKY_MAX_RESAMPLE + 1e-9: issues.append(f"{n}: resample factor {f:.4f} exceeds the approved 10% maximum")
+    if not _cover_crop_ok(ow, oh, W, H): issues.append(f"{n}: the sky was stretched or cropped by more than 3% (source {int(ow)}x{int(oh)} -> {W}x{H}); only uniform scaling is allowed")
+    notes.append(f"{n}: RESAMPLED up {f:.3f}x from {int(ow)}x{int(oh)} (owner-approved); this is NOT native resolution")
+def _cover_crop_ok(ow, oh, W, H):
+    f = max(W / ow, H / oh)
+    cw, ch = ow * f - W, oh * f - H
+    return -1.5 <= cw <= 0.03 * W and -1.5 <= ch <= 0.03 * H
 def validate(d, budget_mb=BUDGET_MB, scale=None):
     global S
     if scale is not None: S = scale
@@ -84,6 +138,10 @@ def validate(d, budget_mb=BUDGET_MB, scale=None):
             if n != "plate_foreground" and n != "plate_sky":
                 for side, b in zip(("left", "right"), band):
                     if b.mean() < 20: issues.append(f"{n}: {side} edge is empty; the plate must cover the whole pan range")
+            if n in ("plate_far", "plate_mid", "plate_near", "plate_street"):
+                gl, gr = edge_gutters(al)
+                if gl > GUTTER_MAX or gr > GUTTER_MAX:
+                    issues.append(f"{n}: transparent gutter of {gl}px left / {gr}px right (limit {GUTTER_MAX}); the artwork must cover the full width, without horizontal stretching or upscaling to get there")
             key = (al > 8) & (a[..., 1] > 215) & (a[..., 0] < 40) & (a[..., 2] < 40)
             if key.any(): issues.append(f"{n}: leftover #00FF00 key colour")
         prov = d / (n + ".provenance.json")
@@ -91,14 +149,18 @@ def validate(d, budget_mb=BUDGET_MB, scale=None):
         else:
             try: pv = json.loads(prov.read_text())
             except Exception: pv = {}
-            if pv.get("independent_plate") is not True or pv.get("method") in (None, "split_from_flat_image") or not pv.get("tool"):
-                issues.append(f"{n}: provenance must state tool, method and independent_plate=true (a plate cut out of a flattened concept is not accepted)")
+            check_provenance(n, pv, im.size, issues, notes)
     tram = load(d, PROP_TRAM[0])
     if tram is not None:
         exp = (int(PROP_TRAM[1] * S), int(PROP_TRAM[2] * S))
         if tram.size != exp: issues.append(f"{PROP_TRAM[0]}: size {tram.size}, expected {exp}")
         budget += tram.width * tram.height * 4
-        if not (d / (PROP_TRAM[0] + ".provenance.json")).exists(): issues.append(f"{PROP_TRAM[0]}: provenance file missing")
+        tp = d / (PROP_TRAM[0] + ".provenance.json")
+        if not tp.exists(): issues.append(f"{PROP_TRAM[0]}: provenance file missing")
+        else:
+            try: tv = json.loads(tp.read_text())
+            except Exception: tv = {}
+            check_provenance(PROP_TRAM[0], tv, tram.size, issues, notes)
     mb = budget * MIP / 1048576.0
     if mb > budget_mb: issues.append(f"texture budget: {mb:.1f} MB decoded RGBA exceeds {budget_mb:.0f} MB")
     notes.append(f"decoded texture total {mb:.1f} MB incl. mipmaps ({budget / 1048576.0:.1f} MB base level), budget {budget_mb:.0f} MB, scale {S}x")
@@ -145,7 +207,7 @@ def main():
     if ok is None:
         print(issues[0]); print("RESULT: BLOCKED"); return 2
     for i in issues: print("FAIL:", i)
-    print("RESULT:", "PASS (automatic checks; the manual checklist still applies)" if ok else "FAIL")
+    print("RESULT:", "PASS (automatic checks; the manual checklist still applies; any RESAMPLED plate above is not native resolution)" if ok else "FAIL")
     return 0 if ok else 1
 if __name__ == "__main__":
     sys.exit(main())
