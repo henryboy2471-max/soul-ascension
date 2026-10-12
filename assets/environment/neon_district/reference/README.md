@@ -1,3 +1,5 @@
 # Reference images (not production plates)
 `aether_storm_sky_REFERENCE_ONLY_1983x793.webp` is the owner-approved Aether Storm look. It is a reference only: never resized, never enlarged, never loaded by the game, and ignored by `tools/validate_env_plates.py` (which reads only `plate_*.png` and `prop_*.png` in the parent folder).
 Measured on the file as received: 1983x793 RGB; blue-violet 99% of lit pixels (magenta, gold and red about 0%); mean luminance 0.25; the lower ~45% is a baked-in skyline; the top-right has a bright violet arc and lightning (busy where EXIT/SKIP sits).
+
+`aether_storm_sky_only_CANDIDATE_REFERENCE_2000x694.webp` is the sky-only version (no skyline) of the same look: 2000x694 RGB as received, aspect 2.882 (target 2.885). Same palette (blue-violet 99%), mean luminance 0.27, HUD objective zone calm (0.15), EXIT zone mean 0.20 with detail 0.082 (limit 0.10). It is 250 px short of the 2250 px production width, so it is a candidate reference only; a native 2250x780 version is needed (an enlargement would not be native).
