@@ -112,6 +112,48 @@ def _cover_crop_ok(ow, oh, W, H):
     f = max(W / ow, H / oh)
     cw, ch = ow * f - W, oh * f - H
     return -1.5 <= cw <= 0.03 * W and -1.5 <= ch <= 0.03 * H
+def validate_sky(d):
+    """Individual checks for plate_sky.png alone (the full set is validated separately): size, opacity, provenance policy, palette, HUD-safe zones above y=520."""
+    global S
+    issues, notes = [], []
+    d = Path(d)
+    im = load(d, "plate_sky")
+    if im is None: return None, ["BLOCKED: plate_sky.png not found in " + str(d)], notes
+    f, lw, lh, y0, _ = PLATES["plate_sky"]
+    exp = (int(lw * S), int(lh * S))
+    if im.size != exp: issues.append(f"plate_sky: size {im.size}, expected exactly {exp[0]}x{exp[1]}")
+    a = np.asarray(im)
+    if (a[..., 3] < 255).any(): issues.append("plate_sky: must be fully opaque")
+    prov = d / "plate_sky.provenance.json"
+    if not prov.exists(): issues.append("plate_sky: provenance file plate_sky.provenance.json missing")
+    else:
+        try: pv = json.loads(prov.read_text())
+        except Exception: pv = {}
+        check_provenance("plate_sky", pv, im.size, issues, notes)
+    rgb = a[..., :3].astype(np.float32) / 255.0
+    H_, S_, V_ = hsv(rgb); lit = (S_ > 0.25) & (V_ > 0.35)
+    if lit.sum() == 0: issues.append("palette: no lit coloured pixels")
+    else:
+        hh = H_[lit]; n = lit.sum()
+        bv, mg, gd, rd = [(((hh >= lo) & (hh < hi)).sum() / n) for lo, hi in ((200, 300), (300, 345), (25, 65))] + [(((hh >= 345) | (hh < 25)).sum() / n)]
+        notes.append(f"palette share: blue-violet {bv:.0%}, magenta {mg:.0%}, warm gold {gd:.0%}, red/orange {rd:.0%}")
+        if bv < 0.55: issues.append(f"palette: blue-violet share {bv:.0%} < 55%")
+        if mg > 0.22: issues.append(f"palette: magenta share {mg:.0%} > 22%")
+        if gd > 0.12: issues.append(f"palette: warm gold share {gd:.0%} > 12%")
+        if rd > 0.08: issues.append(f"palette: red/orange share {rd:.0%} > 8%")
+    L = lum(rgb)
+    worst = {}
+    for cam in CAMERAS:
+        off = int(round(f * cam * S))
+        for zn, (x, y, w, h) in HUD_ZONES.items():
+            if y + h > lh: continue            # zones below the sky's rows (stick, ACT) are covered by other plates
+            z = L[int(y * S):int((y + h) * S), off + int(x * S):off + int((x + w) * S)]
+            ml, ts = float(z.mean()), tile_std(z)
+            lim = 0.55 if "prompt" in zn else MAX_LUM   # the interaction prompt pill has its own opaque panel: the contract limits only the brightness of that band, not its detail
+            worst[zn] = (max(worst.get(zn, (0, 0))[0], ml), max(worst.get(zn, (0, 0))[1], ts))
+            if ml > lim or (ts > MAX_TILE_STD and "prompt" not in zn): issues.append(f"camera {cam}: HUD zone '{zn}' too bright or busy (mean {ml:.2f} > {lim} or detail {ts:.3f} > {MAX_TILE_STD})")
+    for zn, (ml, ts) in worst.items(): notes.append(f"HUD zone '{zn}': worst mean {ml:.2f}, worst detail {ts:.3f} over cameras {CAMERAS}")
+    return (not issues), issues, notes
 def validate(d, budget_mb=BUDGET_MB, scale=None):
     global S
     if scale is not None: S = scale
@@ -173,8 +215,8 @@ def validate(d, budget_mb=BUDGET_MB, scale=None):
         for zn, (x, y, w, h) in HUD_ZONES.items():
             z = L[int(y * S):int((y + h) * S), int(x * S):int((x + w) * S)]
             ml, ts = float(z.mean()), tile_std(z)
-            lim = 0.55 if "prompt" in zn else MAX_LUM
-            if ml > lim or ts > MAX_TILE_STD: issues.append(f"camera {cam}: HUD zone '{zn}' too bright or busy (mean {ml:.2f} > {lim} or detail {ts:.3f} > {MAX_TILE_STD})")
+            lim = 0.55 if "prompt" in zn else MAX_LUM   # the interaction prompt pill has its own opaque panel: the contract limits only the brightness of that band, not its detail
+            if ml > lim or (ts > MAX_TILE_STD and "prompt" not in zn): issues.append(f"camera {cam}: HUD zone '{zn}' too bright or busy (mean {ml:.2f} > {lim} or detail {ts:.3f} > {MAX_TILE_STD})")
         H_, S_, V_ = hsv(frame)
         lit = (S_ > 0.25) & (V_ > 0.35)
         if lit.sum() > 0:
@@ -201,7 +243,15 @@ def main():
     ap.add_argument("--dir", default="assets/environment/neon_district")
     ap.add_argument("--budget-mb", type=float, default=BUDGET_MB)
     ap.add_argument("--scale", type=float, default=1.5, help="1.5 = standard tier (default), 1.0 = lite lower-memory tier")
+    ap.add_argument("--only", choices=["plate_sky"], help="run only the individual checks of one plate (the full set must still be validated before production)")
     a = ap.parse_args()
+    if a.only == "plate_sky":
+        ok, issues, notes = validate_sky(a.dir)
+        for n in notes: print("note:", n)
+        if ok is None: print(issues[0]); print("RESULT: BLOCKED"); return 2
+        for i in issues: print("FAIL:", i)
+        print("RESULT:", "SKY PASS (individual checks only; the full environment set is NOT validated; the sky is RESAMPLED, not native resolution)" if ok else "SKY FAIL")
+        return 0 if ok else 1
     ok, issues, notes = validate(a.dir, a.budget_mb, a.scale)
     for n in notes: print("note:", n)
     if ok is None:

@@ -83,6 +83,21 @@ def main():
         rc, out = run(d); expect("a skyline downscaled from a larger native source is accepted", rc == 0)
         d = base / "midup"; write_set(d); prov(d, "plate_mid", resolution="resampled_up", resample_factor=1.05, original_dimensions=[2571, 586], owner_approved_resample=True)
         rc, out = run(d); expect("no other plate may be resampled up", rc == 1 and "plate_mid: resampled enlargement is not allowed" in out)
+        # ---- individual sky checks (--only plate_sky) ----
+        d = base / "skyonly"; d.mkdir(); plate("plate_sky").save(d / "plate_sky.png")
+        (d / "plate_sky.provenance.json").write_text(json.dumps({"tool": "t", "method": "uniform_lanczos_resample_crop_bottom_1px", "independent_plate": True, "resolution": "resampled_up", "resample_factor": 1.05683419, "original_dimensions": [2129, 739], "source": "src.png", "owner_approved_resample": True}))
+        rc, out = run(d, "--only", "plate_sky"); expect("the individual sky checks pass for a conforming resampled sky and say the set is NOT validated", rc == 0 and "SKY PASS" in out and "NOT validated" in out and "RESAMPLED" in out)
+        skyb = plate("plate_sky"); a2 = np.asarray(skyb).copy(); a2[45:230, 36:700, :3] = (np.indices((185, 664)).sum(0) // 6 % 2 * 255)[..., None]
+        d = base / "skybusy"; d.mkdir(); Image.fromarray(a2, "RGBA").save(d / "plate_sky.png"); (d / "plate_sky.provenance.json").write_text((base / "skyonly" / "plate_sky.provenance.json").read_text())
+        rc, out = run(d, "--only", "plate_sky"); expect("the individual sky checks reject a bright busy HUD zone", rc == 1 and "HUD zone" in out)
+        skyp = plate("plate_sky"); a3 = np.asarray(skyp).copy(); a3[int(255 * 1.5):int(315 * 1.5), :, :3] = (np.indices((90, a3.shape[1])).sum(0) // 4 % 2 * 90 + 30)[..., None]   # busy but dark band
+        d = base / "skyprompt_dark"; d.mkdir(); Image.fromarray(a3, "RGBA").save(d / "plate_sky.png"); (d / "plate_sky.provenance.json").write_text((base / "skyonly" / "plate_sky.provenance.json").read_text())
+        rc, out = run(d, "--only", "plate_sky"); expect("the interaction-prompt band is limited by brightness only: busy but dark passes", rc == 0)
+        a4 = a3.copy(); a4[int(255 * 1.5):int(315 * 1.5), :, :3] = 255
+        d = base / "skyprompt_bright"; d.mkdir(); Image.fromarray(a4, "RGBA").save(d / "plate_sky.png"); (d / "plate_sky.provenance.json").write_text((base / "skyonly" / "plate_sky.provenance.json").read_text())
+        rc, out = run(d, "--only", "plate_sky"); expect("a bright interaction-prompt band is still rejected", rc == 1 and "interaction prompt band" in out)
+        d = base / "skyunappr"; d.mkdir(); plate("plate_sky").save(d / "plate_sky.png"); (d / "plate_sky.provenance.json").write_text(json.dumps({**json.loads((base / "skyonly" / "plate_sky.provenance.json").read_text()), "owner_approved_resample": False}))
+        rc, out = run(d, "--only", "plate_sky"); expect("the individual sky checks reject an unapproved resample", rc == 1 and "owner_approved_resample" in out)
         d = base / "ok"; rc, out = run(d, "--budget-mb", "5"); expect("the texture budget is enforced", rc == 1 and "texture budget" in out)
         rc, out = run(base / "ok"); expect("the standard 1.5x set stays under the 64 MB ceiling (about 56 MB with mipmaps)", rc == 0 and "scale 1.5x" in out)
         d = base / "lite"; write_set(d, **{n: plate(n, scale=1.0) for n in V.PLATES})
@@ -90,7 +105,12 @@ def main():
         rc, out = run(d); expect("a lite-size set is rejected by the standard tier (exact sizes)", rc == 1 and "expected exactly" in out)
     finally:
         shutil.rmtree(base, ignore_errors=True)
-    rc, out = run(ROOT / "assets/environment/neon_district"); expect("repository itself is BLOCKED (no real plates exist yet)", rc == 2)
+    rc, out = run(ROOT / "assets/environment/neon_district")
+    sky_there = (ROOT / "assets/environment/neon_district/plate_sky.png").exists()
+    expect("the repository set is NOT production-ready: " + ("only plate_sky exists, the other six plates are reported missing" if sky_there else "no plates exist yet (BLOCKED)"),
+           (rc == 1 and "plate_far.png: file missing" in out and "PASS" not in out) if sky_there else rc == 2)
+    if sky_there:
+        rc, out = run(ROOT / "assets/environment/neon_district", "--only", "plate_sky"); expect("the delivered repository plate_sky.png passes its individual checks (RESAMPLED, set not validated)", rc == 0 and "SKY PASS" in out and "NOT validated" in out)
     print("RESULT:", "ALL PASS" if not bad else f"{bad} FAILED"); return 1 if bad else 0
 if __name__ == "__main__":
     raise SystemExit(main())
