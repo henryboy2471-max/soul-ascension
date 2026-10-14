@@ -30,21 +30,19 @@
     543
    ],
    "source_crop_px": [
-    76,
+    23,
     444,
-    2172,
+    2145,
     724
    ],
    "top_rows_padded_transparent": 0,
    "mosaic_x": 0,
-   "mosaic_width": 1572,
-   "seam_crossfade_px": 240,
-   "edits": {
-    "feather": 0.4
-   },
+   "mosaic_width": 1592,
+   "seam_crossfade_px": 0,
+   "edits": {},
    "trim_px": [
-    57,
-    0
+    17,
+    20
    ]
   },
   {
@@ -62,19 +60,17 @@
    "source_crop_px": [
     0,
     488,
-    2048,
+    1755,
     768
    ],
    "top_rows_padded_transparent": 0,
-   "mosaic_x": 1332,
-   "mosaic_width": 1536,
-   "seam_crossfade_px": 240,
-   "edits": {
-    "feather": 0.4
-   },
+   "mosaic_x": 1432,
+   "mosaic_width": 1316,
+   "seam_crossfade_px": 160,
+   "edits": {},
    "trim_px": [
     0,
-    0
+    220
    ]
   },
   {
@@ -92,23 +88,24 @@
    "source_crop_px": [
     0,
     444,
-    2096,
+    2149,
     724
    ],
    "top_rows_padded_transparent": 0,
-   "mosaic_x": 2628,
-   "mosaic_width": 1572,
-   "seam_crossfade_px": 240,
-   "edits": {
-    "feather": 0.4
-   },
+   "mosaic_x": 2588,
+   "mosaic_width": 1612,
+   "seam_crossfade_px": 160,
+   "edits": {},
    "trim_px": [
     0,
-    57
+    17
    ]
   }
  ],
  "source_manifest": "reference/source_panels_v2/manifest.json",
  "notes": "uniform scale 0.7500 on every component; bottom-aligned",
- "post_process": null
+ "post_process": {
+  "top_feather_fraction": 0.55,
+  "why": "soft top edge of the foreground mist strip"
+ }
 }

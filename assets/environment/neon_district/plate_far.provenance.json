@@ -38,7 +38,7 @@
    "top_rows_padded_transparent": 0,
    "mosaic_x": 0,
    "mosaic_width": 1394,
-   "seam_crossfade_px": 240,
+   "seam_crossfade_px": 0,
    "edits": {},
    "trim_px": [
     288,

@@ -30,19 +30,19 @@
     634
    ],
    "source_crop_px": [
-    633,
+    269,
     27,
-    1774,
+    1550,
     887
    ],
    "top_rows_padded_transparent": 0,
    "mosaic_x": 0,
-   "mosaic_width": 815,
-   "seam_crossfade_px": 240,
+   "mosaic_width": 915,
+   "seam_crossfade_px": 0,
    "edits": {},
    "trim_px": [
-    452,
-    0
+    192,
+    160
    ]
   },
   {
@@ -58,19 +58,19 @@
     517
    ],
    "source_crop_px": [
+    84,
     0,
-    0,
-    2171,
+    2143,
     724
    ],
    "top_rows_padded_transparent": 98,
-   "mosaic_x": 575,
-   "mosaic_width": 1551,
-   "seam_crossfade_px": 240,
+   "mosaic_x": 755,
+   "mosaic_width": 1471,
+   "seam_crossfade_px": 160,
    "edits": {},
    "trim_px": [
-    0,
-    0
+    60,
+    20
    ]
   },
   {
@@ -86,19 +86,19 @@
     634
    ],
    "source_crop_px": [
-    0,
+    504,
     27,
-    1140,
+    1504,
     887
    ],
    "top_rows_padded_transparent": 0,
-   "mosaic_x": 1886,
-   "mosaic_width": 814,
+   "mosaic_x": 1986,
+   "mosaic_width": 714,
    "seam_crossfade_px": 240,
    "edits": {},
    "trim_px": [
-    0,
-    453
+    360,
+    193
    ]
   }
  ],
