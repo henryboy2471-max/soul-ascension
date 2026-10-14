@@ -1,0 +1,144 @@
+{
+  "status": "SOURCE_PANELS_FOR_REVIEW_AND_ASSEMBLY_NOT_PRODUCTION",
+  "tool": "OpenAI built-in image generator",
+  "generated_on": "2026-10-13",
+  "method": "15 independent RGBA source panel generations; original bytes preserved; no upscaling or stretching",
+  "contract": "docs/visual_redesign/ENV_PLATE_ASSET_REQUIREMENTS.md",
+  "panels": {
+    "far_left": {
+      "file": "panels/far_left.png",
+      "original_dimensions": [
+        1916,
+        821
+      ],
+      "mode": "RGBA",
+      "sha256": "314ccf22dad2806b9b74f9d854a4a7b6f32b55862bf2346572f96f40699f61f5"
+    },
+    "far_right": {
+      "file": "panels/far_right.png",
+      "original_dimensions": [
+        1918,
+        820
+      ],
+      "mode": "RGBA",
+      "sha256": "a35222c1343151492772b89d43413b7ebc5b1ca4f9ac6f863b2ced852b2f4109"
+    },
+    "foreground_1": {
+      "file": "panels/foreground_1.png",
+      "original_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "sha256": "ac73287cd012dd8c36ce9bf3eb94c25297e09d882fb24a5a690331cd76305020"
+    },
+    "foreground_2": {
+      "file": "panels/foreground_2.png",
+      "original_dimensions": [
+        2048,
+        768
+      ],
+      "mode": "RGBA",
+      "sha256": "4c0aa1a95ac1a058db9534e68466a6fedc470a21921c2127ea62b460ef80517a"
+    },
+    "foreground_3": {
+      "file": "panels/foreground_3.png",
+      "original_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "sha256": "597d72834475dd3a30e43016980763fb0872c2157351e4fceb50231cd86237d9"
+    },
+    "mid_center": {
+      "file": "panels/mid_center.png",
+      "original_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "sha256": "931a78fea8715aa34ea3e2b3ff32338c9728b323a031eecbb97e273dc5ec4571"
+    },
+    "mid_left": {
+      "file": "panels/mid_left.png",
+      "original_dimensions": [
+        1774,
+        887
+      ],
+      "mode": "RGBA",
+      "sha256": "9d235cbad68a0a81aaf2b15aad8941b70240f3f2baa60924f749370bd32f6a3b"
+    },
+    "mid_right": {
+      "file": "panels/mid_right.png",
+      "original_dimensions": [
+        1774,
+        887
+      ],
+      "mode": "RGBA",
+      "sha256": "0e1f1707fa9f656d4fc7c249becef6d0520d0f0ad513f2a41ce2bf187d34df66"
+    },
+    "near_center": {
+      "file": "panels/near_center.png",
+      "original_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "sha256": "9ee44346266cf569ff650a03ffb8ff866c7241fd673d2b9e722364316d86a5cb"
+    },
+    "near_left": {
+      "file": "panels/near_left.png",
+      "original_dimensions": [
+        1971,
+        798
+      ],
+      "mode": "RGBA",
+      "sha256": "f672ae932b011f7f264813d066ca9c5573e32f63a4fa5bcc7aef0cdef8916cba"
+    },
+    "near_right": {
+      "file": "panels/near_right.png",
+      "original_dimensions": [
+        1983,
+        793
+      ],
+      "mode": "RGBA",
+      "sha256": "f584907fbcd868a72c5a4abe594280fe74d95d363adb2dcd9848e8ee82213d2f"
+    },
+    "street_center": {
+      "file": "panels/street_center.png",
+      "original_dimensions": [
+        2079,
+        756
+      ],
+      "mode": "RGBA",
+      "sha256": "03d5f9c1a6020cd604faf6058659664a89b19ad9d609ec27d27a48dfecea8efb"
+    },
+    "street_left": {
+      "file": "panels/street_left.png",
+      "original_dimensions": [
+        1942,
+        809
+      ],
+      "mode": "RGBA",
+      "sha256": "472a6a0175047dbe5e0e5731b3a9911d1b0a66cb038c7256a5ad26cfff01d48a"
+    },
+    "street_right": {
+      "file": "panels/street_right.png",
+      "original_dimensions": [
+        1983,
+        793
+      ],
+      "mode": "RGBA",
+      "sha256": "0b98061be9e3dd679444ec3271a2859c70ef288d568969494e083012a59d0351"
+    },
+    "tram": {
+      "file": "panels/tram.png",
+      "original_dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "sha256": "8bb243ff2238cc1ee8eaabb621a803fe325e41b5ba0dc9fc4a2865c2b39736c5"
+    }
+  }
+}
