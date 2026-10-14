@@ -1,0 +1,20 @@
+{
+  "status": "ASSEMBLED_INSERT_CANDIDATE_PENDING_OWNER_REVIEW",
+  "tool": "Pillow Lanczos",
+  "method": "Crop of original RGBA source followed by uniform downscale; no enlargement, no painted or procedural additions",
+  "source": "tram_track_source.png",
+  "source_sha256": "b5151895424ef7d47e95241e88c41500aaadb2a50604ddc59d3ccec1d4bce3b3",
+  "source_dimensions": [2021, 778],
+  "source_crop_px": [82, 242, 1939, 529],
+  "cropped_dimensions": [1857, 287],
+  "scale": 0.66236,
+  "delivered_dimensions": [1230, 190],
+  "mode": "RGBA",
+  "sha256": "d5b676f4a282e2a63dc507eb40fc322798cccc15ee36183c6e0c19714f520505",
+  "placement_on_plate_street_px": [862, 280],
+  "measured_alpha_gt_12": {
+    "rail_start_insert_row": 11,
+    "pier_base_last_insert_row": 169
+  },
+  "note": "Use as the authored insert under the tram. It is not yet part of plate_street and requires composite validation and owner visual review."
+}
