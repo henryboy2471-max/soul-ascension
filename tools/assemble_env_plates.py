@@ -11,11 +11,13 @@ SRC = ROOT / "assets/environment/neon_district/reference/source_panels_v2"
 OV = 240   # default seam crossfade width in delivered px (a plate may set ovs per seam; trims and widths were picked by a search that minimises the visible luminance step across each stitch)
 # name: size, scale ("fit" = largest uniform scale <= 1 that keeps every part's artwork inside the plate height), outer-trim bias (share taken from the left), parts
 # part = (panel, ops); ops: opaque (alpha 1), clean (alpha >= .94 -> 1), feather=f (top alpha ramp over f of the height), burn=local exposure multiply, trim=(left,right) px after scaling
+INSERT_TRACK = dict(file="reference/tram_track_source/tram_track_insert_1230x190.png", sha256="d5b676f4a282e2a63dc507eb40fc322798cccc15ee36183c6e0c19714f520505", at=(862, 280),
+ source="reference/tram_track_source/tram_track_source.png", source_sha256="b5151895424ef7d47e95241e88c41500aaadb2a50604ddc59d3ccec1d4bce3b3", source_dims=(2021, 778), source_crop=(82, 242, 1939, 529), scale=0.66236)
 PLATES = {
  "plate_far":        dict(size=(2550, 720), s="fit", bias=.5, parts=[("far_left", {}), ("far_right", {})]),
  "plate_mid":        dict(size=(2700, 615), s="fit", bias=.5, ovs=[160, 240], parts=[("mid_left", {"trim": (0, 160)}), ("mid_center", {"trim": (60, 20)}), ("mid_right", {"trim": (360, 0)})]),
  "plate_near":       dict(size=(3450, 690), s="fit", bias=.5, ovs=[160, 160], parts=[("near_left", {"trim": (0, 20)}), ("near_center", {"trim": (240, 60)}), ("near_right", {"trim": (120, 0)})]),
- "plate_street":     dict(size=(3750, 630), s=.85, bias=0., ovs=[360, 120], floor_soften=(300, 10), parts=[("street_left", {"clean": 1}), ("street_center", {"opaque": 1, "feather": .3, "trim": (260, 425)}), ("street_right", {"opaque": 1, "feather": .3, "burn": (529, 139, 1051, 509, .55, 50)})]),
+ "plate_street":     dict(size=(3750, 630), s=.85, bias=0., ovs=[360, 120], floor_soften=(300, 10), inserts=[INSERT_TRACK], parts=[("street_left", {"clean": 1}), ("street_center", {"opaque": 1, "feather": .3, "trim": (260, 425)}), ("street_right", {"opaque": 1, "feather": .3, "burn": (529, 139, 1051, 509, .55, 50)})]),
  "plate_foreground": dict(size=(4200, 210), s=.75, bias=.5, top_feather=.55, ovs=[160, 160], parts=[("foreground_1", {"trim": (0, 20)}), ("foreground_2", {"trim": (0, 220)}), ("foreground_3", {})]),
 }
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -87,6 +89,16 @@ def assemble(name, cfg):
         pm = Image.fromarray(np.round(np.clip(out, 0, 1) * 255).astype(np.uint8), "RGBa"); b = np.asarray(pm.filter(ImageFilter.GaussianBlur(sg))).astype(np.float32) / 255
         t = np.clip((np.arange(H) - r0) / (H - r0), 0, 1); t = (t * t * (3 - 2 * t))[:, None, None]
         out = out * (1 - t) + b * t
+    ins_rec = []
+    for ins in cfg.get("inserts", []):   # authored RGBA insert, alpha-composited over the finished (already softened) plate
+        fp = ROOT / "assets/environment/neon_district" / ins["file"]
+        assert sha(fp) == ins["sha256"], f"{fp} sha256 mismatch"
+        pm = np.asarray(Image.open(fp).convert("RGBa")).astype(np.float32) / 255; x0, y0 = ins["at"]; h, w = pm.shape[:2]
+        out[y0:y0 + h, x0:x0 + w] = pm + out[y0:y0 + h, x0:x0 + w] * (1 - pm[..., 3:4])
+        so, sc = ins["source_dims"], ins["scale"]
+        ins_rec.append({"role": "insert", "file": ins["source"], "sha256": ins["source_sha256"], "original_dimensions": list(so), "scale": sc, "scaled_dimensions": [round(so[0] * sc), round(so[1] * sc)],
+            "source_crop_px": list(ins["source_crop"]), "placed_at": list(ins["at"]), "derived_insert": {"file": ins["file"], "sha256": ins["sha256"], "dimensions": [w, h]}, "edits": {}})
+    parts_rec += ins_rec
     if cfg.get("top_feather"):   # soft top edge of the finished strip (applied after the vertical crop so it is really visible)
         t = np.clip(np.arange(H) / (cfg["top_feather"] * H), 0, 1); out = out * (t * t * (3 - 2 * t))[:, None, None]
     a = out[..., 3:4]; rgb = np.where(a > 1e-6, out[..., :3] / np.maximum(a, 1e-6), 0)

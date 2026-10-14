@@ -17,14 +17,16 @@ def seam_scores(d):
         pv = json.loads((Path(d) / (n + ".provenance.json")).read_text()); im = V.load(d, n)
         a = np.asarray(im).astype(np.float32) / 255; L = V.lum(a[..., :3] * a[..., 3:4]); al = a[..., 3]
         D = np.abs(np.diff(L, axis=1)); m = (al[:, 1:] > .5) & (al[:, :-1] > .5)
+        for c in pv["components"]:   # an authored insert is not a stitch: score the stitch only outside it
+            if c.get("role") == "insert": x, y = c["placed_at"]; w, h = c["derived_insert"]["dimensions"]; m[y:y + h, max(x - 1, 0):x + w] = False
         col = np.array([D[:, x][m[:, x]].mean() if m[:, x].sum() > 20 else np.nan for x in range(D.shape[1])])
         zones = []
-        for c in pv["components"][1:]:
+        for c in [c for c in pv["components"] if c.get("role") != "insert"][1:]:
             x0 = c["mosaic_x"]; w = c.get("seam_crossfade_px") or 120; zones.append((x0, x0 + w))
         mask = np.ones(len(col), bool)
         for x0, x1 in zones: mask[max(x0 - 20, 0):x1 + 20] = False
         base = np.nanmedian(col[mask])
-        for (x0, x1), c in zip(zones, pv["components"][1:]):
+        for (x0, x1), c in zip(zones, [c for c in pv["components"] if c.get("role") != "insert"][1:]):
             seg = col[max(x0 - 4, 0):x1 + 4]; r = float(np.nanmax(seg) / base)
             out.append({"plate": n, "seam_px": [x0, x1], "joins": c["file"].split("/")[-1], "step_ratio": round(r, 2), "flag": bool(r > SEAM_RATIO_MAX)})
     return out

@@ -116,6 +116,39 @@
     0,
     189
    ]
+  },
+  {
+   "role": "insert",
+   "file": "reference/tram_track_source/tram_track_source.png",
+   "sha256": "b5151895424ef7d47e95241e88c41500aaadb2a50604ddc59d3ccec1d4bce3b3",
+   "original_dimensions": [
+    2021,
+    778
+   ],
+   "scale": 0.66236,
+   "scaled_dimensions": [
+    1339,
+    515
+   ],
+   "source_crop_px": [
+    82,
+    242,
+    1939,
+    529
+   ],
+   "placed_at": [
+    862,
+    280
+   ],
+   "derived_insert": {
+    "file": "reference/tram_track_source/tram_track_insert_1230x190.png",
+    "sha256": "d5b676f4a282e2a63dc507eb40fc322798cccc15ee36183c6e0c19714f520505",
+    "dimensions": [
+     1230,
+     190
+    ]
+   },
+   "edits": {}
   }
  ],
  "source_manifest": "reference/source_panels_v2/manifest.json",
