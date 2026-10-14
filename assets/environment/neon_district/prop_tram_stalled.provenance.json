@@ -1,0 +1,52 @@
+{
+ "tool": "OpenAI built-in image generator (source panels); Pillow/NumPy (assembly, tools/assemble_env_plates.py)",
+ "method": "assembled_from_native_source_panels: crop, uniform downscale (never up) and a seam crossfade; not a single generation",
+ "independent_plate": true,
+ "resolution": "assembled_native",
+ "status": "PRODUCTION_CANDIDATE_PENDING_OWNER_REVIEW",
+ "mosaic_dimensions": [
+  1050,
+  234
+ ],
+ "delivered_dimensions": [
+  1050,
+  234
+ ],
+ "final_crop_px": [
+  0,
+  0
+ ],
+ "components": [
+  {
+   "file": "reference/source_panels_v2/panels/tram.png",
+   "sha256": "8bb243ff2238cc1ee8eaabb621a803fe325e41b5ba0dc9fc4a2865c2b39736c5",
+   "original_dimensions": [
+    2172,
+    724
+   ],
+   "scale": 0.48951,
+   "scaled_dimensions": [
+    1063,
+    354
+   ],
+   "subject_scaled_dimensions": [
+    1050,
+    224
+   ],
+   "source_crop_px": [
+    14,
+    127,
+    2159,
+    584
+   ],
+   "placed_at": [
+    0,
+    8
+   ],
+   "edits": {}
+  }
+ ],
+ "source_manifest": "reference/source_panels_v2/manifest.json",
+ "notes": "subject cropped from the transparent margins, uniformly scaled into the canvas",
+ "post_process": null
+}

@@ -1,0 +1,108 @@
+{
+ "tool": "OpenAI built-in image generator (source panels); Pillow/NumPy (assembly, tools/assemble_env_plates.py)",
+ "method": "assembled_from_native_source_panels: crop, uniform downscale (never up) and a seam crossfade; not a single generation",
+ "independent_plate": true,
+ "resolution": "assembled_native",
+ "status": "PRODUCTION_CANDIDATE_PENDING_OWNER_REVIEW",
+ "mosaic_dimensions": [
+  2700,
+  615
+ ],
+ "delivered_dimensions": [
+  2700,
+  615
+ ],
+ "final_crop_px": [
+  0,
+  0
+ ],
+ "components": [
+  {
+   "file": "reference/source_panels_v2/panels/mid_left.png",
+   "sha256": "9d235cbad68a0a81aaf2b15aad8941b70240f3f2baa60924f749370bd32f6a3b",
+   "original_dimensions": [
+    1774,
+    887
+   ],
+   "scale": 0.714286,
+   "scaled_dimensions": [
+    1267,
+    634
+   ],
+   "source_crop_px": [
+    633,
+    27,
+    1774,
+    887
+   ],
+   "top_rows_padded_transparent": 0,
+   "mosaic_x": 0,
+   "mosaic_width": 815,
+   "seam_crossfade_px": 240,
+   "edits": {},
+   "trim_px": [
+    452,
+    0
+   ]
+  },
+  {
+   "file": "reference/source_panels_v2/panels/mid_center.png",
+   "sha256": "931a78fea8715aa34ea3e2b3ff32338c9728b323a031eecbb97e273dc5ec4571",
+   "original_dimensions": [
+    2172,
+    724
+   ],
+   "scale": 0.714286,
+   "scaled_dimensions": [
+    1551,
+    517
+   ],
+   "source_crop_px": [
+    0,
+    0,
+    2171,
+    724
+   ],
+   "top_rows_padded_transparent": 98,
+   "mosaic_x": 575,
+   "mosaic_width": 1551,
+   "seam_crossfade_px": 240,
+   "edits": {},
+   "trim_px": [
+    0,
+    0
+   ]
+  },
+  {
+   "file": "reference/source_panels_v2/panels/mid_right.png",
+   "sha256": "0e1f1707fa9f656d4fc7c249becef6d0520d0f0ad513f2a41ce2bf187d34df66",
+   "original_dimensions": [
+    1774,
+    887
+   ],
+   "scale": 0.714286,
+   "scaled_dimensions": [
+    1267,
+    634
+   ],
+   "source_crop_px": [
+    0,
+    27,
+    1140,
+    887
+   ],
+   "top_rows_padded_transparent": 0,
+   "mosaic_x": 1886,
+   "mosaic_width": 814,
+   "seam_crossfade_px": 240,
+   "edits": {},
+   "trim_px": [
+    0,
+    453
+   ]
+  }
+ ],
+ "source_manifest": "reference/source_panels_v2/manifest.json",
+ "notes": "uniform scale 0.7143 on every component; bottom-aligned",
+ "post_process": null
+}

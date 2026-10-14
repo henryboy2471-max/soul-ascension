@@ -2,7 +2,7 @@
 """Validator for the Episode 1 Neon District environment plates (see docs/visual_redesign/ENV_PLATE_ASSET_REQUIREMENTS.md).
 Checks sizes, alpha, provenance, HUD-safe calm, prop slots, palette and texture budget on ACTUAL plate files only.
 Exit 0 = all automatic checks pass (manual checks in the document still apply), 1 = failures, 2 = no plates delivered (BLOCKED)."""
-import argparse, json, sys
+import argparse, hashlib, json, sys
 from pathlib import Path
 import numpy as np
 from PIL import Image
@@ -65,7 +65,7 @@ def edge_gutters(al):
     if not cols.any(): return al.shape[1], al.shape[1]
     idx = np.nonzero(cols)[0]
     return int(idx[0]), int(al.shape[1] - 1 - idx[-1])
-def check_provenance(n, pv, size, issues, notes):
+def check_provenance(n, pv, size, issues, notes, d=None):
     """Enforces the artwork policy on a plate's provenance. size = delivered (w, h)."""
     status = str(pv.get("status", "")).upper()
     if any(t in status for t in ("REVIEW_ONLY", "REFERENCE", "NOT_PRODUCTION", "ASSISTED")):
@@ -76,8 +76,11 @@ def check_provenance(n, pv, size, issues, notes):
     orig = pv.get("original_dimensions")
     W, H = size
     valid_orig = isinstance(orig, (list, tuple)) and len(orig) == 2 and all(isinstance(v, (int, float)) and v > 0 for v in orig)
+    if res == "assembled_native":
+        _check_assembled(n, pv, size, issues, notes, d)
+        return
     if res not in ("native", "resampled_up"):
-        issues.append(f"{n}: provenance 'resolution' must be \"native\" (or, for plate_sky only, \"resampled_up\")")
+        issues.append(f"{n}: provenance 'resolution' must be \"native\", \"assembled_native\" (or, for plate_sky only, \"resampled_up\")")
         return
     if not valid_orig:
         issues.append(f"{n}: provenance original_dimensions [width, height] of the generated source is required (it is how native resolution is verified)")
@@ -108,6 +111,31 @@ def check_provenance(n, pv, size, issues, notes):
     if f > SKY_MAX_RESAMPLE + 1e-9: issues.append(f"{n}: resample factor {f:.4f} exceeds the approved 10% maximum")
     if not _cover_crop_ok(ow, oh, W, H): issues.append(f"{n}: the sky was stretched or cropped by more than 3% (source {int(ow)}x{int(oh)} -> {W}x{H}); only uniform scaling is allowed")
     notes.append(f"{n}: RESAMPLED up {f:.3f}x from {int(ow)}x{int(oh)} (owner-approved); this is NOT native resolution")
+def _check_assembled(n, pv, size, issues, notes, d):
+    """A plate stitched from several native source panels: crop, uniform downscale (never up) and seam blending only. Every component is recorded and verified."""
+    W, H = size
+    if n == "plate_sky": issues.append(f"{n}: the sky must be one native or approved-resampled image, not an assembly"); return
+    if "assembled_from_native" not in str(pv.get("method", "")): issues.append(f"{n}: an assembled plate's method must say assembled_from_native_source_panels (never claim a single generation)")
+    comps = pv.get("components")
+    if not isinstance(comps, list) or not comps: issues.append(f"{n}: assembled provenance needs a components list"); return
+    for c in comps:
+        f, od, sc = c.get("file"), c.get("original_dimensions"), c.get("scale")
+        if not f or not c.get("sha256") or not (isinstance(od, (list, tuple)) and len(od) == 2) or not isinstance(sc, (int, float)):
+            issues.append(f"{n}: component {f} needs file, sha256, original_dimensions and scale"); continue
+        if sc > 1.0 + 1e-9: issues.append(f"{n}: component {f} is scaled {sc} (> 1.0); upscaling is not allowed")
+        sd = c.get("scaled_dimensions")
+        if not (isinstance(sd, (list, tuple)) and len(sd) == 2 and abs(sd[0] - od[0] * sc) <= 1 and abs(sd[1] - od[1] * sc) <= 1): issues.append(f"{n}: component {f} scaled_dimensions do not match original_dimensions x scale")
+        if d is not None:
+            fp = Path(d) / f
+            if not fp.exists(): issues.append(f"{n}: component {f} is not in the repository")
+            else:
+                if hashlib.sha256(fp.read_bytes()).hexdigest() != c["sha256"]: issues.append(f"{n}: component {f} sha256 does not match the file")
+                if list(Image.open(fp).size) != list(od): issues.append(f"{n}: component {f} original_dimensions do not match the file")
+    mos, crop = pv.get("mosaic_dimensions"), pv.get("final_crop_px", [0, 0])
+    if not (isinstance(mos, (list, tuple)) and len(mos) == 2): issues.append(f"{n}: mosaic_dimensions (the assembled size before output) is required"); return
+    if not (isinstance(crop, (list, tuple)) and len(crop) == 2) or crop[0] > 0.03 * W or crop[1] > 0.03 * H: issues.append(f"{n}: final crop {crop} exceeds 3% of the delivered {W}x{H}")
+    elif [mos[0] - crop[0], mos[1] - crop[1]] != [W, H]: issues.append(f"{n}: mosaic {mos} minus final crop {crop} is not the delivered {W}x{H} (the mosaic must be used at scale 1.0)")
+    notes.append(f"{n}: assembled from {len(comps)} native source panel(s), crop/downscale/blend only (min scale {min((c.get('scale', 1) for c in comps), default=1):.3f}); not a single generation")
 def _cover_crop_ok(ow, oh, W, H):
     f = max(W / ow, H / oh)
     cw, ch = ow * f - W, oh * f - H
@@ -191,7 +219,7 @@ def validate(d, budget_mb=BUDGET_MB, scale=None):
         else:
             try: pv = json.loads(prov.read_text())
             except Exception: pv = {}
-            check_provenance(n, pv, im.size, issues, notes)
+            check_provenance(n, pv, im.size, issues, notes, d)
     tram = load(d, PROP_TRAM[0])
     if tram is not None:
         exp = (int(PROP_TRAM[1] * S), int(PROP_TRAM[2] * S))
@@ -202,7 +230,7 @@ def validate(d, budget_mb=BUDGET_MB, scale=None):
         else:
             try: tv = json.loads(tp.read_text())
             except Exception: tv = {}
-            check_provenance(PROP_TRAM[0], tv, tram.size, issues, notes)
+            check_provenance(PROP_TRAM[0], tv, tram.size, issues, notes, d)
     mb = budget * MIP / 1048576.0
     if mb > budget_mb: issues.append(f"texture budget: {mb:.1f} MB decoded RGBA exceeds {budget_mb:.0f} MB")
     notes.append(f"decoded texture total {mb:.1f} MB incl. mipmaps ({budget / 1048576.0:.1f} MB base level), budget {budget_mb:.0f} MB, scale {S}x")

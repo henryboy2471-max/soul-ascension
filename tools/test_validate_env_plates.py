@@ -32,6 +32,18 @@ def main():
     try:
         d = base / "ok"; write_set(d)
         rc, out = run(d); expect("conformant synthetic set passes", rc == 0 and "PASS" in out)
+        import hashlib
+        def assembled(d, **kw):
+            write_set(d); d = Path(d); (d / "reference").mkdir(exist_ok=True)
+            Image.fromarray(np.zeros((900, 2000, 4), np.uint8) + 5, "RGBA").save(d / "reference/p.png")
+            pv = {"tool": "synthetic", "method": "assembled_from_native_source_panels", "independent_plate": True, "resolution": "assembled_native", "mosaic_dimensions": [2550, 720], "final_crop_px": [0, 0],
+                  "components": [{"file": "reference/p.png", "sha256": hashlib.sha256((d / "reference/p.png").read_bytes()).hexdigest(), "original_dimensions": [2000, 900], "scale": 0.8, "scaled_dimensions": [1600, 720]}]}
+            pv.update(kw); (d / "plate_far.provenance.json").write_text(json.dumps(pv)); return d
+        d = assembled(base / "asm_ok"); rc, out = run(d); expect("an assembled plate with verified components passes", rc == 0 and "assembled from 1 native" in out)
+        d = assembled(base / "asm_up", components=[{"file": "reference/p.png", "sha256": "0", "original_dimensions": [2000, 900], "scale": 1.2, "scaled_dimensions": [2400, 1080]}]); rc, out = run(d); expect("an assembled plate with an upscaled component is rejected", rc == 1 and "upscaling is not allowed" in out)
+        d = assembled(base / "asm_sha", components=[{"file": "reference/p.png", "sha256": "0" * 64, "original_dimensions": [2000, 900], "scale": 0.8, "scaled_dimensions": [1600, 720]}]); rc, out = run(d); expect("an assembled plate whose component hash does not match is rejected", rc == 1 and "sha256 does not match" in out)
+        d = assembled(base / "asm_crop", mosaic_dimensions=[2700, 720], final_crop_px=[150, 0]); rc, out = run(d); expect("an assembled plate cropped more than 3% at the end is rejected", rc == 1 and "exceeds 3%" in out)
+        d = assembled(base / "asm_single", method="single_generation"); rc, out = run(d); expect("an assembly claiming a single generation is rejected", rc == 1 and "assembled_from_native" in out)
         d = base / "empty"; d.mkdir(); rc, out = run(d); expect("no plates delivered is BLOCKED (exit 2)", rc == 2 and "BLOCKED" in out)
         d = base / "size"; write_set(d, plate_far=plate("plate_far", (100, 100))); rc, out = run(d); expect("wrong plate size is rejected", rc == 1 and "plate_far: size" in out)
         d = base / "missing"; write_set(d); (d / "plate_mid.png").unlink(); rc, out = run(d); expect("a missing plate is rejected", rc == 1 and "plate_mid.png: file missing" in out)

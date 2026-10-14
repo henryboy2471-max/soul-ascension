@@ -1,0 +1,130 @@
+{
+ "tool": "OpenAI built-in image generator (source panels); Pillow/NumPy (assembly, tools/assemble_env_plates.py)",
+ "method": "assembled_from_native_source_panels: crop, uniform downscale (never up) and a seam crossfade; not a single generation",
+ "independent_plate": true,
+ "resolution": "assembled_native",
+ "status": "PRODUCTION_CANDIDATE_PENDING_OWNER_REVIEW",
+ "mosaic_dimensions": [
+  3750,
+  630
+ ],
+ "delivered_dimensions": [
+  3750,
+  630
+ ],
+ "final_crop_px": [
+  0,
+  0
+ ],
+ "components": [
+  {
+   "file": "reference/source_panels_v2/panels/street_left.png",
+   "sha256": "472a6a0175047dbe5e0e5731b3a9911d1b0a66cb038c7256a5ad26cfff01d48a",
+   "original_dimensions": [
+    1942,
+    809
+   ],
+   "scale": 0.85,
+   "scaled_dimensions": [
+    1651,
+    688
+   ],
+   "source_crop_px": [
+    0,
+    68,
+    1942,
+    809
+   ],
+   "top_rows_padded_transparent": 0,
+   "mosaic_x": 0,
+   "mosaic_width": 1651,
+   "seam_crossfade_px": 120,
+   "edits": {
+    "clean": 1
+   },
+   "trim_px": [
+    0,
+    0
+   ]
+  },
+  {
+   "file": "reference/source_panels_v2/panels/street_center.png",
+   "sha256": "03d5f9c1a6020cd604faf6058659664a89b19ad9d609ec27d27a48dfecea8efb",
+   "original_dimensions": [
+    2079,
+    756
+   ],
+   "scale": 0.85,
+   "scaled_dimensions": [
+    1767,
+    643
+   ],
+   "source_crop_px": [
+    588,
+    15,
+    1579,
+    756
+   ],
+   "top_rows_padded_transparent": 0,
+   "mosaic_x": 1531,
+   "mosaic_width": 842,
+   "seam_crossfade_px": 120,
+   "edits": {
+    "opaque": 1,
+    "feather": 0.3
+   },
+   "trim_px": [
+    500,
+    425
+   ]
+  },
+  {
+   "file": "reference/source_panels_v2/panels/street_right.png",
+   "sha256": "0b98061be9e3dd679444ec3271a2859c70ef288d568969494e083012a59d0351",
+   "original_dimensions": [
+    1983,
+    793
+   ],
+   "scale": 0.85,
+   "scaled_dimensions": [
+    1686,
+    674
+   ],
+   "source_crop_px": [
+    0,
+    52,
+    1761,
+    793
+   ],
+   "top_rows_padded_transparent": 0,
+   "mosaic_x": 2253,
+   "mosaic_width": 1497,
+   "seam_crossfade_px": 120,
+   "edits": {
+    "opaque": 1,
+    "feather": 0.3,
+    "burn": [
+     529,
+     139,
+     1051,
+     509,
+     0.55,
+     50
+    ]
+   },
+   "trim_px": [
+    0,
+    189
+   ]
+  }
+ ],
+ "source_manifest": "reference/source_panels_v2/manifest.json",
+ "notes": "uniform scale 0.8500 on every component; bottom-aligned",
+ "post_process": {
+  "floor_soften": {
+   "from_row": 300,
+   "gaussian_sigma_px": 10,
+   "why": "depth-of-field softening of the near ground so the touch-stick HUD zone stays calm"
+  }
+ }
+}
