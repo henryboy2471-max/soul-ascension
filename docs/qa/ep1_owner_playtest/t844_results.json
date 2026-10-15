@@ -1,0 +1,55 @@
+{
+ "tag": "t844",
+ "viewport": [
+  844,
+  390
+ ],
+ "mode": "touch",
+ "results": [
+  {
+   "n": "Clean build: no QA hook (window.__qa undefined)",
+   "c": true,
+   "d": ""
+  },
+  {
+   "n": "Fresh save written after onboarding",
+   "c": true,
+   "d": "gold 500 energy 60"
+  },
+  {
+   "n": "Reload keeps progress: step 1, energy untouched",
+   "c": true,
+   "d": "step 1 energy 60"
+  },
+  {
+   "n": "Episode 1 completed with real input (saved completion)",
+   "c": true,
+   "d": "elapsed 215 s"
+  },
+  {
+   "n": "First-clear rewards saved once: +250 gold, +120 XP (level 1 -> 2 with 20 XP left), energy 60 -> 54",
+   "c": true,
+   "d": "gold 750 level 2 xp 20 energy 54"
+  },
+  {
+   "n": "Codex has all 6 Episode 1 entries, no duplicates",
+   "c": true,
+   "d": "[\"mira\",\"board\",\"terminal\",\"mural\",\"breach\",\"enforcer\"]"
+  },
+  {
+   "n": "Resume state cleared after completion",
+   "c": true,
+   "d": "{\"flags\":{}}"
+  },
+  {
+   "n": "After reload: same save (gold 750, completed once)",
+   "c": true,
+   "d": "gold 750"
+  },
+  {
+   "n": "No console errors",
+   "c": true,
+   "d": "[]"
+  }
+ ]
+}

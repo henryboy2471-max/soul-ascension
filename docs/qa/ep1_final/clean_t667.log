@@ -1,0 +1,11 @@
+PASS: Clean build has no QA telemetry (window.__qa undefined)
+shot t667_0_first_screen
+shot t667_1_home_after_onboarding
+shot t667_1b_home_modal_closed
+shot t667_2_settings
+shot t667_3_after_reload_home
+shot t667_4_mission_screen
+shot t667_5_title_card_or_intro
+shot t667_6_explore
+shot t667_7_explore_walked
+PASS: No console errors  ([])

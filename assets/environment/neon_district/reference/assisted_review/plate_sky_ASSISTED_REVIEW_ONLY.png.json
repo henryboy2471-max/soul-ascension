@@ -1,0 +1,25 @@
+{
+  "asset": "plate_sky.png",
+  "status": "ASSISTED_REVIEW_ONLY_NOT_PRODUCTION",
+  "independent_plate": false,
+  "source_tool": "OpenAI image generator",
+  "source_file": "a_wide_cinematic_ultra_detailed_sci_fi_fantasy_s.png",
+  "source_dimensions": [
+    2129,
+    739
+  ],
+  "source_sha256": "917db96e79d5b39257a956859fe98f2f25a812146915c1b35763438654d4d665",
+  "working_output": "plate_sky_ASSISTED_REVIEW_ONLY.png",
+  "target_dimensions": [
+    2250,
+    780
+  ],
+  "output_dimensions": [
+    2250,
+    780
+  ],
+  "output_mode": "RGB",
+  "output_sha256": "36e1ad2ceb90afd9eec716561fd2337e73a44a09733b4e6bf98f0632186a2921",
+  "processing": "uniform assisted upscale 1.0568x, cropped by (0, 1) pixels total; not native generation",
+  "notes": "Generated design is approved visually; this file is a scaled layout candidate, not native production art. Do not promote, validate as independent original, or integrate without separate owner approval and project policy decision."
+}

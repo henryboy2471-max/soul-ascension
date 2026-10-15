@@ -11,6 +11,8 @@ var seen_ids:Array=[]
 func log(line:String) -> void:
  events.append(line)
 func texts(node:Node, out:Array) -> void:
+ if node is CanvasLayer:
+  return   # the global preview-build notice lives on its own layer; the locked golden traces cover story/UI text only
  if node is Label or node is Button or node is CheckButton:
   if node.visible and str(node.text)!="":
    out.append(str(node.text))
@@ -155,6 +157,15 @@ func run(root:Window, main) -> Array:
  await tree.create_timer(0.3).timeout
  snapshot("result-first-clear",main)
  events.append("REWARD gold=%d xp=%d level=%d completed=%s codex=%s energy=%d" % [int(profile.data.gold),int(profile.data.xp),int(profile.data.level),str(profile.data.completed),str(profile.data.codex),int(profile.data.energy)])
+ # NEXT EPISODE on the rewards screen plays the teaser card, then returns home (Episode 2 is not started)
+ for b in main.screen.find_children("*","Button",true,false):
+  if b.text=="NEXT EPISODE": b.pressed.emit()
+ await tree.process_frame
+ await tree.process_frame
+ events.append("TEASER scene=%s" % main.scene_name)
+ if main.scene_name=="teaser": main.screen.get_child(0).finish()
+ await tree.create_timer(0.8).timeout
+ events.append("AFTER-TEASER scene=%s" % main.scene_name)
  main.show_home()
  await tree.process_frame
  snapshot("home-cleared",main)

@@ -1,0 +1,12 @@
+{
+ "status": "CANDIDATE_REFERENCE_NOT_PRODUCTION",
+ "not_a_production_plate": true,
+ "role": "distant skyline candidate for plate_far; wrong size and aspect for production",
+ "origin": "ChatGPT image generation, supplied by the owner",
+ "file_as_received_by_this_session": "WebP, 1979x795 RGBA (with ICC profile), 448386 bytes",
+ "sha256": "972670e2bbbb8aaacbe9c012c5b89559297e44433d46d500761af9412fa2a5ee",
+ "modified": false,
+ "enlarged": false,
+ "production_target": "plate_far.png, native 2550x720 RGBA, transparent background (this file is 571 px too narrow, and its aspect is 2.49:1 against the required 3.54:1)",
+ "measured": {"alpha_transparent_share": 0.47, "alpha_ge_250_share_of_visible_pixels": 0.857, "soft_edge_share": 0.14, "content_bbox": [0, 102, 1978, 779], "left_edge_mean_alpha": 46.5, "right_edge_mean_alpha": 57.8, "bottom_edge_alpha": 0, "blue_violet_share": 0.97, "magenta": 0.01, "gold": 0.0, "mean_luminance_of_visible_pixels": 0.351}
+}

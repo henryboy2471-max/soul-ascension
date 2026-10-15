@@ -1,0 +1,65 @@
+{
+ "tag": "t667",
+ "viewport": [
+  667,
+  375
+ ],
+ "mode": "touch",
+ "results": [
+  {
+   "n": "Episode 1 reaches exploration",
+   "c": true,
+   "d": "boot 3.2 s"
+  },
+  {
+   "n": "Camera tracks the Hero while walking (cam moved)",
+   "c": true,
+   "d": "0 -> 292"
+  },
+  {
+   "n": "Parallax layer positions are whole pixels",
+   "c": true,
+   "d": "26 samples"
+  },
+  {
+   "n": "Camera never reverses while walking one way",
+   "c": true,
+   "d": "reversals 0"
+  },
+  {
+   "n": "Hero passes Mira without walking through her (eased around)",
+   "c": true,
+   "d": "px 421 -> 1170"
+  },
+  {
+   "n": "Mira dialogue opens and locks movement",
+   "c": true,
+   "d": "MIRA VEY: There you are. Keep your head down, the "
+  },
+  {
+   "n": "Dialogue closes and the relay objective unlocks",
+   "c": true,
+   "d": "step 1"
+  },
+  {
+   "n": "Relay hold-to-channel completes and advances to the breach",
+   "c": true,
+   "d": "step 2"
+  },
+  {
+   "n": "Breach prompt appears at the breach",
+   "c": true,
+   "d": "spot breach"
+  },
+  {
+   "n": "Breach entry starts the Soul Realm battle",
+   "c": true,
+   "d": "scene battle"
+  },
+  {
+   "n": "No console errors",
+   "c": true,
+   "d": "[]"
+  }
+ ]
+}

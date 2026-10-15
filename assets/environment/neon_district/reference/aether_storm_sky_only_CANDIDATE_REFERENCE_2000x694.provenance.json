@@ -1,0 +1,12 @@
+{
+ "status": "CANDIDATE_REFERENCE_NOT_PRODUCTION",
+ "not_a_production_plate": true,
+ "role": "sky-only candidate for plate_sky (no skyline); too small for the production size",
+ "origin": "ChatGPT image generation, supplied by the owner",
+ "file_as_received_by_this_session": "WebP, 2000x694 RGB, 339920 bytes",
+ "sha256": "1608009b99651415791c279140bee2ebfefb736c505b728fac82cfaf2be2aa76",
+ "modified": false,
+ "enlarged": false,
+ "production_target": "plate_sky.png, native 2250x780 opaque (this file is 250 px / 11% too narrow and 86 px too short; an enlargement would not be native)",
+ "measured": {"blue_violet_share": 0.99, "magenta": 0.0, "gold": 0.0, "mean_luminance": 0.274, "aspect": 2.882, "target_aspect": 2.885, "hud_objective_zone_mean": 0.15, "hud_exit_zone_mean": 0.20, "hud_exit_zone_detail": 0.082}
+}

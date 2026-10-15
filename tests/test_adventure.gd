@@ -46,6 +46,7 @@ func run() -> void:
  root.add_child(main)
  await process_frame
  main.close_modal()
+ check(main.temp_notice!=null and "TEMPORARY" in main.temp_notice.text and "NOT ECHO V2" in main.temp_notice.text and main.temp_notice.get_parent() is CanvasLayer,"Every screen carries the temporary-art notice (not Echo V2 production art)")
  var energy_before=int(profile.data.energy)
  var gold_before=int(profile.data.gold)
  main.start_episode()
@@ -99,7 +100,7 @@ func run() -> void:
  ex.act_button.held=false
  check(ep.busy and t>1.0 and t<3.0,"Terminal needs a sustained hold (not an instant tap)")
  await skip_scenes(ep,func(): return not ep.busy)
- check(ep.step==2 and ex.props.breach_open and ex.enabled.breach,"Terminal reboot opens the Soul Realm breach")
+ check(ep.step==2 and ex.props.breach_open and ex.enabled.breach and not ex.enabled.terminal,"Terminal reboot opens the Soul Realm breach and retires the relay prompt")
  # Not enough energy: stays in the world, no battle
  await create_timer(0.55).timeout
  profile.data.energy=0
@@ -135,7 +136,7 @@ func run() -> void:
  check(main.scene_name=="ending","Winning the boss fight plays the ending scene")
  var ending=main.screen.get_child(0)
  await skip_scenes(ending,func(): return main.scene_name=="result",900)
- check(main.scene_name=="result" and profile.active_run=="","Ending and next-episode teaser lead to rewards")
+ check(main.scene_name=="result" and profile.active_run=="","Ending leads to rewards (the teaser follows from NEXT EPISODE)")
  check(profile.data.completed.has("1-1") and int(profile.data.gold)==gold_before+250,"First clear rewards are granted once")
  # Exit confirmation in the world
  main.start_episode()

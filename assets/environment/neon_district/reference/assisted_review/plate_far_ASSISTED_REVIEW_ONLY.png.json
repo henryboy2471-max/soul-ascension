@@ -1,0 +1,25 @@
+{
+  "asset": "plate_far.png",
+  "status": "ASSISTED_REVIEW_ONLY_NOT_PRODUCTION",
+  "independent_plate": false,
+  "source_tool": "OpenAI image generator",
+  "source_file": "a_wide_cinematic_futuristic_sci_fi_cityscape_bac.png",
+  "source_dimensions": [
+    1983,
+    793
+  ],
+  "source_sha256": "69bab9e700e1d2b6ec3785038059e46a254d39befe0fe6687c0a0225c418d14e",
+  "working_output": "plate_far_ASSISTED_REVIEW_ONLY.png",
+  "target_dimensions": [
+    2550,
+    720
+  ],
+  "output_dimensions": [
+    2550,
+    720
+  ],
+  "output_mode": "RGBA",
+  "output_sha256": "9213613adc60621718e7404cdfa725825b83d4cf5de6520a1651effb0b94cecb",
+  "processing": "uniform downscale 0.9079x; centered with 375px transparent gutters on left/right; NOT edge-coverage compliant",
+  "notes": "Generated design is approved visually; this file is a scaled layout candidate, not native production art. Do not promote, validate as independent original, or integrate without separate owner approval and project policy decision."
+}

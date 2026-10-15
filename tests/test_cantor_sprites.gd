@@ -153,6 +153,15 @@ func run() -> void:
  var cantor_h=cantor.sprite.scale.y*cantor.sprite_frames.get_frame_texture("idle",0).get_size().y*cantor.scale.y
  check(cantor_h>hero_h*1.35 and cantor_h<hero_h*1.9,"Boss scale: the Cantor stands %.2fx the Hero" % (cantor_h/hero_h))
  check(ResourceLoader.load_threaded_get_status("res://assets/enemies/hollow_cantor/phase2/frames.tres")!=ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,"Phase 2 art is requested during the Cantor intro, so the transformation does not stall on a synchronous load")
+ battle.combo=5
+ battle.combo_timer=3.0
+ battle.intro_card.modulate.a=1.0
+ await process_frame
+ var hidden_during_card=battle.combo_label.text==""
+ battle.intro_card.modulate.a=0.0
+ battle.intro_sub.modulate.a=0.0
+ await process_frame
+ check(hidden_during_card and battle.combo_label.text=="5 HIT","The combo text yields to an intro card/banner and returns afterwards (counter unaffected)")
  # Phase 2 swap keeps health and position, same node
  var node=cantor
  var hp_before=0.49*node.max_health

@@ -1,0 +1,20 @@
+{
+  "status": "REFERENCE_ONLY_NOT_PRODUCTION",
+  "asset_role": "plate_far visual direction candidate",
+  "tool": "OpenAI built-in image generation",
+  "method": "independent transparent skyline generation using the approved sky as style reference only",
+  "independent_plate": true,
+  "source": "ChatGPT Work generated image exec-22757971-5fcd-46cc-9e09-78800bd9d7b5.png",
+  "source_sha256": "e570b1c26b275329374998fbf7bff821d84c6d5becb07ca6ab4a0d769a4968b6",
+  "source_style_reference": "aether_storm_sky_ORIGINAL_2129x739_REFERENCE_ONLY.png",
+  "original_dimensions": [
+    1979,
+    795
+  ],
+  "required_delivery_dimensions": [
+    2550,
+    720
+  ],
+  "resolution": "native_source_under_target",
+  "note": "571 px too narrow. May not be enlarged or relabelled as a production plate. The generator did not deliver the required native-width source. Do not copy into ../plate_far.png or integrate into gameplay."
+}

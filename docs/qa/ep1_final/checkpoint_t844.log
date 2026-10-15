@@ -1,0 +1,23 @@
+PASS: Episode 1 reaches exploration  (boot 3.1 s)
+shot t844_1_explore_start
+layer samples [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-17,-56,-93,-134,-173,-214,-254]
+PASS: Camera tracks the Hero while walking (cam moved)  (0 -> 254)
+PASS: Parallax layer positions are whole pixels  (26 samples)
+PASS: Camera never reverses while walking one way  (reversals 0)
+shot t844_2_mira_collision_or_pass
+PASS: Hero passes Mira without walking through her (eased around)  (px 398 -> 1110)
+shot t844_3_npc_dialogue
+PASS: Mira dialogue opens and locks movement  (MIRA VEY: There you are. Keep your head down, the )
+shot t844_3b_hero_line
+PASS: Dialogue closes and the relay objective unlocks  (step 1)
+shot t844_4_relay_prompt
+shot t844_5_relay_channel
+PASS: Relay hold-to-channel completes and advances to the breach  (step 2)
+shot t844_6_relay_done
+shot t844_7_breach_prompt
+PASS: Breach prompt appears at the breach  (spot breach)
+shot t844_8_breach_entry
+shot t844_9_battle_start
+PASS: Breach entry starts the Soul Realm battle  (scene battle)
+PASS: No console errors  ([])
+SUMMARY t844 11/11

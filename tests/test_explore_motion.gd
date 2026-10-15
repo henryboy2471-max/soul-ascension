@@ -20,8 +20,16 @@ func run() -> void:
  var ex=load("res://scripts/world/explore.gd").new()
  root.add_child(ex)
  await process_frame
+ # pedestrians' feet line on the approved Neon District plates: 22 px below the old 516, below the tram girder deck; the Hero and Mira are not moved
+ ex.update_positions(1.0)
+ var walk_ok=ex.walkers.size()>0
+ for w in ex.walkers:
+  if absf(w.node.position.y-538.0)>0.01: walk_ok=false
+ check(walk_ok and is_equal_approx(ex.walker_y,538.0),"Ambient pedestrians stand at y 538 (22 px below the tram girder deck line)")
+ check(is_equal_approx(ex.player.position.y,ex.py+ex.lift) and is_equal_approx(ex.npc.position.y,548.0+ex.lift),"Hero and Mira lanes are unchanged")
  ex.locked=false
  ex.px=500.0
+ ex.py=585.0   # front lane: these motion checks walk past Mira's x (she is solid on her own lane, see the NPC checks below)
  ex.vel=Vector2.ZERO
  # ramp-up: not an instant snap, but at full speed within ~0.15 s
  ex.advance_motion(Vector2(1,0),1.0/60.0)
@@ -69,5 +77,69 @@ func run() -> void:
  for i in range(60):
   ex.advance_motion(Vector2(0,1),1.0/60.0)
  check(ex.py<=585.0 and ex.py>=515.0,"Depth lane stays inside its band")
+ # NPC collision: the Hero cannot walk through Mira along her depth lane, can pass in front of her, and can walk out if placed inside
+ ex.vel=Vector2.ZERO
+ ex.px=ex.npc_x-120.0
+ ex.py=548.0
+ var entered=false
+ var held_back=false
+ for i in range(120):
+  ex.advance_motion(Vector2(1,0),1.0/60.0)
+  entered=entered or ex.blocked(ex.px,ex.py)
+  held_back=held_back or (ex.px>ex.npc_x-ex.NPC_HALF_W-4.0 and ex.px<=ex.npc_x-ex.NPC_HALF_W+0.01)
+ check(not entered and held_back,"NPC is solid: the Hero reaches her edge and never enters her footprint")
+ for i in range(120):
+  ex.advance_motion(Vector2(1,0),1.0/60.0)
+ check(ex.px>ex.npc_x+ex.NPC_HALF_W,"Holding right against the NPC eases the Hero around her without a vertical key (px %.0f, py %.0f)" % [ex.px,ex.py])
+ ex.vel=Vector2.ZERO
+ ex.px=ex.npc_x-120.0
+ ex.py=585.0
+ for i in range(120):
+  ex.advance_motion(Vector2(1,0),1.0/60.0)
+ check(ex.px>ex.npc_x+ex.NPC_HALF_W,"Hero can walk past the NPC in the front lane (px %.0f)" % ex.px)
+ ex.vel=Vector2.ZERO
+ ex.px=ex.npc_x+5.0
+ ex.py=548.0
+ for i in range(60):
+  ex.advance_motion(Vector2(1,0),1.0/60.0)
+ check(ex.px>ex.npc_x+ex.NPC_HALF_W,"Hero placed inside the NPC footprint can still walk out (px %.0f)" % ex.px)
+ ex.px=ex.npc_x-100.0
+ ex.py=585.0
+ ex.enabled.mira=true
+ ex.player.facing=-1
+ ex.act_edge=true
+ ex.act_block=0.0
+ ex.locked=false
+ await process_frame
+ await process_frame
+ check(ex.player.facing==1,"Hero turns toward the NPC when starting a conversation")
+ # camera: rendered positions are whole pixels, never reverse while walking one way, and respect both world boundaries (variable frame times)
+ ex.locked=false
+ ex.px=300.0
+ ex.py=585.0
+ ex.vel=Vector2.ZERO
+ ex.lead=0.0
+ ex.update_positions(1.0)
+ var dts=[1.0/30.0,1.0/144.0,1.0/60.0,1.0/90.0,1.0/60.0]
+ var last_x=ex.layers[4].position.x
+ var whole=true
+ var reversals=0
+ for i in range(400):
+  var dt=dts[i%dts.size()]
+  ex.advance_motion(Vector2(1,0),dt)
+  ex.update_positions(1.0-exp(-dt*9.0))
+  var lx=ex.layers[4].position.x
+  whole=whole and lx==roundf(lx) and ex.props.position.x==roundf(ex.props.position.x) and ex.player.position.x==roundf(ex.player.position.x)
+  if lx>last_x+0.01:
+   reversals+=1
+  last_x=lx
+ check(whole,"Camera/parallax/sprite positions are whole pixels (no shimmer)")
+ check(reversals==0,"Camera never reverses or stutters back while walking one way (variable frame times)")
+ check(ex.cam>=0.0 and ex.cam<=ex.world_w-1280.0,"Camera stays inside the world boundaries at the far end (cam %.0f)" % ex.cam)
+ ex.px=80.0
+ for i in range(120):
+  ex.advance_motion(Vector2(-1,0),1.0/60.0)
+  ex.update_positions(1.0-exp(-9.0/60.0))
+ check(ex.cam>=0.0 and ex.layers[4].position.x<=0.0,"Camera stops at the start boundary (cam %.1f)" % ex.cam)
  print("RESULT: %d passed / %d failed" % [passed,failed])
  quit(1 if failed>0 else 0)

@@ -1,0 +1,428 @@
+{
+ "branch": "chatgpt/approved-anime-art-integration",
+ "revision": 5,
+ "spec": "docs/demo25d/phase2/PRODUCTION_ASSET_MANIFEST.md",
+ "frame_canvas": [
+  576,
+  1152
+ ],
+ "anchor": {
+  "x": 288,
+  "baseline_y": 1088
+ },
+ "views": [
+  "front",
+  "right",
+  "back",
+  "left"
+ ],
+ "mirror_allowed": false,
+ "walk_frames_per_view": 6,
+ "idle_frames_per_view": 2,
+ "next_deliverable": "echo (hero) native turnaround hero_turnaround_{front,right,back,left}_native.png 1152x2304 + face and costume detail sheets - no rigging until G2 approval",
+ "assets": [
+  {
+   "id": "hero_turnaround_clean_4view",
+   "path": "source/hero/hero_turnaround_{front,right,back,left}_native.png",
+   "size": "1152x2304+",
+   "status": "MISSING",
+   "priority": 1,
+   "note": "native resolution, clean matte, based on the approved candidate; owner approval before rigging; status stays MISSING"
+  },
+  {
+   "id": "hero_rig_parts_4view",
+   "path": "source/hero_parts/",
+   "size": "per part",
+   "status": "MISSING",
+   "priority": 2,
+   "note": "layered skeletal-style parts; starts only after turnaround approval"
+  },
+  {
+   "id": "hero_front_idle",
+   "path": "assets/approved_anime/characters/hero/frames/front_idle_00..01.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 2 frames"
+  },
+  {
+   "id": "hero_front_walk",
+   "path": "assets/approved_anime/characters/hero/frames/front_walk_00..05.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 6 frames"
+  },
+  {
+   "id": "hero_right_idle",
+   "path": "assets/approved_anime/characters/hero/frames/right_idle_00..01.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 2 frames"
+  },
+  {
+   "id": "hero_right_walk",
+   "path": "assets/approved_anime/characters/hero/frames/right_walk_00..05.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 6 frames"
+  },
+  {
+   "id": "hero_back_idle",
+   "path": "assets/approved_anime/characters/hero/frames/back_idle_00..01.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 2 frames"
+  },
+  {
+   "id": "hero_back_walk",
+   "path": "assets/approved_anime/characters/hero/frames/back_walk_00..05.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 6 frames"
+  },
+  {
+   "id": "hero_left_idle",
+   "path": "assets/approved_anime/characters/hero/frames/left_idle_00..01.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 2 frames"
+  },
+  {
+   "id": "hero_left_walk",
+   "path": "assets/approved_anime/characters/hero/frames/left_walk_00..05.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 6 frames"
+  },
+  {
+   "id": "hero_portrait",
+   "path": "assets/approved_anime/characters/hero/portrait.png",
+   "size": "1024x1024",
+   "status": "MISSING",
+   "priority": 4,
+   "note": "transparent"
+  },
+  {
+   "id": "hero_expressions",
+   "path": "assets/approved_anime/characters/hero/portrait_<expression>.png",
+   "size": "1024x1024 x5",
+   "status": "MISSING",
+   "priority": 4,
+   "note": ""
+  },
+  {
+   "id": "hero_manifest",
+   "path": "assets/approved_anime/characters/hero/manifest.json + anchor.json",
+   "size": "json",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "canvas [576,1152], anchor_x 288, baseline_y 1088, height_px 1000"
+  },
+  {
+   "id": "imani_turnaround_clean_4view",
+   "path": "source/imani_turnaround_{front,right,back,left}.png",
+   "size": "1152x2304+",
+   "status": "MISSING",
+   "priority": 3,
+   "note": "flat #00FF00 key background; strictly from reference 04; needs owner approval before rigging"
+  },
+  {
+   "id": "imani_rig_parts_4view",
+   "path": "source/imani_parts/",
+   "size": "per part",
+   "status": "MISSING",
+   "priority": 4,
+   "note": "layered skeletal-style parts; starts only after turnaround approval"
+  },
+  {
+   "id": "imani_front_idle",
+   "path": "assets/approved_anime/characters/imani/frames/front_idle_00..01.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 2 frames"
+  },
+  {
+   "id": "imani_front_walk",
+   "path": "assets/approved_anime/characters/imani/frames/front_walk_00..05.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 6 frames"
+  },
+  {
+   "id": "imani_right_idle",
+   "path": "assets/approved_anime/characters/imani/frames/right_idle_00..01.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 2 frames"
+  },
+  {
+   "id": "imani_right_walk",
+   "path": "assets/approved_anime/characters/imani/frames/right_walk_00..05.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 6 frames"
+  },
+  {
+   "id": "imani_back_idle",
+   "path": "assets/approved_anime/characters/imani/frames/back_idle_00..01.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 2 frames"
+  },
+  {
+   "id": "imani_back_walk",
+   "path": "assets/approved_anime/characters/imani/frames/back_walk_00..05.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 6 frames"
+  },
+  {
+   "id": "imani_left_idle",
+   "path": "assets/approved_anime/characters/imani/frames/left_idle_00..01.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 2 frames"
+  },
+  {
+   "id": "imani_left_walk",
+   "path": "assets/approved_anime/characters/imani/frames/left_walk_00..05.png",
+   "size": "576x1152",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "exactly 6 frames"
+  },
+  {
+   "id": "imani_portrait",
+   "path": "assets/approved_anime/characters/imani/portrait.png",
+   "size": "1024x1024",
+   "status": "MISSING",
+   "priority": 4,
+   "note": "transparent"
+  },
+  {
+   "id": "imani_expressions",
+   "path": "assets/approved_anime/characters/imani/portrait_<expression>.png",
+   "size": "1024x1024 x5",
+   "status": "MISSING",
+   "priority": 4,
+   "note": ""
+  },
+  {
+   "id": "imani_manifest",
+   "path": "assets/approved_anime/characters/imani/manifest.json + anchor.json",
+   "size": "json",
+   "status": "MISSING",
+   "priority": 5,
+   "note": "canvas [576,1152], anchor_x 288, baseline_y 1088, height_px 940"
+  },
+  {
+   "id": "npc_a1_tram_technician",
+   "path": "assets/approved_anime/characters/npc_a1_tram_technician/",
+   "size": "576x1152 frames, 4 views",
+   "status": "MISSING",
+   "priority": 6,
+   "note": "tier A; owner names TBD; not validated by current tool"
+  },
+  {
+   "id": "npc_a2_courier",
+   "path": "assets/approved_anime/characters/npc_a2_courier/",
+   "size": "576x1152 frames, 4 views",
+   "status": "MISSING",
+   "priority": 6,
+   "note": "tier A; owner names TBD; not validated by current tool"
+  },
+  {
+   "id": "npc_a3_grey_hoodie",
+   "path": "assets/approved_anime/characters/npc_a3_grey_hoodie/",
+   "size": "576x1152 frames, 4 views",
+   "status": "MISSING",
+   "priority": 6,
+   "note": "tier A; owner names TBD; not validated by current tool"
+  },
+  {
+   "id": "npc_b01_b10",
+   "path": "assets/approved_anime/characters/npc_b*/",
+   "size": "TBD",
+   "status": "MISSING",
+   "priority": 6,
+   "note": "tier B crowd"
+  },
+  {
+   "id": "env_sky",
+   "path": "assets/approved_anime/environments/neon_district/sky.png",
+   "size": "2560x1440",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_far_skyline",
+   "path": "assets/approved_anime/environments/neon_district/far_skyline.png",
+   "size": "4640x900",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_mid_buildings_0",
+   "path": "assets/approved_anime/environments/neon_district/mid_buildings_0.png",
+   "size": "3200x784",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_mid_buildings_1",
+   "path": "assets/approved_anime/environments/neon_district/mid_buildings_1.png",
+   "size": "3200x784",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_mid_buildings_2",
+   "path": "assets/approved_anime/environments/neon_district/mid_buildings_2.png",
+   "size": "3200x784",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_street_floor_0",
+   "path": "assets/approved_anime/environments/neon_district/street_floor_0.png",
+   "size": "3200x720",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_street_floor_1",
+   "path": "assets/approved_anime/environments/neon_district/street_floor_1.png",
+   "size": "3200x720",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_street_floor_2",
+   "path": "assets/approved_anime/environments/neon_district/street_floor_2.png",
+   "size": "3200x720",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_foreground_0",
+   "path": "assets/approved_anime/environments/neon_district/foreground_0.png",
+   "size": "3200x1440",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_foreground_1",
+   "path": "assets/approved_anime/environments/neon_district/foreground_1.png",
+   "size": "3200x1440",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_foreground_2",
+   "path": "assets/approved_anime/environments/neon_district/foreground_2.png",
+   "size": "3200x1440",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_foreground_3",
+   "path": "assets/approved_anime/environments/neon_district/foreground_3.png",
+   "size": "3200x1440",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_reflection_plate_0_2",
+   "path": "assets/approved_anime/environments/neon_district/reflection_plate_0..2.png",
+   "size": "3200x400 x3 (optional)",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_props_x",
+   "path": "assets/approved_anime/environments/neon_district/props/*.png",
+   "size": "per prop",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_occluders_x",
+   "path": "assets/approved_anime/environments/neon_district/occluders/*.png",
+   "size": "per prop",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_light_masks_x",
+   "path": "assets/approved_anime/environments/neon_district/light_masks/*.png",
+   "size": "per mask",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "env_collision_mask",
+   "path": "assets/approved_anime/environments/neon_district/collision_mask.png",
+   "size": "4800x264",
+   "status": "MISSING",
+   "priority": 5,
+   "note": ""
+  },
+  {
+   "id": "cast_portrait_c1_c4",
+   "path": "reference/02_cast_portrait_montage_2x2.png",
+   "size": "n/a",
+   "status": "UNASSIGNED",
+   "priority": 99,
+   "note": "identities not approved; do not produce"
+  },
+  {
+   "id": "hero_detail_sheets",
+   "path": "source/hero/hero_{face,costume}_detail_sheet.png",
+   "size": "2048+",
+   "status": "MISSING",
+   "priority": 1,
+   "note": "identity lock"
+  }
+ ],
+ "hero_design": "FINAL: Echo V2 - assets/approved_anime/review/echo_v2_review/ (REVIEW ONLY, not native). SUPERSEDED FOR ECHO: reference 01, hero_reference_pack_v2, hero_turnaround_candidate, white-twist Echo art. See docs/demo25d/phase2/ECHO_V2_DESIGN_AUTHORITY.md. Folder/id 'hero' = Echo V2 alias.",
+ "superseded_for_echo": [
+  "assets/echo_key_art.png",
+  "assets/characters/hero/",
+  "assets/_incoming/hero/",
+  "assets/approved_anime/reference/01_main_hero_turnaround_portrait.png",
+  "assets/approved_anime/reference/hero_reference_pack_v2/",
+  "assets/approved_anime/preview/hero_turnaround_candidate/",
+  "hero panel of assets/approved_anime/reference/03_overview_mockup_hero_npc_environment_with_hud.png"
+ ],
+ "front_view_readiness": "round-2 front (530x887) is REFERENCE ONLY: 2.31x short of native, clipped hem, soft edges, eye colour; see ECHO_V2_FRONT_PRODUCTION_READINESS_REPORT.md"
+}

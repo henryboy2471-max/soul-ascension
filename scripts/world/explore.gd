@@ -9,6 +9,8 @@ const ACCEL = 2600.0
 const DECEL = 3600.0
 const LOOK_AHEAD = 70.0
 const CHANNEL_SECONDS = 1.4
+const NPC_HALF_W = 36.0   # solid footprint around the NPC (x half-width, depth half-height); the Hero walks around, not through
+const NPC_HALF_D = 20.0
 var cam=0.0
 var vel=Vector2.ZERO
 var lead=0.0
@@ -20,6 +22,7 @@ var npc:Fighter
 var layers:Array=[]
 var props:WorldArt
 var fore:WorldArt
+var foreground_plate:NeonDistrictArt
 var stick:VirtualStick
 var act_button:TouchAction
 var hud_node:Hud
@@ -34,6 +37,8 @@ var gate_locked=false
 var objective_targets:Array=[]
 var counter_done=0
 var counter_total=0
+var obstacles:Array=[]
+var hud_dirty=true
 var spots=[
  {"id":"mira","x":560.0,"label":"TALK  /  MIRA VEY","kind":"talk","range":130.0},
  {"id":"board","x":1050.0,"label":"READ  /  TRAM BOARD","kind":"talk","range":110.0},
@@ -64,6 +69,7 @@ var obj_panel:Panel
 var flash_rect:ColorRect
 var time=0.0
 var lift=0.0
+var walker_y=516.0   # feet line of the ambient pedestrians (not the Hero or Mira)
 var floor_fill:ColorRect
 var hud_nodes:Array=[]
 var extra_npcs:Array=[]
@@ -75,10 +81,17 @@ func _ready() -> void:
  px=float(config.get("start_px",px))
  npc_x=float(config.get("npc_x",npc_x))
  gate_x=float(config.get("gate_x",gate_x))
+ obstacles=config.get("obstacles",[{"x":npc_x,"y":548.0,"hw":NPC_HALF_W,"hd":NPC_HALF_D}])
+ var wall=blocker(px,py)
+ if not wall.is_empty():
+  # a saved position that lands inside the NPC (resume) is moved to the side the Hero was on
+  px=float(wall.x)+(1.0 if px>=float(wall.x) else -1.0)*(float(wall.hw)+4.0)
  if config.has("spots"):
   spots=config.spots
   enabled=config.enabled
- var art_script=config.get("art",WorldArt)
+ var art_script=config.get("art",NeonDistrictArt)
+ if art_script == NeonDistrictArt:
+  walker_y=538.0   # approved plates: the tram girder deck sits at y 497-520, so the pedestrians stand 22 px lower, on the street below it
  floor_fill=ColorRect.new()
  floor_fill.color=Color(0.02,0.025,0.06)
  floor_fill.position=Vector2(0,560)
@@ -159,6 +172,10 @@ func _ready() -> void:
  player.scale=Vector2(1.2,1.2)
  player.load_sprite_set("res://assets/characters/hero/frames.tres",170.0,Color("4aa3ff"))
  add_child(player)
+ if art_script == NeonDistrictArt:
+  foreground_plate=NeonDistrictArt.new()
+  foreground_plate.kind="foreground"
+  add_child(foreground_plate)
  fore=art_script.new()
  fore.kind="fore"
  add_child(fore)
@@ -269,6 +286,13 @@ func request_exit() -> void:
 func _unhandled_key_input(event:InputEvent) -> void:
  if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode in [KEY_E,KEY_ENTER,KEY_KP_ENTER] and act_block<=0.0:
   act_edge=true
+func blocker(x:float, y:float) -> Dictionary:
+ for o in obstacles:
+  if absf(x-float(o.x))<float(o.hw) and absf(y-float(o.y))<float(o.hd):
+   return o
+ return {}
+func blocked(x:float, y:float) -> bool:
+ return not blocker(x,y).is_empty()
 func move_input() -> Vector2:
  var move=stick.direction
  if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT): move.x-=1
@@ -279,19 +303,20 @@ func move_input() -> Vector2:
 func update_positions(blend:float) -> void:
  var goal=clampf(px-640.0+(lead if blend<1.0 else 0.0),0.0,world_w-1280.0)
  cam=goal if blend>=1.0 else lerpf(cam,goal,blend)
+ # `cam` stays a smooth float; everything on screen is placed from its whole-pixel value so parallax layers and sprites never shimmer between sub-pixel positions.
+ var view=roundf(cam)
  for layer in layers:
-  layer.position.x=-cam*layer.get_meta("factor")
- props.position.x=-cam
+  layer.position=Vector2(roundf(-view*layer.get_meta("factor")),lift)
+ props.position=Vector2(-view,lift)
+ if foreground_plate != null:
+  foreground_plate.position=Vector2(roundf(-view*1.2),lift)
  # While a conversation is open the whole street lifts so the dialogue box never covers characters.
- for layer in layers:
-  layer.position.y=lift
- props.position.y=lift
- npc.position=Vector2(npc_x-cam,548.0+lift)
+ npc.position=Vector2(roundf(npc_x)-view,548.0+lift)
  for e in extra_npcs:
-  e.node.position=Vector2(e.x-cam,548.0+lift)
+  e.node.position=Vector2(roundf(e.x)-view,548.0+lift)
  for w in walkers:
-  w.node.position=Vector2(w.x-cam,516.0+lift)
- player.position=Vector2(px-cam,py+lift)
+  w.node.position=Vector2(roundf(w.x)-view,walker_y+lift)
+ player.position=Vector2(roundf(px)-view,py+lift)
 func _process(delta:float) -> void:
  time+=delta
  act_block=maxf(0.0,act_block-delta)
@@ -316,10 +341,10 @@ func _process(delta:float) -> void:
   player.facing=1 if move.x>0 else -1
  player.moving=vel.length()>25.0
  if player.moving:
-  step_timer-=delta
+  step_timer-=delta*clampf(vel.length()/190.0,0.55,1.3)
   if step_timer<=0:
-   Sound.play("step")
-   step_timer=0.28
+   Sound.footstep("wet",clampf(vel.length()/230.0,0.5,1.0))
+   step_timer=0.30
  if companion:
   # the companion trails the player at a short distance on the side the player came from, easing so it never snaps
   var want=px-float(player.facing)*90.0
@@ -332,8 +357,8 @@ func _process(delta:float) -> void:
   e.node.facing=1 if px>e.x else -1
  lift=lerpf(lift,-125.0 if locked else 0.0,1.0-exp(-delta*8.0))
  # touch controls step aside while a conversation is open, so nothing sits on top of the dialogue box
- for node in [stick,act_button,move_hint,act_hint]:
-  node.visible=not locked
+ for node in [stick,act_button,move_hint,act_hint,exit_button]:
+  node.visible=not locked   # EXIT also steps aside: the dialogue box has its own SKIP button in the same corner
  update_positions(1.0-exp(-delta*9.0))
  # nearest enabled interaction spot
  active_spot={}
@@ -354,6 +379,7 @@ func _process(delta:float) -> void:
   if active_spot.kind=="talk":
    if act_edge:
     act_edge=false
+    player.facing=1 if active_spot.x>=px else -1   # turn toward whoever/whatever is being used
     interact.emit(active_spot.id)
   else:
    var held=Input.is_physical_key_pressed(KEY_E) or Input.is_physical_key_pressed(KEY_ENTER) or act_button.held
@@ -362,6 +388,7 @@ func _process(delta:float) -> void:
     if channel_t>=1.0:
      channel_t=0.0
      act_edge=false
+     player.facing=1 if active_spot.x>=px else -1
      interact.emit(active_spot.id)
    else:
     channel_t=maxf(0.0,channel_t-delta*2.0)
@@ -376,7 +403,11 @@ func _process(delta:float) -> void:
   dist_label.text=str(int(absf(px-target_x)/12.0))+" M"
  else:
   dist_label.text=""
- hud_node.queue_redraw()
+ # the HUD overlay only needs repainting while it has something to show (plus one final frame to clear it)
+ var hud_active=target_x>=0 or counter_total>0 or not active_spot.is_empty()
+ if hud_active or hud_dirty:
+  hud_node.queue_redraw()
+ hud_dirty=hud_active
 # Eased walking: speed ramps up in ~0.12 s and stops in ~0.08 s instead of snapping, and the camera leads slightly in the facing direction.
 func advance_motion(move:Vector2, delta:float) -> void:
  if locked:
@@ -389,13 +420,24 @@ func advance_motion(move:Vector2, delta:float) -> void:
  var max_x=world_w-80.0
  if gate_locked and gate_x>0.0:
   max_x=minf(max_x,gate_x-40.0)
- var nx=clampf(px+vel.x*delta,80.0,max_x)
- if nx!=px+vel.x*delta:
+ # Axis-separated sliding against the NPC footprint (a Hero already inside it, e.g. after a scripted placement, may still walk out).
+ var inside=blocked(px,py)
+ var want_x=px+vel.x*delta
+ var nx=clampf(want_x,80.0,max_x)
+ var wall=blocker(nx,py) if not inside else {}
+ if nx!=want_x or not wall.is_empty():
   vel.x=0.0
+  if nx==want_x:
+   nx=px
  px=nx
- var ny=clampf(py+vel.y*delta,515.0,585.0)
- if ny!=py+vel.y*delta:
+ var want_y=py+vel.y*delta
+ if not wall.is_empty() and absf(move.x)>0.1 and absf(move.y)<0.1:
+  want_y=py+(1.0 if py>=float(wall.y) else -1.0)*140.0*delta   # walking into someone: ease around them instead of sticking
+ var ny=clampf(want_y,515.0,585.0)
+ if ny!=want_y or (not inside and blocked(px,ny)):
   vel.y=0.0
+  if ny==want_y:
+   ny=py
  py=ny
  var want=clampf(vel.x/SPEED,-1.0,1.0)*LOOK_AHEAD
  lead=lerpf(lead,want,1.0-exp(-delta*3.5))

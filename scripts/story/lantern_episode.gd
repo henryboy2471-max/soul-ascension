@@ -59,7 +59,7 @@ func stored_progress() -> Dictionary:
  return Profile.mission_progress(mission_id)
 func breach_label() -> String:
  var stored=stored_progress()
- if stored.get("combat_run",false):
+ if Profile.flag(stored,"combat_run"):
   return "RESUME  /  THE BREACH  ·  ENERGY PAID"
  return "ENTER  /  THE BREACH  ·  %d ENERGY" % MissionDefs.energy_cost(mission_id)
 func begin_explore() -> void:
@@ -206,7 +206,7 @@ func enter_breach() -> void:
  var stored=stored_progress()
  Economy.regenerate(Profile.data,int(Time.get_unix_time_from_system()))
  var prompt=BreachPrompt.new()
- prompt.setup(MissionDefs.energy_cost(mission_id),int(Profile.data.energy),bool(stored.get("combat_run",false)))
+ prompt.setup(MissionDefs.energy_cost(mission_id),int(Profile.data.energy),Profile.flag(stored,"combat_run"))
  add_child(prompt)
  var go=await prompt.decided
  prompt.queue_free()

@@ -1,0 +1,29 @@
+[   1.8s] shot 00_home
+[   9.0s] after Mira step=1
+[  17.0s] after relay step=2
+[  20.0s] shot 01_breach_open_prompt
+[  21.8s] shot 02_mission_zone_or_transition
+[  22.8s] scene now: battle
+[  23.1s] shot 03_battle_first_frame
+[  23.1s] battle state wave0_phase1  foe=RESONANCE SHADE  hero hp 260/260
+[  23.6s] shot 04_wave1_shade_start
+[  24.8s] shot 05_wave1_mid
+[  26.4s] shot 05b_shade_nearly_dead
+[  26.4s] battle state wave1_phase1  foe=MERIDIAN ENFORCER  hero hp 260/260
+[  26.9s] shot 06_boss_intro_enforcer
+[  27.8s] shot 07_boss_mid
+[  30.2s] battle state wave1_phase2  foe=MERIDIAN ENFORCER  hero hp 260/260
+[  30.9s] shot 08_boss_phase2_banner
+[  32.2s] shot 09_boss_nearly_dead
+[  33.3s] battle ended flag set (finisher/result transition); hero hp 260/260, foe hp 0, combo 26, phase 2
+[  33.5s] shot 09b_finisher_cinematic
+[  34.0s] shot 09c_finisher_aftermath
+[  34.8s] scene -> ending
+[  36.1s] shot 10_ending
+[  41.0s] scene -> result
+[  42.3s] shot 10_result
+[  42.3s] pressing the result screen button: HOME
+[  42.5s] shot 11_result_before_home
+[  42.7s] final scene: home  level 2  completed ["1-1"]
+[  43.6s] shot 12_final
+[  43.6s] progression: xp 0 -> 20, gold 500 -> 750, energy 60.0 -> 54.0, completed=["1-1"]

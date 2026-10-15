@@ -1,0 +1,100 @@
+{
+  "source_file": "wide_character_turnaround_orthographic_lineup_on_a.png",
+  "source_size": [
+    1774,
+    887
+  ],
+  "purpose": "visual preparation only",
+  "production_ready": false,
+  "separated_rig_parts": false,
+  "views": [
+    {
+      "name": "front",
+      "file": "hero_front_turnaround_preview.png",
+      "source_panel": [
+        0,
+        0,
+        444,
+        887
+      ],
+      "bbox": [
+        24,
+        0,
+        444,
+        863
+      ],
+      "target_size": [
+        576,
+        1152
+      ],
+      "visual_height": 1000,
+      "display_scale": 1.1587
+    },
+    {
+      "name": "right",
+      "file": "hero_right_turnaround_preview.png",
+      "source_panel": [
+        444,
+        0,
+        887,
+        887
+      ],
+      "bbox": [
+        0,
+        0,
+        374,
+        877
+      ],
+      "target_size": [
+        576,
+        1152
+      ],
+      "visual_height": 1000,
+      "display_scale": 1.1403
+    },
+    {
+      "name": "back",
+      "file": "hero_back_turnaround_preview.png",
+      "source_panel": [
+        887,
+        0,
+        1330,
+        887
+      ],
+      "bbox": [
+        26,
+        0,
+        425,
+        868
+      ],
+      "target_size": [
+        576,
+        1152
+      ],
+      "visual_height": 1000,
+      "display_scale": 1.1521
+    },
+    {
+      "name": "left",
+      "file": "hero_left_turnaround_preview.png",
+      "source_panel": [
+        1330,
+        0,
+        1774,
+        887
+      ],
+      "bbox": [
+        72,
+        0,
+        387,
+        877
+      ],
+      "target_size": [
+        576,
+        1152
+      ],
+      "visual_height": 1000,
+      "display_scale": 1.1403
+    }
+  ]
+}

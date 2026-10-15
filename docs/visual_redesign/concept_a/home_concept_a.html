@@ -1,0 +1,83 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Concept A home layout</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0b1021;--gold:#efce8e;--violet:#bd95ff;--muted:#a1a9c2;--panel:rgba(6,9,20,.78);--line:rgba(239,206,142,.42)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1280px;height:720px;overflow:hidden;background:#05070f;font-family:'Open Sans','Inter',sans-serif;color:#e8e9f4;position:relative}
+.art{position:absolute;inset:0;filter:brightness(1.12) saturate(1.1);background:url(../../../assets/echo_key_art.png) 50% 36%/cover no-repeat;transform:scale(1.04);transform-origin:60% 40%}
+.vig{position:absolute;inset:0;background:
+ linear-gradient(90deg,rgba(4,7,18,.84) 0%,rgba(4,7,18,.62) 22%,rgba(4,7,18,.08) 44%,rgba(4,7,18,0) 58%,rgba(4,7,18,.18) 100%),
+ linear-gradient(0deg,rgba(4,7,18,.72) 0%,rgba(4,7,18,0) 28%),
+ linear-gradient(180deg,rgba(4,7,18,.7) 0%,rgba(4,7,18,0) 14%)}
+.rain{position:absolute;inset:0;background:repeating-linear-gradient(104deg,rgba(150,170,255,.035) 0 1px,transparent 1px 14px);mix-blend-mode:screen}
+/* top bar */
+.top{position:absolute;left:0;right:0;top:0;height:78px;display:flex;align-items:center;padding:0 34px;gap:26px}
+.logo{line-height:1}.logo b{display:block;font-size:22px;letter-spacing:.42em;font-weight:800;color:#fff}.logo i{display:block;font-style:normal;font-size:16px;letter-spacing:.5em;color:var(--gold);margin-top:5px;font-weight:700}
+.chips{margin-left:auto;display:flex;gap:10px}
+.chip{background:var(--panel);border:1px solid rgba(160,170,210,.22);border-radius:8px;padding:9px 14px;font-size:15px;font-weight:700;letter-spacing:.04em;white-space:nowrap}
+.chip small{color:var(--muted);font-weight:600;margin-right:7px;font-size:12px;letter-spacing:.14em}
+.chip.lv{color:var(--gold)}
+.gear{height:46px;padding:0 14px;border-radius:9px;background:var(--panel);border:1px solid rgba(160,170,210,.22);display:grid;place-items:center;font-size:12px;letter-spacing:.1em;color:var(--muted);font-weight:700}
+/* episode card */
+.ep{position:absolute;left:34px;bottom:44px;width:560px}
+.kicker{font-size:14px;letter-spacing:.3em;color:var(--violet);font-weight:700;margin-bottom:10px}
+.title{font-size:46px;line-height:1.02;font-weight:800;color:#fff;text-shadow:0 2px 22px rgba(80,120,255,.45)}
+.title span{display:block;font-size:18px;letter-spacing:.34em;color:var(--gold);font-weight:700;margin-top:10px;text-shadow:none}
+.meta{margin:16px 0 18px;font-size:15px;color:#c8cce0;display:flex;gap:14px;flex-wrap:wrap}
+.meta em{font-style:normal;background:rgba(10,15,34,.72);border:1px solid rgba(160,170,210,.26);border-radius:6px;padding:6px 11px;font-size:15px;font-weight:600;color:#cfd4ea}
+.meta em.g{color:var(--gold);border-color:var(--line)}
+.progress{display:none;margin:0 0 16px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:11px 14px;font-size:14px}
+.progress b{color:var(--gold);letter-spacing:.14em;font-size:11px;display:block;margin-bottom:3px}
+.resume .progress{display:block}
+.play{position:relative;height:104px;border-radius:10px;background:linear-gradient(180deg,#f7dca0 0%,#efce8e 55%,#d9b36c 100%);color:var(--ink);display:flex;align-items:center;justify-content:space-between;padding:0 30px;box-shadow:0 0 0 1px rgba(255,236,190,.9),0 10px 44px rgba(239,206,142,.34),0 0 90px rgba(120,150,255,.22)}
+.play .big{font-size:36px;font-weight:800;letter-spacing:.06em}
+.play .sub{font-size:13px;letter-spacing:.24em;font-weight:700;opacity:.72;margin-top:4px}
+.play .arrow{font-size:46px;font-weight:800}
+.sec{display:flex;gap:10px;margin-top:12px}
+.btn{flex:1;height:50px;border-radius:8px;background:var(--panel);border:1px solid rgba(160,170,210,.28);display:grid;place-items:center;font-size:15px;font-weight:700;letter-spacing:.14em;color:#dfe2f2}
+/* right nav */
+.nav{position:absolute;right:34px;top:104px;width:216px;display:flex;flex-direction:column;gap:8px}
+.nav .btn{flex:none;height:44px;justify-content:flex-start;display:flex;align-items:center;padding:0 16px;font-size:14px;letter-spacing:.16em}
+.nav .soon{opacity:.7;height:38px;font-size:13px;color:var(--muted)}
+.nav .soon span{margin-left:auto;font-size:11px;letter-spacing:.14em;border:1px solid rgba(160,170,210,.3);border-radius:4px;padding:2px 6px}
+.nav h6{font-size:11px;letter-spacing:.3em;color:var(--muted);margin:8px 4px 0;font-weight:700}
+.tag{position:absolute;right:34px;bottom:44px;width:216px;background:var(--panel);border:1px solid rgba(189,149,255,.45);border-radius:8px;padding:12px 14px}
+.tag small{display:block;font-size:11px;letter-spacing:.26em;color:var(--violet);font-weight:700}
+.tag b{display:block;font-size:20px;margin-top:4px;color:#fff}
+.tag i{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:3px;letter-spacing:.08em}
+.foot{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:13px;letter-spacing:.12em;color:rgba(210,214,235,.78)}
+.saved{position:absolute;left:36px;bottom:14px;font-size:13px;color:var(--muted)}
+</style></head><body>
+<div class="art"></div><div class="vig"></div><div class="rain"></div>
+<div class="top">
+ <div class="logo"><b>SOUL</b><i>ASCENSION</i></div>
+ <div class="chips">
+  <div class="chip lv"><small>LV</small>1 &nbsp;Ascendant</div>
+  <div class="chip"><small>GOLD</small>500</div>
+  <div class="chip"><small>CRYSTALS</small>0</div>
+  <div class="chip"><small>ENERGY</small>60 / 120</div>
+  <div class="gear">SETTINGS</div>
+ </div>
+</div>
+<div class="ep" id="ep">
+ <div class="kicker">SEASON 01 &nbsp;/&nbsp; THE FRACTURE &nbsp;/&nbsp; NEON DISTRICT</div>
+ <div class="title">EPISODE 1<span>FIRST AWAKENING</span></div>
+ <div class="meta"><em>A spark in the static</em><em class="g">Explore free &nbsp;·&nbsp; 6 energy for the boss</em><em>First clear +120 XP &nbsp;+250 gold</em></div>
+ <div class="progress"><b>SAVED PROGRESS</b>Objective: Reboot the relay terminal</div>
+ <div class="play"><div><div class="big" id="pt">PLAY EPISODE 1</div><div class="sub" id="ps">BEGIN YOUR AWAKENING</div></div><div class="arrow">&#9654;</div></div>
+ <div class="sec"><div class="btn">MISSIONS</div><div class="btn">HEROES</div><div class="btn">UPGRADE</div></div>
+</div>
+<div class="nav">
+ <h6>MORE</h6>
+ <div class="btn soon">SUMMON<span>SOON</span></div>
+ <div class="btn soon">SHOP<span>SOON</span></div>
+ <div class="btn soon">EVENTS<span>SOON</span></div>
+ <div class="btn soon">BATTLE PASS<span>SOON</span></div>
+ <div class="btn soon">VIP<span>SOON</span></div>
+</div>
+<div class="tag"><small>ECHO / STRIKER</small><b>THE UNBOUND</b><i>BASE FORM &nbsp;·&nbsp; EVOLUTION UNKNOWN</i></div>
+<div class="saved">Progress is saved on this device.</div>
+<div class="foot">PREVIEW BUILD &nbsp;/&nbsp; TEMPORARY CHARACTER ART &nbsp;/&nbsp; NOT ECHO V2 PRODUCTION ART</div>
+<script>
+if(location.search.includes('resume')){document.getElementById('ep').classList.add('resume');document.getElementById('pt').textContent='RESUME EPISODE 1';document.getElementById('ps').textContent='CONTINUE WHERE YOU LEFT OFF';}
+</script></body></html>

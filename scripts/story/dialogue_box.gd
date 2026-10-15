@@ -20,6 +20,10 @@ var portrait_ring:Panel
 var name_plate:Panel
 var counter:Label
 var pulse_t=0.0
+var last_portrait=""
+const FADE_IN = 0.16
+const FADE_OUT = 0.14
+var speakers:Dictionary={}   # optional extra speakers (the 2.5D demo cast); falls back to EpisodeData.SPEAKERS
 func setup(list:Array, hero_name:String) -> void:
  lines=list
  player_name=hero_name
@@ -53,12 +57,16 @@ func _ready() -> void:
  name_label=UI.label(self,"",Vector2(270,486),21,Color.WHITE,700)
  UI.outline(name_label,4)
  text_label=UI.label(self,"",Vector2(262,530),25,Color("e6e9f6"),930)
+ UI.outline(text_label,3)
  hint=UI.label(self,"TAP  /  ENTER",Vector2(1000,640),17,UI.GOLD,200)
  hint.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
  counter=UI.label(self,"",Vector2(262,642),17,Color(UI.MUTED,0.95),200)
  var skip=UI.button(self,"SKIP",Rect2(1118,22,132,46),finish_all)
  skip.focus_mode=Control.FOCUS_NONE
  skip.add_theme_font_size_override("font_size",15)
+ # the box fades in instead of popping on
+ modulate.a=0.0
+ create_tween().tween_property(self,"modulate:a",1.0,FADE_IN)
  next_line()
 func on_gui_input(event:InputEvent) -> void:
  if event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_LEFT:
@@ -91,7 +99,7 @@ func next_line() -> void:
   finish_all()
   return
  var line=lines[index]
- var speaker=EpisodeData.SPEAKERS.get(line.who,EpisodeData.SPEAKERS.NARRATOR)
+ var speaker=speakers.get(line.who,EpisodeData.SPEAKERS.get(line.who,EpisodeData.SPEAKERS.NARRATOR))
  var display=speaker.name
  if line.who=="PLAYER":
   display=player_name.to_upper()
@@ -131,6 +139,11 @@ func style_for(accent:Color, named:bool) -> void:
  portrait_ring.add_theme_stylebox_override("panel",ring)
  text_label.position.y=534 if named else 510
 func set_portrait(kind:String) -> void:
+ if kind!=last_portrait and last_portrait!="":
+  # speaker changed: the portrait fades in rather than swapping instantly
+  portrait_frame.modulate.a=0.0
+  create_tween().tween_property(portrait_frame,"modulate:a",1.0,0.14)
+ last_portrait=kind
  if is_instance_valid(portrait_node):
   portrait_node.queue_free()
   portrait_node=null
@@ -153,6 +166,22 @@ func set_portrait(kind:String) -> void:
   art.mouse_filter=Control.MOUSE_FILTER_IGNORE
   portrait_frame.add_child(art)
   portrait_node=art
+ elif kind.begins_with("tex:"):
+  # Crisp vector-rendered portrait (mipmapped, so it stays sharp when scaled down into the frame)
+  var bgc=ColorRect.new()
+  bgc.color=Color("141a30")
+  bgc.size=Vector2(172,172)
+  bgc.mouse_filter=Control.MOUSE_FILTER_IGNORE
+  portrait_frame.add_child(bgc)
+  var face=TextureRect.new()
+  face.texture=SpriteActor.portrait_mip(kind.substr(4))
+  face.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+  face.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+  face.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
+  face.size=Vector2(172,172)
+  face.mouse_filter=Control.MOUSE_FILTER_IGNORE
+  portrait_frame.add_child(face)
+  portrait_node=bgc
  elif kind!="none":
   var bg=ColorRect.new()
   bg.color=Color("141a30")
@@ -173,7 +202,7 @@ func set_portrait(kind:String) -> void:
    if rig.load_sprite_set("res://assets/characters/mira/frames.tres",155.0,Color("c27bff")):
     # sprite art is a full-body figure: enlarge and lower it so the frame shows face and shoulders
     rig.scale=Vector2(3.1,3.1)
-    rig.position=Vector2(86,452)
+    rig.position=Vector2(86,474)
   elif kind=="enforcer":
    rig.enemy=true
   portrait_frame.add_child(rig)
@@ -183,4 +212,8 @@ func finish_all() -> void:
  if done:
   return
  done=true
+ # input is already ignored (done); fade out, then hand control back
+ var tween=create_tween()
+ tween.tween_property(self,"modulate:a",0.0,FADE_OUT)
+ await tween.finished
  finished.emit()
