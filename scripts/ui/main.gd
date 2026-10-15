@@ -413,29 +413,38 @@ Critical   12% / 160%",Vector2(530,250),22,Color("cbd0e2"))
  UI.button(node,"TURN",Rect2(294,568,110,58),func(): rig.facing*=-1)
  UI.button(node,"AETHER POSE",Rect2(416,568,210,58),func(): rig.swing=1.0;rig.invincible=1.0;Sound.play("special"))
  UI.button(node,"CODEX",Rect2(638,568,170,58),show_codex)
-func show_codex() -> void:
+func show_codex(page:int=0) -> void:
  # Entries that belong to a locked episode stay hidden, so a fresh save shows only the Episode 1 entries.
  var entries=[]
- for entry in EpisodeData.CODEX:
+ for entry in EpisodeData.CODEX+Episode3Data.CODEX:
   var source=MissionDefs.mission_for_codex(entry.id)
   if entry.get("secret",false) and not Profile.data.codex.has(entry.id):
    continue
-  if source.is_empty() or MissionDefs.is_unlocked(source.id,Profile.data.completed):
+  # an entry of a work-in-progress (not yet playable) episode only shows once the player has found it
+  if source.is_empty() or (MissionDefs.is_unlocked(source.id,Profile.data.completed) and (MissionDefs.is_playable(source.id) or Profile.data.codex.has(entry.id))):
    entries.append(entry)
- var node=new_modal("CODEX","STORY AND WORLD ENTRIES  /  "+str(Profile.data.codex.size())+" OF "+str(entries.size())+" FOUND")
+ # More than 12 entries (Episode 3 onwards) no longer fit one screen: 6 per page (two roomy rows) with a NEXT PAGE button; 12 or fewer keep the single-page layout.
+ var paged=entries.size()>12
+ var per_page=6 if paged else entries.size()
+ var pages=maxi(1,(entries.size()+per_page-1)/maxi(per_page,1))
+ page=clampi(page,0,pages-1)
+ var node=new_modal("CODEX","STORY AND WORLD ENTRIES  /  "+str(Profile.data.codex.size())+" OF "+str(entries.size())+" FOUND"+("  /  PAGE %d OF %d" % [page+1,pages] if paged else ""))
  var wide=entries.size()>6
- for i in range(entries.size()):
-  var entry=entries[i]
+ var shown=entries.slice(page*per_page,page*per_page+per_page) if paged else entries
+ for i in range(shown.size()):
+  var entry=shown[i]
   var found=Profile.data.codex.has(entry.id)
-  var rows=4 if entries.size()>9 else 3
+  var rows=2 if paged else (4 if entries.size()>9 else 3)
   var col=i/rows
   var row=i%rows
   var x=294+col*(236 if wide else 350)
-  var y=200+row*(92 if rows==4 else 118)
+  var y=200+row*(170 if rows==2 else (92 if rows==4 else 118))
   var width=224 if wide else 330
   UI.label(node,entry.title if found else "UNDISCOVERED",Vector2(x,y),17,UI.GOLD if found else Color("68738c"),width)
   var source=MissionDefs.mission_for_codex(entry.id)
   UI.label(node,entry.text if found else "Explore Episode %d to uncover this entry." % int(source.get("episode",1)),Vector2(x,y+26),13,Color("cbd0e2") if found else Color("68738c"),width)
+ if paged:
+  UI.button(node,"NEXT PAGE" if page<pages-1 else "FIRST PAGE",Rect2(294,568,170,58),func(): show_codex((page+1)%pages))
 func show_upgrade() -> void:
  var node=new_modal("GROW YOUR AETHER","LEVELS INCREASE YOUR COMBAT STATS")
  UI.label(node,"Level "+str(Profile.data.level)+"   →   "+str(mini(100,Profile.data.level+1)),Vector2(294,221),37,UI.GOLD)
@@ -467,6 +476,8 @@ func mission_status(id:String) -> String:
   return "PLANNED"
  if Profile.data.completed.has(id):
   return "CLEARED · REPLAY AVAILABLE"
+ if not d.playable:
+  return "PLANNED"   # work-in-progress episodes (e.g. 1-3 before release) are not announced as "up next"
  if d.playable and MissionDefs.is_unlocked(id,Profile.data.completed):
   return d.number+" · PLAYABLE"
  return d.number+" · UP NEXT"

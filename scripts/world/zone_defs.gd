@@ -38,6 +38,7 @@ static func zones() -> Dictionary:
     {"id":"anselm","x":1300.0,"label":"TALK  /  FORMER REGISTRY CLERK","kind":"talk","range":130.0,"visual":"none"},
     {"id":"records","x":1750.0,"label":"SEARCH  /  RECORDS","kind":"talk","range":110.0,"visual":"records"},
     {"id":"archive_door","x":2200.0,"label":"EXAMINE  /  ARCHIVE DOOR","kind":"talk","range":120.0,"visual":"door"},
+    {"id":"registry_hidden","x":2580.0,"label":"SEARCH  /  LOOSE PANEL","kind":"talk","range":90.0,"visual":"fragment","hidden":true},
     {"id":"exit_alleys_s","x":2930.0,"label":"GO  /  SHORTCUT TO THE ALLEYWAYS","kind":"talk","range":110.0,"visual":"exit","exit":{"to":"alleys","spawn_x":1560.0,"lock":"shortcut"}}
    ]},
   "alleys":{
@@ -107,6 +108,29 @@ static func reachable(start:String, open_locks:Array=[]) -> Array:
     seen.append(e.to)
     queue.append(e.to)
  return seen
+# x of the exit in zone `from` that leads towards zone `to` (locked exits skipped); -1.0 when `to` is not reachable
+static func route_x(from:String, to:String, open_locks:Array=[]) -> float:
+ if from==to:
+  return -1.0
+ var first={from:null}
+ var queue=[from]
+ while not queue.is_empty():
+  var z=queue.pop_front()
+  for e in exits_of(z):
+   if e.lock!="" and not open_locks.has(e.lock):
+    continue
+   if first.has(e.to):
+    continue
+   first[e.to]=e if z==from else first[z]
+   if e.to==to:
+    return float(first[e.to].x)
+   queue.append(e.to)
+ return -1.0
+static func spot_x(zone_id:String, spot_id:String) -> float:
+ for sp in zone(zone_id).get("spots",[]):
+  if sp.id==spot_id:
+   return float(sp.x)
+ return -1.0
 # Explore config for a zone (art script is supplied by the caller so this file stays free of autoload references)
 static func explore_config(id:String, art_script) -> Dictionary:
  var z=zone(id)
@@ -114,6 +138,6 @@ static func explore_config(id:String, art_script) -> Dictionary:
  var enabled={}
  for sp in z.spots:
   spots.append(sp)
-  enabled[sp.id]=true
+  enabled[sp.id]=not bool(sp.get("hidden",false))   # hidden spots are switched on by the episode once their condition is met
  return {"world_w":float(z.world_w),"start_px":float(z.start_px),"art":art_script,"npcs":z.get("npcs",[]),"companion":true,"no_walkers":bool(z.get("interior",false)),
   "walker_count":2,"spots":spots,"enabled":enabled}

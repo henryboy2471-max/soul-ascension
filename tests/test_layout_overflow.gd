@@ -133,6 +133,49 @@ func run() -> void:
     print("INFO dialogue ",name," ",str(line.who)," need=",need," bottom=",bottom," limit=",box.box_panel.global_position.y+box.box_panel.size.y-4.0," textw=",box.text_label.size.x," plate_ok=",plate_ok)
    box.queue_free()
  check(all_ok,"Every Episode 2 dialogue line fits inside the dialogue box %s" % worst)
+ # Episode 3: the Codex with every entry (two pages), and every investigation line in the real dialogue box
+ await fresh()
+ profile.data.completed=["1-1","1-2"]
+ profile.data.codex=["mira","board","mural","terminal","breach","enforcer","violet_rain","sleepers","rain_array","hollow_cantor","relay_voices","teo","anselm","false_register","earlier_candidates","relay_journal","pips_trail"]
+ main.show_codex()
+ await process_frame
+ report("Codex page 1 of 2 (Episode 3 entries)",main)
+ var next_page=null
+ for b in main.find_children("*","Button",true,false):
+  if b.text=="NEXT PAGE": next_page=b
+ check(next_page!=null,"The Codex offers NEXT PAGE once it holds more than 12 entries")
+ if next_page!=null:
+  next_page.pressed.emit()
+  await process_frame
+  await process_frame
+  report("Codex page 2 of 2",main)
+ main.close_modal()
+ var e3_ok=true
+ var e3_worst=""
+ var states=[[],["terminal"],["terminal","anselm_admits"],["anselm_admits","records"],["teo_met"],["teo_met","tx_1","tx_2","tx_3"],["teo_met","decoded","records"],["pip_met","frag_1","frag_2","frag_3"],["records","hidden_registry"],["theory","tower_reached"]]
+ for zone in ZoneDefs.zones():
+  for sp in ZoneDefs.zone(zone).spots:
+   if sp.has("exit"): continue
+   for st in states:
+    for line in Episode3Data.respond(sp.id,st).lines:
+     var box=load("res://scripts/story/dialogue_box.gd").new()
+     box.speakers=Episode3Data.SPEAKERS
+     box.setup([line],"Ascendant")
+     main.add_child(box)
+     await process_frame
+     box.advance()
+     await process_frame
+     var need=box.text_label.get_combined_minimum_size()
+     var bottom=box.text_label.global_position.y+need.y
+     var plate_ok=true
+     if box.name_plate.visible:
+      plate_ok=box.name_label.get_theme_font("font").get_string_size(box.name_label.text,HORIZONTAL_ALIGNMENT_LEFT,-1,21).x<=box.name_plate.size.x-14.0 and box.name_plate.global_position.x+box.name_plate.size.x<=1240.0
+     if bottom>box.box_panel.global_position.y+box.box_panel.size.y-4.0 or need.x>box.text_label.size.x+1.0 or not plate_ok:
+      e3_ok=false
+      e3_worst=str(line.text).substr(0,40)
+      print("INFO e3 dialogue ",sp.id," ",str(line.who)," need=",need," plate_ok=",plate_ok)
+     box.queue_free()
+ check(e3_ok,"Every Episode 3 investigation line fits inside the dialogue box %s" % e3_worst)
  # explore HUD, counter objective, breach prompt
  await fresh({"intro":true,"depot":true,"mira":true,"resonators":["res_a"]})
  main.start_episode("1-2")

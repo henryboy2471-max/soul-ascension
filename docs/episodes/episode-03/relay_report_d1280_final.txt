@@ -1,0 +1,24 @@
+[   5.6s] OK   opening objective is the 0/3 transmissions counter
+[  16.0s] OK   scanning a transmission advances the counter to 1/3
+[  41.3s] OK   after 3/3 the objective moves to the station terminal
+[  49.9s] OK   the hidden journal enters the Codex
+[  81.7s] OK   travelled through exit_station to station
+[  89.7s] OK   records give nothing before Anselm admits
+[  94.3s] OK   Anselm stonewalls without the terminal log
+[ 103.9s] OK   Anselm admits after the terminal log
+[ 108.9s] OK   records found; the hidden panel is now available
+[ 148.9s] OK   travelled through exit_market to market
+[ 180.8s] OK   travelled through exit_alleys to alleys
+[ 196.2s] OK   Pip's quest stays open at 2 of 3 marks
+[ 208.3s] OK   Pip's optional quest completes
+[ 246.7s] OK   travelled through exit_workshop to workshop
+[ 250.2s] OK   decoder refuses before Teo has been spoken to
+[ 257.8s] OK   board has gaps before the signals are decoded
+[ 294.0s] OK   the tower stays sealed before the theory
+[ 299.6s] OK   theory assembled: tower unlocked, objective updated
+[ 331.4s] OK   travelled through exit_tower to tower_1
+[ 331.4s] OK   inside the tower the objective is to climb it
+[ 333.1s] OK   all seven Episode 3 Codex entries found
+[ 333.1s] OK   Episode 1-2 completion untouched
+[ 333.1s] final: zone=tower_1 obj='Climb the Central Relay Tower' counter=0/0 clues=23
+[ 333.1s] RESULT: 0 failures
