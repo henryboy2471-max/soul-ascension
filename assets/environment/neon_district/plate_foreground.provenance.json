@@ -106,6 +106,16 @@
  "notes": "uniform scale 0.7500 on every component; bottom-aligned",
  "post_process": {
   "top_feather_fraction": 0.55,
-  "why": "soft top edge of the foreground mist strip"
+  "mist_tone": {
+   "glow_cut": 0.3,
+   "knee_percentile": 85,
+   "peak_percentile": 99.95,
+   "haze_sigma": 9,
+   "haze_weight": 0.65,
+   "haze_from": 0.3,
+   "haze_until": 0.6,
+   "label": "glow -30%, haze sigma 9",
+   "why": "owner review: tone down the brightest cyan/magenta mist glow and particles, softer haze band, keep wet-floor reflections and lower rows sharp"
+  }
  }
 }

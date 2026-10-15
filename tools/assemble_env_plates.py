@@ -13,12 +13,15 @@ OV = 240   # default seam crossfade width in delivered px (a plate may set ovs p
 # part = (panel, ops); ops: opaque (alpha 1), clean (alpha >= .94 -> 1), feather=f (top alpha ramp over f of the height), burn=local exposure multiply, trim=(left,right) px after scaling
 INSERT_TRACK = dict(file="reference/tram_track_source/tram_track_insert_1230x190.png", sha256="d5b676f4a282e2a63dc507eb40fc322798cccc15ee36183c6e0c19714f520505", at=(862, 278), fade_right=72,
  source="reference/tram_track_source/tram_track_source.png", source_sha256="b5151895424ef7d47e95241e88c41500aaadb2a50604ddc59d3ccec1d4bce3b3", source_dims=(2021, 778), source_crop=(82, 242, 1939, 529), scale=0.66236)
+# selected review level "glow -30%, haze sigma 9": peak glow of the foreground mist cut by 30% (soft knee at the 85th luminance percentile so the rest and the wet-floor reflections are untouched),
+# the hottest cyan/magenta pulled the same 30% toward grey, and the upper haze band blurred (sigma 9, up to 65% weight, gone by 60% of the strip height; the lower rows stay sharp)
+MIST_TONE = dict(glow_cut=0.30, knee_percentile=85, peak_percentile=99.95, haze_sigma=9, haze_weight=0.65, haze_from=0.30, haze_until=0.60)
 PLATES = {
  "plate_far":        dict(size=(2550, 720), s="fit", bias=.5, parts=[("far_left", {}), ("far_right", {})]),
  "plate_mid":        dict(size=(2700, 615), s="fit", bias=.5, ovs=[160, 240], parts=[("mid_left", {"trim": (0, 160)}), ("mid_center", {"trim": (60, 20)}), ("mid_right", {"trim": (360, 0)})]),
  "plate_near":       dict(size=(3450, 690), s="fit", bias=.5, ovs=[160, 160], parts=[("near_left", {"trim": (0, 20)}), ("near_center", {"trim": (240, 60)}), ("near_right", {"trim": (120, 0)})]),
  "plate_street":     dict(size=(3750, 630), s=.85, bias=0., ovs=[360, 120], floor_soften=(300, 10), inserts=[INSERT_TRACK], parts=[("street_left", {"clean": 1}), ("street_center", {"opaque": 1, "feather": .3, "trim": (260, 425)}), ("street_right", {"opaque": 1, "feather": .3, "burn": (529, 139, 1051, 509, .55, 50)})]),
- "plate_foreground": dict(size=(4200, 210), s=.75, bias=.5, top_feather=.55, ovs=[160, 160], parts=[("foreground_1", {"trim": (0, 20)}), ("foreground_2", {"trim": (0, 220)}), ("foreground_3", {})]),
+ "plate_foreground": dict(size=(4200, 210), s=.75, bias=.5, top_feather=.55, mist_tone=MIST_TONE, ovs=[160, 160], parts=[("foreground_1", {"trim": (0, 20)}), ("foreground_2", {"trim": (0, 220)}), ("foreground_3", {})]),
 }
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def load(name):
@@ -106,7 +109,20 @@ def assemble(name, cfg):
         t = np.clip(np.arange(H) / (cfg["top_feather"] * H), 0, 1); out = out * (t * t * (3 - 2 * t))[:, None, None]
     a = out[..., 3:4]; rgb = np.where(a > 1e-6, out[..., :3] / np.maximum(a, 1e-6), 0)
     px = np.concatenate([np.clip(rgb, 0, 1), np.clip(a, 0, 1)], -1)
+    if cfg.get("mist_tone"): px = mist_tone(px, cfg["mist_tone"])
     return Image.fromarray(np.round(px * 255).astype(np.uint8), "RGBA"), parts_rec, s
+def mist_tone(px, m):
+    """Tone down the brightest mist glow and soften the upper haze band; reflections in the lower rows are not blurred. px = straight RGBA float 0..1."""
+    rgb, al = px[..., :3], px[..., 3]; H = px.shape[0]; L = 0.2126 * rgb[..., 0] + 0.7152 * rgb[..., 1] + 0.0722 * rgb[..., 2]; lit = al > 0.3
+    t, hi = np.percentile(L[lit], m["knee_percentile"]), np.percentile(L[lit], m["peak_percentile"])
+    w = np.clip((L - t) / (hi - t), 0, 1); w = w * w * (3 - 2 * w); k = 1 - m["glow_cut"] * w
+    out = rgb * k[..., None]; out = out + ((L * k)[..., None] - out) * (m["glow_cut"] * w)[..., None]     # brightness down, then the hottest colour pulled toward grey by the same share
+    pm = np.concatenate([out * al[..., None], al[..., None]], -1)
+    bl = np.asarray(Image.fromarray(np.round(np.clip(pm, 0, 1) * 255).astype(np.uint8), "RGBa").filter(ImageFilter.GaussianBlur(m["haze_sigma"]))).astype(np.float32) / 255
+    r = np.clip((np.arange(H) - m["haze_from"] * H) / ((m["haze_until"] - m["haze_from"]) * H), 0, 1); r = r * r * (3 - 2 * r)
+    wt = ((1 - r) * m["haze_weight"])[:, None, None]; pm = pm * (1 - wt) + bl * wt
+    a2 = pm[..., 3:4]; rgb2 = np.where(a2 > 1e-6, pm[..., :3] / np.maximum(a2, 1e-6), 0)
+    return np.concatenate([np.clip(rgb2, 0, 1), np.clip(a2, 0, 1)], -1)
 def tram():
     im = load("tram"); W, H = 1050, 234
     box = Image.fromarray((np.asarray(im)[..., 3] > 12).astype(np.uint8) * 255).getbbox()
@@ -117,6 +133,12 @@ def tram():
     rec = [{"file": "reference/source_panels_v2/panels/tram.png", "sha256": sha(SRC / "panels" / "tram.png"), "original_dimensions": [im.width, im.height],
         "scale": round(s, 6), "scaled_dimensions": [round(im.width * s), round(im.height * s)], "subject_scaled_dimensions": [p.width, p.height], "source_crop_px": list(box), "placed_at": [ox, oy], "edits": {}}]
     return canvas, rec, s
+def post_ops(cfg):
+    d = {}
+    if cfg.get("floor_soften"): d["floor_soften"] = {"from_row": cfg["floor_soften"][0], "gaussian_sigma_px": cfg["floor_soften"][1], "why": "depth-of-field softening of the near ground so the touch-stick HUD zone stays calm"}
+    if cfg.get("top_feather"): d["top_feather_fraction"] = cfg["top_feather"]
+    if cfg.get("mist_tone"): d["mist_tone"] = {**cfg["mist_tone"], "label": "glow -30%, haze sigma 9", "why": "owner review: tone down the brightest cyan/magenta mist glow and particles, softer haze band, keep wet-floor reflections and lower rows sharp"}
+    return d or None
 def provenance(name, size, rec, note, post=None):
     return {"tool": "OpenAI built-in image generator (source panels); Pillow/NumPy (assembly, tools/assemble_env_plates.py)",
         "method": "assembled_from_native_source_panels: crop, uniform downscale (never up) and a seam crossfade; not a single generation",
@@ -129,7 +151,7 @@ def main():
     for name, cfg in PLATES.items():
         im, rec, s = assemble(name, cfg)
         im.save(out / (name + ".png"), optimize=True)
-        (out / (name + ".provenance.json")).write_text(json.dumps(provenance(name, cfg["size"], rec, f"uniform scale {s:.4f} on every component; bottom-aligned", {"floor_soften": {"from_row": cfg["floor_soften"][0], "gaussian_sigma_px": cfg["floor_soften"][1], "why": "depth-of-field softening of the near ground so the touch-stick HUD zone stays calm"}} if cfg.get("floor_soften") else ({"top_feather_fraction": cfg["top_feather"], "why": "soft top edge of the foreground mist strip"} if cfg.get("top_feather") else None)), indent=1) + "\n")
+        (out / (name + ".provenance.json")).write_text(json.dumps(provenance(name, cfg["size"], rec, f"uniform scale {s:.4f} on every component; bottom-aligned", post_ops(cfg)), indent=1) + "\n")
         print(name, im.size, f"scale {s:.4f}")
     im, rec, s = tram(); im.save(out / "prop_tram_stalled.png", optimize=True)
     (out / "prop_tram_stalled.provenance.json").write_text(json.dumps(provenance("prop_tram_stalled", (1050, 234), rec, "subject cropped from the transparent margins, uniformly scaled into the canvas"), indent=1) + "\n")
