@@ -381,8 +381,8 @@ func show_result(won:bool) -> void:
  xp.readout_size=13
  UI.label(screen,"Progress saved locally" if Profile.save_ok else "Save failed — check device storage",Vector2(326,484),15,UI.MUTED if Profile.save_ok else Color("ff7188"))
  var teaser=MissionDefs.get_def(reward.id).ending.teaser
- if won and MissionDefs.get_def(reward.id).get("flow","district")=="lantern":
-  UI.chip(screen,"CODEX  /  HOLLOW CANTOR",Rect2(584,399,214,26),UI.VIOLET,13)
+ if won:
+  if MissionDefs.get_def(reward.id).get("flow","district")=="lantern": UI.chip(screen,"CODEX  /  HOLLOW CANTOR",Rect2(584,399,214,26),UI.VIOLET,13)
   UI.button(screen,"NEXT EPISODE",Rect2(325,535,280,65),func(): show_teaser(teaser),true)
  else:
   UI.button(screen,"HOME",Rect2(325,535,280,65),show_home)

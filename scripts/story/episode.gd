@@ -1,7 +1,7 @@
 extends Control
 class_name Episode
 # Episode flow controller. "intro" phase: title card -> opening scene -> explore with objectives -> Soul Realm breach -> battle.
-# "ending" phase (after the battle is won): closing scene -> next-episode teaser -> completed.
+# "ending" phase (after the battle is won): closing scene -> completed (the rewards screen offers NEXT EPISODE -> teaser).
 signal exit_requested
 signal completed
 var phase="intro"
@@ -170,6 +170,4 @@ func run_ending() -> void:
  var backdrop=make_backdrop()
  await say(ending.lines)
  backdrop.queue_free()
- var teaser=ending.teaser
- await card(teaser.kicker,teaser.number+"  /  "+teaser.title,teaser.subtitle,true,teaser.length)
  completed.emit()

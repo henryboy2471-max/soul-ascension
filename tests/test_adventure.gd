@@ -136,7 +136,7 @@ func run() -> void:
  check(main.scene_name=="ending","Winning the boss fight plays the ending scene")
  var ending=main.screen.get_child(0)
  await skip_scenes(ending,func(): return main.scene_name=="result",900)
- check(main.scene_name=="result" and profile.active_run=="","Ending and next-episode teaser lead to rewards")
+ check(main.scene_name=="result" and profile.active_run=="","Ending leads to rewards (the teaser follows from NEXT EPISODE)")
  check(profile.data.completed.has("1-1") and int(profile.data.gold)==gold_before+250,"First clear rewards are granted once")
  # Exit confirmation in the world
  main.start_episode()

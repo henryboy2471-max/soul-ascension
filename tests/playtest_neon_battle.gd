@@ -186,13 +186,13 @@ func run() -> void:
    seen_scenes[sc] = true
    note("scene -> " + sc)
    await shot("10_" + sc, 1.2)
-  # advance with the game's own input (Enter / E advances dialogue); buttons on the result screen are pressed where the game expects them
+  # advance with the game's own input (Enter / E advances dialogue); the rewards screen's NEXT EPISODE button is pressed where the game expects it (rewards -> teaser -> home)
   var pressed_button := false
   for n in main.screen.find_children("*", "Button", true, false):
    var t := str(n.text).to_upper()
-   if sc == "result" and t.begins_with("HOME") and n.visible and not n.disabled:
+   if sc == "result" and t.begins_with("NEXT EPISODE") and n.visible and not n.disabled:
     note("pressing the result screen button: " + str(n.text))
-    await shot("11_result_before_home", 0.2)
+    await shot("11_result_before_next_episode", 0.2)
     n.pressed.emit()
     pressed_button = true
     break

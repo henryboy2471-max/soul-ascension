@@ -1,4 +1,4 @@
-// Episode 1 through the real web export (keyboard 1280x720 or touch): home -> intro -> explore objectives -> Soul Realm battle (Shade + Enforcer) -> ending -> rewards
+// Episode 1 through the real web export (keyboard 1280x720 or touch): home -> intro -> explore objectives -> Soul Realm battle (Shade + Enforcer) -> ending -> rewards -> NEXT EPISODE -> teaser -> home
 const { chromium } = require('/home/user/my-app/node_modules/@playwright/test');
 const [,, S, MODE, WS, HS, TAG] = process.argv; const W=+WS, H=+HS; const PORT=process.env.PORT||'8771';
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -54,6 +54,11 @@ const T=MODE==='touch';
  }
  st=await q(); console.log('result',JSON.stringify({scene:st.scene,gold:st.gold,xp:st.xp,level:st.level,energy:st.energy,completed:st.completed,codex:st.codex}));
  await sleep(900); await shot('rewards');
+ const before=await q(); const nx=G(465,567);
+ if(T) await ttap(465,567); else await p.mouse.click(nx.x,nx.y);
+ await sleep(1500); let tz=await q(); console.log('after NEXT EPISODE',tz.scene); await shot('teaser');
+ for(let i=0;i<20&&(await q()).scene==='teaser';i++) await sleep(500);
+ const fin=await q(); console.log('after teaser',JSON.stringify({scene:fin.scene,gold:fin.gold,xp:fin.xp,level:fin.level,completed:fin.completed,unchanged:JSON.stringify([before.gold,before.xp,before.completed])===JSON.stringify([fin.gold,fin.xp,fin.completed])})); await shot('home_after_teaser');
  console.log('CONSOLE',JSON.stringify(msgs));
  await b.close();
 })();
