@@ -138,7 +138,7 @@
    ],
    "placed_at": [
     862,
-    280
+    278
    ],
    "derived_insert": {
     "file": "reference/tram_track_source/tram_track_insert_1230x190.png",
@@ -148,7 +148,15 @@
      190
     ]
    },
-   "edits": {}
+   "edits": {
+    "placement": "moved from (862, 280) to (862, 278) so the rail top meets the tram wheels (wheel bottoms plate row 291)",
+    "alpha_fade_right": {
+     "px": 72,
+     "curve": "smoothstep",
+     "alpha_at_last_column": 0,
+     "why": "blend the girder end into the shutter wall; no terminal pier added"
+    }
+   }
   }
  ],
  "source_manifest": "reference/source_panels_v2/manifest.json",

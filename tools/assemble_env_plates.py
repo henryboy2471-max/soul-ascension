@@ -11,7 +11,7 @@ SRC = ROOT / "assets/environment/neon_district/reference/source_panels_v2"
 OV = 240   # default seam crossfade width in delivered px (a plate may set ovs per seam; trims and widths were picked by a search that minimises the visible luminance step across each stitch)
 # name: size, scale ("fit" = largest uniform scale <= 1 that keeps every part's artwork inside the plate height), outer-trim bias (share taken from the left), parts
 # part = (panel, ops); ops: opaque (alpha 1), clean (alpha >= .94 -> 1), feather=f (top alpha ramp over f of the height), burn=local exposure multiply, trim=(left,right) px after scaling
-INSERT_TRACK = dict(file="reference/tram_track_source/tram_track_insert_1230x190.png", sha256="d5b676f4a282e2a63dc507eb40fc322798cccc15ee36183c6e0c19714f520505", at=(862, 280),
+INSERT_TRACK = dict(file="reference/tram_track_source/tram_track_insert_1230x190.png", sha256="d5b676f4a282e2a63dc507eb40fc322798cccc15ee36183c6e0c19714f520505", at=(862, 278), fade_right=72,
  source="reference/tram_track_source/tram_track_source.png", source_sha256="b5151895424ef7d47e95241e88c41500aaadb2a50604ddc59d3ccec1d4bce3b3", source_dims=(2021, 778), source_crop=(82, 242, 1939, 529), scale=0.66236)
 PLATES = {
  "plate_far":        dict(size=(2550, 720), s="fit", bias=.5, parts=[("far_left", {}), ("far_right", {})]),
@@ -94,10 +94,13 @@ def assemble(name, cfg):
         fp = ROOT / "assets/environment/neon_district" / ins["file"]
         assert sha(fp) == ins["sha256"], f"{fp} sha256 mismatch"
         pm = np.asarray(Image.open(fp).convert("RGBa")).astype(np.float32) / 255; x0, y0 = ins["at"]; h, w = pm.shape[:2]
+        fr = ins.get("fade_right", 0)
+        if fr: t = np.ones(w, np.float32); r = np.linspace(1, 0, fr, dtype=np.float32); t[w - fr:] = r * r * (3 - 2 * r); pm = pm * t[None, :, None]   # short alpha fade of the girder's far-right end (premultiplied, so colour is untouched)
         out[y0:y0 + h, x0:x0 + w] = pm + out[y0:y0 + h, x0:x0 + w] * (1 - pm[..., 3:4])
         so, sc = ins["source_dims"], ins["scale"]
         ins_rec.append({"role": "insert", "file": ins["source"], "sha256": ins["source_sha256"], "original_dimensions": list(so), "scale": sc, "scaled_dimensions": [round(so[0] * sc), round(so[1] * sc)],
-            "source_crop_px": list(ins["source_crop"]), "placed_at": list(ins["at"]), "derived_insert": {"file": ins["file"], "sha256": ins["sha256"], "dimensions": [w, h]}, "edits": {}})
+            "source_crop_px": list(ins["source_crop"]), "placed_at": list(ins["at"]), "derived_insert": {"file": ins["file"], "sha256": ins["sha256"], "dimensions": [w, h]},
+            "edits": {"placement": "moved from (862, 280) to (862, 278) so the rail top meets the tram wheels (wheel bottoms plate row 291)", "alpha_fade_right": {"px": fr, "curve": "smoothstep", "alpha_at_last_column": 0, "why": "blend the girder end into the shutter wall; no terminal pier added"}} if fr else {}})
     parts_rec += ins_rec
     if cfg.get("top_feather"):   # soft top edge of the finished strip (applied after the vertical crop so it is really visible)
         t = np.clip(np.arange(H) / (cfg["top_feather"] * H), 0, 1); out = out * (t * t * (3 - 2 * t))[:, None, None]
