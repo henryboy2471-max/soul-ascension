@@ -1,0 +1,11 @@
+{
+ "status": "REFERENCE_ONLY",
+ "not_a_production_plate": true,
+ "owner_approved_visual_direction": true,
+ "origin": "ChatGPT image generation, supplied by the owner",
+ "file_as_received_by_this_session": "WebP, 1983x793 RGB, 482808 bytes (the owner's original PNG could not be received byte-for-byte; the owner keeps the PNG)",
+ "sha256": "71f6d8adbf211566e2624b96805e457ec3118d3322342f6dfbecfacfc47b4d7e",
+ "modified": false,
+ "enlarged": false,
+ "notes": "Stored unchanged for look reference. It contains a baked-in skyline in its lower half, so it cannot be the production plate_sky (sky and skyline are separate assets). Production plate_sky must be a native 2250x780 opaque image; plate_far a native 2550x720 RGBA."
+}

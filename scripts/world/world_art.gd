@@ -2,6 +2,7 @@ extends Node2D
 class_name WorldArt
 # Procedural layered district art. Static layers are drawn once and only moved for parallax (cheap on web).
 var kind="sky"
+var hide_procedural_tram=false
 var width=1280.0
 var time=0.0
 var breach_open=false
@@ -173,21 +174,22 @@ func draw_props() -> void:
   for g in range(4):
    draw_circle(Vector2(lx+24,GROUND_TOP-160),44-g*10,Color(1.0,0.82,0.5,0.045+g*0.025))
   draw_colored_polygon(PackedVector2Array([Vector2(lx+18,GROUND_TOP-156),Vector2(lx+30,GROUND_TOP-156),Vector2(lx+110,GROUND_TOP+60),Vector2(lx-60,GROUND_TOP+60)]),Color(1.0,0.82,0.5,0.045))
- # stalled tram
- var tx=640.0
- draw_rect(Rect2(tx,GROUND_TOP-118,690,134),Color(0.1,0.12,0.24))
- draw_rect(Rect2(tx,GROUND_TOP-118,690,10),Color(0.2,0.22,0.42))
- draw_rect(Rect2(tx,GROUND_TOP-118,690,134),Color(0.45,0.45,0.75,0.5),false,2)
- for i in range(8):
-  var wx=tx+24+i*82
-  var lit=0.18+0.14*sin(time*2.0+i)
-  draw_rect(Rect2(wx,GROUND_TOP-96,60,50),Color(0.04,0.06,0.13))
-  draw_rect(Rect2(wx,GROUND_TOP-96,60,50),Color(0.4,0.85,0.95,lit))
- draw_rect(Rect2(tx+20,GROUND_TOP-36,650,6),Color(0.9,0.3,0.4,0.9))
- draw_string(font,Vector2(tx+20,GROUND_TOP-39),"OUT OF SERVICE   -   OUT OF SERVICE   -   OUT OF SERVICE",HORIZONTAL_ALIGNMENT_LEFT,650,13,Color(1.0,0.6,0.65))
- for wx in [tx+60,tx+200,tx+500,tx+630]:
-  draw_circle(Vector2(wx,GROUND_TOP+14),11,Color(0.05,0.06,0.12))
-  draw_arc(Vector2(wx,GROUND_TOP+14),11,0,TAU,16,Color(0.5,0.5,0.7,0.6),2)
+ if not hide_procedural_tram:
+  # stalled tram
+  var tx=640.0
+  draw_rect(Rect2(tx,GROUND_TOP-118,690,134),Color(0.1,0.12,0.24))
+  draw_rect(Rect2(tx,GROUND_TOP-118,690,10),Color(0.2,0.22,0.42))
+  draw_rect(Rect2(tx,GROUND_TOP-118,690,134),Color(0.45,0.45,0.75,0.5),false,2)
+  for i in range(8):
+   var wx=tx+24+i*82
+   var lit=0.18+0.14*sin(time*2.0+i)
+   draw_rect(Rect2(wx,GROUND_TOP-96,60,50),Color(0.04,0.06,0.13))
+   draw_rect(Rect2(wx,GROUND_TOP-96,60,50),Color(0.4,0.85,0.95,lit))
+  draw_rect(Rect2(tx+20,GROUND_TOP-36,650,6),Color(0.9,0.3,0.4,0.9))
+  draw_string(font,Vector2(tx+20,GROUND_TOP-39),"OUT OF SERVICE   -   OUT OF SERVICE   -   OUT OF SERVICE",HORIZONTAL_ALIGNMENT_LEFT,650,13,Color(1.0,0.6,0.65))
+  for wx in [tx+60,tx+200,tx+500,tx+630]:
+   draw_circle(Vector2(wx,GROUND_TOP+14),11,Color(0.05,0.06,0.12))
+   draw_arc(Vector2(wx,GROUND_TOP+14),11,0,TAU,16,Color(0.5,0.5,0.7,0.6),2)
  # tram board
  var bx=1050.0
  draw_rect(Rect2(bx-5,GROUND_TOP-30,10,60),Color(0.09,0.1,0.18))

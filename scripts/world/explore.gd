@@ -22,6 +22,7 @@ var npc:Fighter
 var layers:Array=[]
 var props:WorldArt
 var fore:WorldArt
+var foreground_plate:NeonDistrictArt
 var stick:VirtualStick
 var act_button:TouchAction
 var hud_node:Hud
@@ -84,7 +85,7 @@ func _ready() -> void:
  if config.has("spots"):
   spots=config.spots
   enabled=config.enabled
- var art_script=config.get("art",WorldArt)
+ var art_script=config.get("art",NeonDistrictArt)
  floor_fill=ColorRect.new()
  floor_fill.color=Color(0.02,0.025,0.06)
  floor_fill.position=Vector2(0,560)
@@ -147,6 +148,10 @@ func _ready() -> void:
  player.scale=Vector2(1.2,1.2)
  player.load_sprite_set("res://assets/characters/hero/frames.tres",170.0,Color("4aa3ff"))
  add_child(player)
+ if art_script == NeonDistrictArt:
+  foreground_plate=NeonDistrictArt.new()
+  foreground_plate.kind="foreground"
+  add_child(foreground_plate)
  fore=art_script.new()
  fore.kind="fore"
  add_child(fore)
@@ -279,6 +284,8 @@ func update_positions(blend:float) -> void:
  for layer in layers:
   layer.position=Vector2(roundf(-view*layer.get_meta("factor")),lift)
  props.position=Vector2(-view,lift)
+ if foreground_plate != null:
+  foreground_plate.position=Vector2(roundf(-view*1.2),lift)
  # While a conversation is open the whole street lifts so the dialogue box never covers characters.
  npc.position=Vector2(roundf(npc_x)-view,548.0+lift)
  for w in walkers:

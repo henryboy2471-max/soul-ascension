@@ -1,0 +1,49 @@
+name: Neon District Art Gate
+
+on:
+  push:
+    branches:
+      - integration/approved-neon-district
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-artwork:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install artwork validation dependencies
+        run: python3 -m pip install --break-system-packages numpy pillow
+      - name: Validate approved plates, provenance, safe zones and memory budget
+        run: python3 tools/validate_env_plates.py
+      - name: Verify assembled seams and camera sweep
+        run: python3 tools/check_camera_seams.py
+      - name: Upload camera review artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neon-district-camera-review
+          path: docs/visual_redesign/environment_review/
+          if-no-files-found: warn
+
+  godot-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot 4.4.1
+        run: |
+          curl -fsSL --retry 3 -o godot.zip https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
+          unzip -q godot.zip
+          sudo mv Godot_v4.4.1-stable_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+      - name: Import project
+        run: godot --headless --editor --import --quit
+      - name: Episode 1 movement and adventure regressions
+        run: |
+          godot --headless --script res://tests/test_explore_motion.gd
+          godot --headless --script res://tests/test_adventure.gd
+          godot --headless --script res://tests/test_layout_overflow.gd

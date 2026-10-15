@@ -1,0 +1,5 @@
+# ASSISTED review-only records (NOT production, NOT validated, NOT integrated)
+Received from the owner/ChatGPT: the two sidecar JSON files (verbatim) and 2000-px-wide WebP previews of the assisted plates and of the sky+skyline composite. The actual 2550x720 and 2250x780 PNG files were NOT received by this session, so only previews are stored here; the previews are not the plates.
+Per the sidecars: plate_sky = an OpenAI-generated 2129x739 sky, uniformly upscaled 1.0568x and cropped to 2250x780 (RGB); plate_far = a 1983x793 skyline, uniformly downscaled 0.9079x and centered on 2550x720 RGBA with 375 px transparent gutters left and right ("NOT edge-coverage compliant"). Both state `independent_plate: false`, "ASSISTED_REVIEW_ONLY_NOT_PRODUCTION", and require a separate owner approval and project policy decision before promotion.
+Observed in the preview: the far skyline (and its mist bank) ends in hard vertical cuts about 15% in from each side, so at the camera positions where those columns are on screen the skyline simply stops.
+`tools/validate_env_plates.py` ignores this folder.

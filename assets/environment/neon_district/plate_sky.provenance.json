@@ -1,0 +1,29 @@
+{
+  "independent_plate": true,
+  "resolution": "resampled_up",
+  "resample_factor": 1.05683419,
+  "original_dimensions": [
+    2129,
+    739
+  ],
+  "tool": "Pillow (Lanczos resampling and center crop); source generated with ChatGPT image generation",
+  "source": "a_wide_cinematic_ultra_detailed_sci_fi_fantasy_s.png",
+  "source_sha256": "917db96e79d5b39257a956859fe98f2f25a812146915c1b35763438654d4d665",
+  "owner_approved_resample": true,
+  "method": "uniform_lanczos_resample_crop_bottom_1px",
+  "dimensions": [
+    2250,
+    780
+  ],
+  "crop_pixels": {
+    "left": 0,
+    "right": 0,
+    "top": 0,
+    "bottom": 1
+  },
+  "note": "Sky-only generated image, owner-approved limited resampling; NOT natively generated at delivery resolution. Independent from all other plates.",
+  "source_file_in_repo": "reference/aether_storm_sky_ORIGINAL_2129x739_REFERENCE_ONLY.png",
+  "output_sha256": "36e1ad2ceb90afd9eec716561fd2337e73a44a09733b4e6bf98f0632186a2921",
+  "verification": "Checked by Claude: source sha256 matches; plate is bit-identical to Pillow Lanczos uniform resample of the source to 2250x781 with the bottom row cropped; factor 1.05683419 matches 2250/2129; 1 px (0.13%) crop.",
+  "status": "RESAMPLED_OWNER_APPROVED_NOT_NATIVE"
+}
