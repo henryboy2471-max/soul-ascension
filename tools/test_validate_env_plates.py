@@ -118,9 +118,10 @@ def main():
     finally:
         shutil.rmtree(base, ignore_errors=True)
     rc, out = run(ROOT / "assets/environment/neon_district")
-    sky_there = (ROOT / "assets/environment/neon_district/plate_sky.png").exists()
-    expect("the repository set is NOT production-ready: " + ("only plate_sky exists, the other six plates are reported missing" if sky_there else "no plates exist yet (BLOCKED)"),
-           (rc == 1 and "plate_far.png: file missing" in out and "PASS" not in out) if sky_there else rc == 2)
+    nd = ROOT / "assets/environment/neon_district"; sky_there = (nd / "plate_sky.png").exists(); names = [n + ".png" for n in V.PLATES] + [V.PROP_TRAM[0] + ".png"]; all_there = all((nd / n).exists() for n in names)
+    if all_there: expect("the repository's seven delivered assets pass the automatic checks (visual approval is separate)", rc == 0 and "RESULT: PASS" in out)
+    else: expect("the repository set is NOT production-ready: " + ("some plates are missing and are reported" if sky_there else "no plates exist yet (BLOCKED)"),
+           (rc == 1 and "file missing" in out and "PASS" not in out) if sky_there else rc == 2)
     if sky_there:
         rc, out = run(ROOT / "assets/environment/neon_district", "--only", "plate_sky"); expect("the delivered repository plate_sky.png passes its individual checks (RESAMPLED, set not validated)", rc == 0 and "SKY PASS" in out and "NOT validated" in out)
     print("RESULT:", "ALL PASS" if not bad else f"{bad} FAILED"); return 1 if bad else 0

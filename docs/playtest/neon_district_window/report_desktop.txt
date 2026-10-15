@@ -1,0 +1,8 @@
+PLAYTEST desktop  window=(1280, 720)  frames=697
+  after Mira: step=1
+  after relay: step=2
+  after mural: step=2
+  parallax layer positions vs round(-view*factor): 0 mismatches in 3485 layer-samples
+  layer coverage of the 1280 px screen (min margin over all layers/frames): 0.0 px, frames with a gap: 0
+  camera: median moving speed 269 px/s, worst single-frame step 28.3 px, pops (step beyond 2.5x the usual speed for that frame time): 0
+  street lift (dialogue) max 125.0 px; frames over 120 ms (excluding screenshot stalls): 0 of 697
