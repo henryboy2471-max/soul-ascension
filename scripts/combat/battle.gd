@@ -741,6 +741,9 @@ func damage_number(point:Vector2, amount:int, critical:bool, color:Color) -> voi
  tween.tween_property(label,"modulate:a",0.0,0.35).set_delay(0.45)
  tween.chain().tween_callback(label.queue_free)
 func finisher() -> void:
+ # a quick kill right after the Phase 2 change must not leave the PHASE 2 banner stacked under FINISH
+ intro_card.modulate.a=0
+ intro_sub.modulate.a=0
  ultimate_title.text="FINISH"
  ultimate_sub.text="THE UNBOUND  /  RESONANCE STRIKE"
  ultimate_title.modulate.a=1

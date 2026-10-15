@@ -20,6 +20,13 @@ func run() -> void:
  var ex=load("res://scripts/world/explore.gd").new()
  root.add_child(ex)
  await process_frame
+ # pedestrians' feet line on the approved Neon District plates: 22 px below the old 516, below the tram girder deck; the Hero and Mira are not moved
+ ex.update_positions(1.0)
+ var walk_ok=ex.walkers.size()>0
+ for w in ex.walkers:
+  if absf(w.node.position.y-538.0)>0.01: walk_ok=false
+ check(walk_ok and is_equal_approx(ex.walker_y,538.0),"Ambient pedestrians stand at y 538 (22 px below the tram girder deck line)")
+ check(is_equal_approx(ex.player.position.y,ex.py+ex.lift) and is_equal_approx(ex.npc.position.y,548.0+ex.lift),"Hero and Mira lanes are unchanged")
  ex.locked=false
  ex.px=500.0
  ex.py=585.0   # front lane: these motion checks walk past Mira's x (she is solid on her own lane, see the NPC checks below)

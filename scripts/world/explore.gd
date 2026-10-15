@@ -68,6 +68,7 @@ var obj_panel:Panel
 var flash_rect:ColorRect
 var time=0.0
 var lift=0.0
+var walker_y=516.0   # feet line of the ambient pedestrians (not the Hero or Mira)
 var floor_fill:ColorRect
 var hud_nodes:Array=[]
 func _ready() -> void:
@@ -86,6 +87,8 @@ func _ready() -> void:
   spots=config.spots
   enabled=config.enabled
  var art_script=config.get("art",NeonDistrictArt)
+ if art_script == NeonDistrictArt:
+  walker_y=538.0   # approved plates: the tram girder deck sits at y 497-520, so the pedestrians stand 22 px lower, on the street below it
  floor_fill=ColorRect.new()
  floor_fill.color=Color(0.02,0.025,0.06)
  floor_fill.position=Vector2(0,560)
@@ -289,7 +292,7 @@ func update_positions(blend:float) -> void:
  # While a conversation is open the whole street lifts so the dialogue box never covers characters.
  npc.position=Vector2(roundf(npc_x)-view,548.0+lift)
  for w in walkers:
-  w.node.position=Vector2(roundf(w.x)-view,516.0+lift)
+  w.node.position=Vector2(roundf(w.x)-view,walker_y+lift)
  player.position=Vector2(roundf(px)-view,py+lift)
 func _process(delta:float) -> void:
  time+=delta
