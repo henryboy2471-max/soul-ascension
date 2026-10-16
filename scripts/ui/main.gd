@@ -270,10 +270,13 @@ On a phone, use the matching touch buttons.",Vector2(294,383),17,UI.MUTED,690)
  UI.button(node,("RESUME " if resuming else "BEGIN ")+mission.number,Rect2(294,551,348,75),func(): start_episode(mission.id),true)
  if not mission.battle_only_waves.is_empty():
   UI.button(node,"BATTLE ONLY",Rect2(656,568,170,58),func(): start_battle(false,mission.id))
+# QA only: lets work-in-progress episodes (1-3) start from a save flag. It needs a debug/editor build, so release exports (the web build uses --export-release)
+# ignore the flag and a hand-edited save cannot start an unreleased episode. `debug_build` is a parameter only so tests can exercise the release branch.
+func dev_unlock_enabled(debug_build:bool=OS.is_debug_build()) -> bool:
+ return debug_build and Profile.flag(Profile.data.settings,"dev_unlock")
 func start_episode(mission_id:String="1-1") -> void:
  close_modal()
- var dev_unlock=bool(Profile.data.settings.get("dev_unlock",false))   # development/QA only: lets work-in-progress episodes start
- if not dev_unlock and (not MissionDefs.is_unlocked(mission_id,Profile.data.completed) or not MissionDefs.is_playable(mission_id)):
+ if not dev_unlock_enabled() and (not MissionDefs.is_unlocked(mission_id,Profile.data.completed) or not MissionDefs.is_playable(mission_id)):
   # A locked (or unfinished) episode never starts; the player stays on the menu.
   var locked=MissionDefs.get_def(mission_id)
   planned("EPISODE LOCKED","Clear the previous episode to unlock "+str(locked.get("number","this episode")).capitalize()+": "+str(locked.get("title_case","")),"LOCKED","")

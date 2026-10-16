@@ -130,7 +130,7 @@ func run() -> void:
  await use("records", "09_old_records")
  expect(ep.progress.clues.has("records") and ep.explore.enabled.get("registry_hidden", false), "records found; the hidden panel is now available")
  await use("registry_hidden", "10_hidden_registry")
- await use("archive_door")
+ # (the archive door opens its sealed-door puzzle since M4: that puzzle and its cinematic are played in playtest_relay_puzzles.gd / playtest_relay_finale.gd)
  # --- back through the market to the alleys (the shortcut is not open yet)
  await go("exit_market", "market")
  await go("exit_alleys", "alleys")
@@ -155,9 +155,10 @@ func run() -> void:
  expect(ep.zone_id == "workshop", "the tower stays sealed before the theory")
  await shot("19_tower_sealed", 0.4)
  await use("board", "20_theory_assembled", "20a_board_dialogue")
- expect(ep.progress.unlocks.has("tower") and ep.explore.objective_text == "Enter the Central Relay Tower", "theory assembled: tower unlocked, objective updated")
+ # since M4 the quest line continues after the theory (door puzzle, relay map) before the tower: the objective is whatever the saved clues say is next
+ expect(ep.progress.unlocks.has("tower") and ep.explore.objective_text == Episode3Data.next_step(ep.progress.clues).text, "theory assembled: tower unlocked, objective follows the saved clues")
  await go("exit_tower", "tower_1")
- expect(ep.explore.objective_text == "Climb the Central Relay Tower", "inside the tower the objective is to climb it")
+ expect(ep.explore.objective_text == Episode3Data.next_step(ep.progress.clues).text, "inside the tower the objective still follows the saved clues")
  await shot("21_tower_floor_1", 0.5)
  # --- Codex
  main.show_hero()

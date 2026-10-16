@@ -43,6 +43,13 @@ func run() -> void:
  for c in main.screen.get_children():
   if c.has_method("on_interact"): started=true
  check(not started and main.scene_name!="episode" and profile.mission_progress("1-3").is_empty(),"start_episode('1-3') opens no episode and writes no progress")
+ # ---- dev_unlock is honoured by debug/QA builds only; a release build ignores it even if the save says true
+ profile.data.settings["dev_unlock"]=true
+ check(main.dev_unlock_enabled(true) and not main.dev_unlock_enabled(false),"dev_unlock works in a debug/QA build and is ignored in a release build")
+ profile.data.settings["dev_unlock"]="yes"
+ check(not main.dev_unlock_enabled(true),"Only a real boolean true enables dev_unlock (\"yes\" does not)")
+ profile.data.settings.erase("dev_unlock")
+ check(not main.dev_unlock_enabled(true),"Without the flag nothing is unlocked, in any build")
  # ---- damaged saves (QA unlock on): every shape resumes into a valid zone with no crash
  profile.data.settings["dev_unlock"]=true
  var bad=[
