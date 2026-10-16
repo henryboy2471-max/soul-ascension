@@ -243,7 +243,7 @@ async function runProd() {
   // walk to Mira and talk until the objective step advances (step >= 1), reloading the moment it is seen
   await setMove(1); await sleep(T ? 2300 : 1800); await setMove(0); await sleep(300);
   let step = 0, tries = 0;
-  while (step < 1 && tries < 24) { await act(); await sleep(500); for (let i = 0; i < 6; i++) { await advance(); await sleep(350); } const m = (await readStores()).mirror; step = m && m.mission_progress && m.mission_progress['1-1'] ? (m.mission_progress['1-1'].step || 0) : 0; tries++; if (step < 1) { await setMove(1); await sleep(300); await setMove(0); } }
+  while (step < 1 && tries < 24) { await act(); await sleep(500); for (let i = 0; i < 6; i++) { await advance(); await sleep(350); } const m = (await readStores()).mirror; step = m && m.mission_progress && m.mission_progress['1-1'] ? (m.mission_progress['1-1'].step || 0) : 0; tries++; if (step < 1) { const dir = (tries % 4 < 2) ? 1 : -1; await setMove(dir); await sleep(350); await setMove(0); await sleep(250); } }   // no hook in production: search left and right of the first guess for Mira
   ok('P3: talking to Mira advanced the objective step in the saved progress', step >= 1, 'step ' + step);
   const want = (await readStores()).mirror.mission_progress['1-1'];
   const p3 = await page.evaluate(() => { const p = window.__soul ? window.__soul.pending : null; setTimeout(() => location.reload(), 0); return p; });

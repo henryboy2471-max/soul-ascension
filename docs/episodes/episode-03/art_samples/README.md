@@ -1,6 +1,6 @@
 # Episode 3 character samples (REVIEW ONLY)
 
-Teo Marrow, Anselm Dray and the Relay Warden, two directions each (A recommended, B alternate). **Nothing here is imported into the game, no batch has been made, and no paid service was used.** The directory has a `.gdignore`, so Godot does not import these files, and `docs/*` is excluded from every export.
+Teo Marrow, Anselm Dray (he/him) and the Relay Warden, two directions each. **Teo A and the Warden A are preferred concept directions only; nothing is approved.** Anselm's sheet was revised for he/him (see below) and still needs your choice of A or B. **Nothing here is imported into the game, no batch has been made, and no paid service was used.** The directory has a `.gdignore`, so Godot does not import these files, and `docs/*` is excluded from every export.
 
 - `overview.png`: all three characters, both directions, one page.
 - `teo_marrow_samples.png`, `anselm_dray_samples.png`: front/side/back plus three portrait expressions per direction, palette strip, story grounding.
@@ -15,5 +15,8 @@ Teo Marrow, Anselm Dray and the Relay Warden, two directions each (A recommended
 ## Known limits
 Teo's spectacle lenses are not amber-tinted (the renderer draws pale frames only); hands are simple; Anselm's ink-stained fingers are not visible at this size; expressions differ only slightly; the Warden is a front view only (no side/back, no animation frames, no attack poses), and an approved design would still need a Cantor-style frame set before it could replace the placeholder.
 
+## Anselm revision (he/him)
+The in-game Codex says "He could not." The first sheet read as ambiguous or feminine because the renderer has no gender setting and the suit template draws a skirt-like lower body. Both options now use a jacket-and-trousers or overcoat silhouette with stronger brow, jaw and nose sliders, smaller eyes and a thinner mouth. The faces still keep this renderer's soft style; a painted portrait would settle it. (`STORY_PLAN.md` itself states no pronouns for Anselm that I could find; the Codex text is the pronoun source I used.)
+
 ## Decision needed from Henry
-For each character: approve A, approve B, ask for changes, or reject the direction. Also: should final art come from these (procedural), a commissioned artist (option A/D), or a generator you approve and pay for (CLAUDE.md requires your explicit approval for paid art services; none was used)? Until then: no integration, no sprite sets, no batch.
+Only this: choose Anselm A or B (or ask for changes). Teo A and the Warden A stay preferred directions until you approve them. How final art is produced (these procedural samples, an artist, or a generator you approve and pay for; CLAUDE.md requires your explicit approval for paid art) is a later call; none is started. No integration, no sprite sets, no batch.

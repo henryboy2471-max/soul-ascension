@@ -3,7 +3,7 @@
 
 Procedural 2D art drawn in code with the project's existing renderer (tools/art25d/chargen.py: ink outline, 3-tone cel shading, upper-left light, cool rim) - no external
 assets, no paid service, nothing imported into the game. Output goes to docs/episodes/episode-03/art_samples/ (a .gdignore keeps Godot from importing it).
-Each character gets two directions: A (recommended) and B (alternate). Run: python3 tools/art25d/ep3_samples.py [out_dir]
+Each character gets two directions (A, B). Teo A and Warden A are preferred concept directions only; nothing is approved. Run: python3 tools/art25d/ep3_samples.py [out_dir]
 """
 import os, sys, math, random
 sys.path.insert(0, os.path.dirname(__file__))
@@ -26,9 +26,9 @@ def font(sz, bold=False):
 TEO_A = dict(acc=['collar', 'bracers', 'cane', 'pouches', 'seams'], expr=0, skin='brown', hair='locs', hair_c='ece9f2', hair_sh='a9a6bd', eye='8a5a26', outfit='coat', top='3a2c28',
              coat_in='c89a4a', trim='e8b878', pants='2a2420', boots='3a2e26', glasses=True, beard=True, brow=1.15, jaw=1.1, nose=1.05, lip=0.95, eyes=0.95, sw=1.05, h=1.06, glow='e8b878')
 TEO_B = dict(TEO_A, hair='twists', outfit='jacket', top='2f3a3c', coat_in='e8b878', trim='d8a85a', acc=['collar', 'bracers', 'pouches', 'seams', 'sole_glow'], expr=1, sw=1.12, h=1.02, beard=True)
-ANS_A = dict(acc=['collar', 'bracers', 'epaulets'], expr=2, skin='honey', hair='fade', hair_c='2a2230', hair_sh='140e1a', eye='5a4a3a', outfit='suit', top='5a6072', coat_in='7c8498',
-             trim='c0384a', pants='3c4152', boots='1c1c24', glasses=False, brow=0.85, jaw=0.8, nose=0.9, lip=0.9, eyes=1.05, sw=0.88, h=1.0, glow='9fb4d8')
-ANS_B = dict(ANS_A, outfit='coat', top='46506a', coat_in='9fb4d8', acc=['collar', 'bracers', 'seams'], glasses=True, expr=0, hair='fade', hair_c='3a3040')
+ANS_A = dict(acc=['collar', 'bracers', 'epaulets'], expr=2, skin='honey', hair='fade', hair_c='2a2230', hair_sh='140e1a', eye='5a4a3a', outfit='jacket', top='5a6072', coat_in='7c8498',
+             trim='c0384a', pants='3c4152', boots='1c1c24', glasses=False, brow=1.2, jaw=1.15, nose=1.1, lip=0.8, eyes=0.85, sw=1.0, h=1.02, glow='9fb4d8')   # he/him: stronger brow and jaw, smaller eyes (the renderer has no gender switch; these are its masculine-coding sliders)
+ANS_B = dict(ANS_A, outfit='coat', top='46506a', coat_in='9fb4d8', acc=['collar', 'bracers', 'epaulets'], glasses=True, expr=0, hair='fade', hair_c='3a3040')
 
 def human_panel(ch, x_label):
     views = [c.render_frame(ch, v, 0, True).resize((216, 432), Image.LANCZOS) for v in ('front', 'side', 'back')]
@@ -276,19 +276,19 @@ def sheet(title, sub, panels, notes, palette, fname, width=1700):
 def main():
     os.makedirs(OUT, exist_ok=True)
     teo = sheet('TEO MARROW  /  THE RELAY KEEPER', 'Sample sheet  -  story: STORY_PLAN.md sec. 3 (cautious, eventually an ally); in-game accent e8b878',
-                [('A  /  RECOMMENDED   long white locs, brass-trimmed long coat, rail-spike cane, round spectacles (amber lens tint not yet rendered)', human_panel(TEO_A, 'A')),
+                [('A  /  PREFERRED CONCEPT DIRECTION (not approved)   long white locs, brass-trimmed long coat, rail-spike cane, round spectacles (amber lens tint not yet rendered)', human_panel(TEO_A, 'A')),
                  ('B  /  ALTERNATE   shorter white twists, work jacket with brass lantern fittings, no cane', human_panel(TEO_B, 'B'))],
                 ['Grounding: the plan calls Teo the Relay Keeper who understands the abandoned network, initially cautious, eventually an ally; the game text has him keeping the network alive from a workshop behind the alleyways and wary of anyone who looks like Meridian; his dialogue colour is amber e8b878. The earlier (superseded) Episode 3 proposal described him as tall and weathered, in a long coat with brass lantern fittings, round amber-lens spectacles, braided white hair and a rail-spike cane. Those details are a hint, not an approved design; A leans on them, B tests a plainer work look.',
                  'Palette follows the approved style: near-black base, one saturated accent (amber/brass), small luminous areas. Known limits of this renderer: spectacle lenses are drawn pale (the amber tint is not rendered yet), hands are mitten-simple, and expressions differ only slightly. A hand-painted portrait set would be needed for final art (see VISUAL_DIRECTION_PROPOSAL.md option D).'],
                 [('base', '3a2c28'), ('coat', '2f3a3c'), ('brass', 'c89a4a'), ('accent', 'e8b878'), ('hair', 'ece9f2'), ('skin', '70482f')], 'teo_marrow_samples.png')
-    ans = sheet('ANSELM DRAY  /  FORMER REGISTRY CLERK', 'Sample sheet  -  story: STORY_PLAN.md sec. 3; in-game accent 9fb4d8',
-                [('A  /  RECOMMENDED   neat grey Meridian clerk uniform, crimson registry armband trim, anxious', human_panel(ANS_A, 'A')),
-                 ('B  /  ALTERNATE   slate-blue registry overcoat, round spectacles, composed', human_panel(ANS_B, 'B'))],
-                ['Grounding: the plan calls Anselm a former Meridian registry clerk who conceals evidence of falsified and unusually old Ascendant records; the game text has him ordered to burn the old registry and unable to, hiding at the Transit Station, anxious and a rule-follower who slowly questions the rules; his dialogue colour is pale blue-grey 9fb4d8. The earlier (superseded) proposal gave him a neat grey uniform, a Meridian-crimson registry armband and ink-stained fingers. Treated as a hint, not approved. Meridian crimson also reads as the Enforcer accent, which is intended: he still wears the institution.',
-                 'Known limits: ink-stained fingers are not visible at this resolution; the uniform is a recoloured suit template; expressions differ only slightly.'],
+    ans = sheet('ANSELM DRAY  /  FORMER REGISTRY CLERK', 'Sample sheet (revised: he/him)  -  story: STORY_PLAN.md sec. 3; in-game accent 9fb4d8; Henry to choose A or B',
+                [('A  /  OPTION A   neat grey Meridian clerk jacket and trousers, crimson registry armband trim, anxious', human_panel(ANS_A, 'A')),
+                 ('B  /  OPTION B   slate-blue registry overcoat, round spectacles, composed', human_panel(ANS_B, 'B'))],
+                ['Revision: Anselm is he/him (the in-game Codex text says "He could not."). The first sheet read as ambiguous or feminine because the renderer has no gender switch and the suit template draws a skirt-like lower body; both options now use a jacket-and-trousers silhouette and stronger brow, jaw and nose sliders with smaller eyes and a thinner mouth. Grounding: the plan calls Anselm a former Meridian registry clerk who conceals evidence of falsified and unusually old Ascendant records; the game text has him ordered to burn the old registry and unable to, hiding at the Transit Station, anxious and a rule-follower who slowly questions the rules; his dialogue colour is pale blue-grey 9fb4d8. The earlier (superseded) proposal gave him a neat grey uniform, a Meridian-crimson registry armband and ink-stained fingers. Treated as a hint, not approved. Meridian crimson also reads as the Enforcer accent, which is intended: he still wears the institution.',
+                 'Known limits: ink-stained fingers are not visible at this resolution; both options are recoloured templates; the faces keep the renderer soft style, so he/him reads mainly from the silhouette, brow and jaw, and a painted portrait would settle it; expressions differ only slightly.'],
                 [('uniform', '5a6072'), ('overcoat (B)', '46506a'), ('armband', 'c0384a'), ('accent', '9fb4d8'), ('hair', '2a2230'), ('skin', 'b27d52')], 'anselm_dray_samples.png')
     wa = sheet('THE RELAY WARDEN', 'Sample sheet  -  story: STORY_PLAN.md sec. 3 and 8; M4 arena; in-game accent 6fd7e4 (restored) / signal red (corrupted)',
-               [('A  /  RECOMMENDED   the Lamp Guardian: tall sentinel, plate coat, lamp-lens head, bell chest, valve wheel shoulder, seal disc crown', warden_panel('A')),
+               [('A  /  PREFERRED CONCEPT DIRECTION (not approved)   the Lamp Guardian: tall sentinel, plate coat, lamp-lens head, bell chest, valve wheel shoulder, seal disc crown', warden_panel('A')),
                 ('B  /  ALTERNATE   the Bell-Tower Sentinel: bell-shaped body, floating lamp head and clamp hands, three seal rings', warden_panel('B'))],
                ['Grounding: the plan calls the Warden an ancient guardian protecting the Central Relay whose original purpose has been corrupted; the fight restores it instead of destroying it (sec. 8): the player wakes three mechanisms in order (VALVE, BELL, SEAL), and in the game text its light flickers, steadies and finds Echo, and its first instruction was to keep, never to choose. So both designs carry the three mechanisms on the body (valve wheel, bell, seal disc) and a single lamp-lens eye, and each is drawn in the two states the player sees: corrupted (signal red, cut cables or broken rings, glitch slices) and restored (steady cyan, intact). The earlier superseded proposal described a Meridian tram construct (signal-lamp head, rail-clamp arms, steel-plate conductor coat); the lamp head and clamp hands are kept, the tram theme is not, because the official plan makes it an ancient guardian.',
                 'Distinct from the existing bosses: Hollow Cantor (halo, porcelain mask), Shade (cloak), Enforcer (flame). Palette: indigo iron, aged brass, one accent (cyan restored / red corrupted). Known limits: this is a drawn-in-code front view only, no side/back, no animation frames, no attack poses; the game currently shows the Warden as the scaled, tinted pedestrian rig, so an approved design would also need a 64-frame-style sprite set (like the Cantor) before it could replace that.'],
@@ -297,7 +297,7 @@ def main():
     ov = Image.new('RGB', (1700, 1010), BG[:3])
     d = ImageDraw.Draw(ov)
     d.text((24, 14), 'EPISODE 3 CHARACTER SAMPLES  /  REVIEW ONLY', fill=(255, 255, 255), font=font(28, True))
-    d.text((24, 54), 'Teo Marrow, Anselm Dray, the Relay Warden. A = recommended, B = alternate. Not integrated. Procedural concept art, no paid service.', fill=(255, 214, 140), font=font(15))
+    d.text((24, 54), 'Teo Marrow, Anselm Dray, the Relay Warden. Teo A and Warden A are preferred concept directions only (not approved); Anselm A/B await a choice. Not integrated. Procedural concept art, no paid service.', fill=(255, 214, 140), font=font(15))
     x = 24
     for ch, lab in ((TEO_A, 'TEO  A'), (TEO_B, 'TEO  B'), (ANS_A, 'ANSELM  A'), (ANS_B, 'ANSELM  B')):
         f = c.render_frame(ch, 'front', 0, True).resize((216, 432), Image.LANCZOS)
