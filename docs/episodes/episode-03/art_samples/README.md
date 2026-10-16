@@ -1,6 +1,6 @@
 # Episode 3 character samples (REVIEW ONLY)
 
-Teo Marrow, Anselm Dray (he/him) and the Relay Warden, two directions each. **Teo A and the Warden A are preferred concept directions only; nothing is approved.** Anselm's sheet was revised for he/him (see below) and still needs your choice of A or B. **Nothing here is imported into the game, no batch has been made, and no paid service was used.** The directory has a `.gdignore`, so Godot does not import these files, and `docs/*` is excluded from every export.
+Teo Marrow, Anselm Dray (he/him) and the Relay Warden, two directions each. **Teo A, Anselm A and the Warden A are Henry's preferred concept directions. That is a direction choice only: nothing here is approved as final art, and nothing is approved for integration.** **Nothing here is imported into the game, no batch has been made, and no paid service was used.** The directory has a `.gdignore`, so Godot does not import these files, and `docs/*` is excluded from every export.
 
 - `overview.png`: all three characters, both directions, one page.
 - `teo_marrow_samples.png`, `anselm_dray_samples.png`: front/side/back plus three portrait expressions per direction, palette strip, story grounding.
@@ -18,5 +18,7 @@ Teo's spectacle lenses are not amber-tinted (the renderer draws pale frames only
 ## Anselm revision (he/him)
 The in-game Codex says "He could not." The first sheet read as ambiguous or feminine because the renderer has no gender setting and the suit template draws a skirt-like lower body. Both options now use a jacket-and-trousers or overcoat silhouette with stronger brow, jaw and nose sliders, smaller eyes and a thinner mouth. The faces still keep this renderer's soft style; a painted portrait would settle it. (`STORY_PLAN.md` itself states no pronouns for Anselm that I could find; the Codex text is the pronoun source I used.)
 
-## Decision needed from Henry
-Only this: choose Anselm A or B (or ask for changes). Teo A and the Warden A stay preferred directions until you approve them. How final art is produced (these procedural samples, an artist, or a generator you approve and pay for; CLAUDE.md requires your explicit approval for paid art) is a later call; none is started. No integration, no sprite sets, no batch.
+## Direction record
+- Teo A, Anselm A (chosen after the he/him revision) and Warden A are the preferred concept directions; the B options are not chosen.
+- Not recorded as approved: final art, sprite sets, portraits, integration into the game, a production method, or a batch. Those each need a separate go-ahead from Henry.
+- Open (not a decision for now): how final art would be produced (these procedural samples, an artist, or a generator Henry approves and pays for; CLAUDE.md requires explicit approval for paid art). None is started.
