@@ -40,7 +40,9 @@ func unlock_codex(id:String) -> bool:
  return true
 # Per-mission story progress (e.g. which Episode 2 resonators are synced), saved with the profile so a mission can be resumed.
 func mission_progress(id:String) -> Dictionary:
- return data.get("mission_progress",{}).get(id,{})
+ var all=data.get("mission_progress",{})
+ var p=all.get(id,{}) if all is Dictionary else {}
+ return p if p is Dictionary else {}   # a damaged or hand-edited save entry reads as "no progress" instead of raising
 func set_mission_progress(id:String, progress:Dictionary) -> void:
  if not data.get("mission_progress") is Dictionary:
   data["mission_progress"]={}

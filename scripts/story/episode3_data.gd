@@ -328,9 +328,9 @@ static func respond(id:String, clues:Array) -> Dictionary:
 # ---------------------------------------------------------------- M4 cinematics (drafts; wording needs owner review)
 const CINE = {
  "opening":[
-  {"who":"NARRATOR","text":"Lantern Quarter, shortly after the Rain Array fell silent. Every Meridian screen still loops the same announcement: forty-eight hours."},
+  {"who":"NARRATOR","text":"Lantern Quarter, shortly after the Rain Array incident. Every Meridian screen still loops the same announcement: forty-eight hours."},
   {"who":"NARRATOR","text":"Up on the rooftops the old relay towers stand dark. Down in the market, the speakers have started to talk."},
-  {"who":"MIRA","text":"Echo. The tower on Ninth just spoke again, the third time today. People are standing in the street, listening."},
+  {"who":"MIRA","text":"Echo. The tower on Ninth just spoke again. People are standing in the street, listening."},
   {"who":"PLAYER","text":"Listening to who?"},
   {"who":"MIRA","text":"That's what we're here to find out. Stay close, and don't flinch when you hear your own name."}
  ],

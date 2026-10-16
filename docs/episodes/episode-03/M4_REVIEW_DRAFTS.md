@@ -3,7 +3,7 @@
 Generated from the code (so this is exactly what the game says and does). **Every line, number and Codex text below is Claude's draft** unless marked as owner-approved. The plan fixes only the beats (§9: opening, Teo reveals the memory network, Anselm exposes Echo's registry entry, Warden recognition, First Echo recording; §8: the Warden is restored, not destroyed). Marked [Inference] where I am judging difficulty or fit without a player.
 
 ## Revision 2: what changed since the first draft (owner instructions)
-- **No unsupported timeline.** The opening no longer says "the morning after the Rain Array fell silent" or that it is "third time since sunrise". It now says "shortly after the Rain Array fell silent" (the plan: "Episode 3 begins shortly afterward in Lantern Quarter") and "the third time today". [Inference] "Third time today" still implies the same day, which is mild; say if you want that removed too.
+- **No unsupported timeline.** The opening no longer says "the morning after the Rain Array fell silent" or that it is "third time since sunrise". **Owner-approved final wording:** "shortly after the Rain Array incident", and Mira's line no longer says "the third time today".
 - **Echo and the First Echo stay open.** Removed: "RETURN... NOT EXPECTED", "THE SIGNATURE THAT WAS FILED FIRST", "It is your note, to the last decimal", "That isn't a copy. That's you.", "Or whoever I came from", and "Whoever carries it now will come looking for the one who first sang it". **Kept: the exact signature match and the Vaust hook.** The scenes now say only that the signature matches exactly ("MATCH: ARCHIVE RECORD 0001. EXACT.", "It matches yours exactly.", "That's your signature. Exactly.") and end on Echo's question "Then who is the First Echo?". Nothing says Echo is, is not, or descends from the First Echo.
 - **Sealed fragment (owner-approved M3 revisions applied):** only the voice counting seven remains; the lamp and "We kept it safe in the towers" are gone from the chamber, the finale payoff and the Codex text. "tonight" stays on the long-tone card, and the memory puzzle no longer reports how many cards are in place.
 - **Rewards are provisional** (section 7).
@@ -13,9 +13,9 @@ For each block reply APPROVE / CHANGE (with your wording). Text lives in `script
 ---
 ## 1. Cinematics (draft dialogue)
 **Episode opening (plan §9.1)**
-> **NARRATOR**: Lantern Quarter, shortly after the Rain Array fell silent. Every Meridian screen still loops the same announcement: forty-eight hours.
+> **NARRATOR**: Lantern Quarter, shortly after the Rain Array incident. Every Meridian screen still loops the same announcement: forty-eight hours.
 > **NARRATOR**: Up on the rooftops the old relay towers stand dark. Down in the market, the speakers have started to talk.
-> **MIRA**: Echo. The tower on Ninth just spoke again, the third time today. People are standing in the street, listening.
+> **MIRA**: Echo. The tower on Ninth just spoke again. People are standing in the street, listening.
 > **PLAYER**: Listening to who?
 > **MIRA**: That's what we're here to find out. Stay close, and don't flinch when you hear your own name.
 

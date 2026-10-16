@@ -80,7 +80,11 @@ func run() -> void:
  for id in Episode3Data.CINE:
   for l in Episode3Data.CINE[id]: all_cine+=" "+str(l.text)+" "+str(l.who)
  var opening=" ".join(Episode3Data.CINE.opening.map(func(l): return str(l.text)))
- check(not opening.contains("morning") and not opening.contains("sunrise") and opening.contains("shortly after the Rain Array fell silent"),"The opening asserts no time of day: 'shortly after', not 'the morning after' or 'since sunrise'")
+ check(not opening.contains("morning") and not opening.contains("sunrise") and opening.contains("shortly after the Rain Array incident") and not opening.contains("fell silent"),"The opening asserts no time of day: 'shortly after the Rain Array incident', not 'the morning after' or 'since sunrise'")
+ var mira_open=" ".join(Episode3Data.CINE.opening.filter(func(l): return l.who=="MIRA").map(func(l): return str(l.text)))
+ check(not mira_open.contains("third time") and not mira_open.contains("today"),"Mira's opening line no longer says 'the third time today'")
+ var glass=" ".join(Episode3Data.finale_extras(["pip_done"]).map(func(l): return str(l.text)))
+ check(glass.contains("Lio's lamp glass") and not Episode3Data.finale_extras(["first_memory_fragment"]).map(func(l): return str(l.text)).any(func(t): return t.contains("lamp")),"Lio's lamp glass (the M2 keepsake, Pip's trail) stays in the finale, separate from the sealed-chamber clue")
  var rec=" ".join(Episode3Data.CINE.recording.map(func(l): return str(l.text)))
  var rec_wake=" ".join(Episode3Data.CINE.recognition.map(func(l): return str(l.text)))
  check(rec.contains("exact") and rec.contains("matches yours exactly") and rec.contains("Vaust") and rec.contains("Then who is the First Echo?"),"The recording keeps the exact signature match and the Vaust hook, and ends on the open question")

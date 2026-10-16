@@ -155,7 +155,22 @@ Branch `episode-3/the-relay-keeper`. Not merged to `main`, not deployed. Mission
 
 Requested by Henry after M4; applied on `episode-3/the-relay-keeper`. Not merged, not deployed.
 - **M3 revisions (owner-approved):** keep "tonight" on the long-tone card; the memory puzzle no longer reports how many cards are in place (wrong order now says `NOT YET  /  THE ORDER IS WRONG`); the sealed-chamber clue keeps only the voice counting seven. The lamp and "We kept it safe in the towers" are removed from the chamber, the finale payoff line and the Codex text.
-- **M4 draft revisions:** the opening no longer asserts "the morning after" or "since sunrise" (now "shortly after the Rain Array fell silent" and "the third time today"); the Warden and recording scenes keep the exact signature match and the Vaust hook but no longer state or imply that Echo is, or came from, the First Echo (the recording ends on Echo's question "Then who is the First Echo?").
+- **M4 draft revisions:** the opening no longer asserts "the morning after" or "since sunrise" (final, owner-approved: "shortly after the Rain Array incident"; Mira's "the third time today" removed); the Warden and recording scenes keep the exact signature match and the Vaust hook but no longer state or imply that Echo is, or came from, the First Echo (the recording ends on Echo's question "Then who is the First Echo?").
 - **Rewards** stay 180 XP / 340 gold and 80 / 150 and are flagged PROVISIONAL (`"provisional":true` in the mission data, a comment beside it, and a labelled table in `M4_REVIEW_DRAFTS.md`).
-- One judgment call to confirm: Pip's "Lio's lamp glass" line in the finale payoff (the approved M2 keepsake) was left, since it is not the removed chamber lamp.
+- Confirmed by Henry: Pip's "Lio's lamp glass" line stays as the M2-established keepsake, separate from the sealed-chamber clue (pinned by a test).
 - Tests updated and extended: `test_puzzle_logic`, `test_relay_m3`, `playtest_relay_puzzles` (feedback text); `test_relay_m4` gained data checks that pin each wording change (no lamp / no "kept it safe" in the chamber, finale payoff and Codex; "tonight" kept; no time-of-day in the opening; the exact match, the Vaust hook and the open question kept; nothing says Echo is the First Echo; rewards unchanged and provisional).
+
+
+---
+# M5: Polish and testing (started after the owner's M4 sign-off; in progress)
+
+Owner sign-off (recorded in `APPROVAL.md`): M4 approved with two opening edits (applied: "shortly after the Rain Array incident"; "the third time today" removed). Lio's lamp glass stays. Rewards 180 XP / 340 gold and 80 / 150 are approved **only as provisional values for M5 economy testing**. Limits: mission 1-3 stays unplayable until the M5 release review; no merge to `main`; no deploy; no new character art before Henry approves samples.
+
+## Done so far
+- **Release gate pinned** (`tests/test_relay_m5.gd`): with Episodes 1-2 cleared, 1-3 is unlocked but not playable, is not the home mission, shows `PLANNED`, and `start_episode("1-3")` opens nothing and writes no progress. [Inference] The only way in is the hidden `settings.dev_unlock` save flag (QA); it should be removed or gated out of release builds at the release review.
+- **Bug found and fixed:** `Profile.mission_progress` raised a script error when a save's entry for a mission (or the whole `mission_progress`) was not a dictionary. It is shared by every mission, so the fix is there: a damaged or hand-edited entry now reads as "no progress". Seven damaged-save shapes for 1-3 (unknown zone, wrong types, the arena with no clues, bogus clue ids, ...) now each resume into a valid zone.
+- **Performance probe** (`tests/probe_relay_perf.gd`), software GL under xvfb at 1280x720, all eight zones: median 28-33 ms/frame, p95 34-41 ms, 99-162 draw calls (market highest). [Unverified for devices] Software rendering says nothing about phone GPUs; zones are uniform, none stands out.
+
+## Not done / blocked
+- **Web export and browser playthrough**: no Godot export templates are installed in this container (`export_templates` is empty), so a web build cannot be produced or played here. No browser or device claim is made.
+- **Artwork integration**: the Warden is still the scaled, tinted pedestrian rig; Teo, Anselm and the Warden have no portraits. Fixing that needs new character art, which is blocked until Henry approves samples. No audio exists for the M3/M4 content.
