@@ -77,6 +77,27 @@ func run() -> void:
  var ep2=main.screen.get_child(0)
  await settle(ep2)
  check(is_instance_valid(ep2) and ep2.explore!=null and ZoneDefs.zone(ep2.zone_id).size()>0,"A non-dictionary 1-3 entry starts a fresh, valid episode")
+ # ---- regression (found by the touch browser run): a tap on the empty cell next to a block slides it ONE step; that step must refresh, save and detect the solved lock
+ var rail=load("res://scripts/puzzle/puzzle_screen.gd").new()
+ rail.setup("rail",{"blocks":[[3,2,2,"h"],[0,0,2,"h"]]},[])
+ var saved=[0]
+ rail.changed.connect(func(_k,_s): saved[0]+=1)
+ root.add_child(rail)
+ await process_frame
+ rail.rail_tap(Vector2i(5,2))
+ check(PuzzleLogic.rail_solved(rail.state) and rail.done and saved[0]>=1,"Tapping the empty cell beside the carriage slides it one step, saves, and completes the rail lock")
+ var rail2=load("res://scripts/puzzle/puzzle_screen.gd").new()
+ rail2.setup("rail",{"blocks":[[1,2,2,"h"],[0,0,2,"h"]]},[])
+ var saved2=[0]
+ rail2.changed.connect(func(_k,_s): saved2[0]+=1)
+ root.add_child(rail2)
+ await process_frame
+ rail2.rail_tap(Vector2i(3,2))
+ check(int(rail2.state.blocks[0][0])==2 and saved2[0]>=1 and not rail2.done,"A one-step tap slide that does not finish the lock is still saved")
+ rail2.rail_tap(Vector2i(0,4))
+ check(int(rail2.state.blocks[0][0])==2 and saved2[0]==1,"A tap off the block's rail does nothing and saves nothing")
+ rail.queue_free()
+ rail2.queue_free()
  profile.data.mission_progress=[1,2]
  check(profile.mission_progress("1-3").is_empty() and profile.mission_progress("1-1").is_empty(),"A non-dictionary mission_progress reads as no progress for every mission")
  print("RESULT: %d passed, %d failed" % [passed,failed])

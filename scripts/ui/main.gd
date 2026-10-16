@@ -54,6 +54,8 @@ func add_temp_notice() -> void:
 func _ready() -> void:
  Profile.changed.connect(refresh_profile)
  add_temp_notice()
+ if OS.has_feature(QA_FEATURE):
+  add_qa_tools()
  show_home()
  if demo_requested():
   call_deferred("start_neon_demo")
@@ -66,6 +68,18 @@ func _ready() -> void:
   if modal: modal.queue_free();modal=null
   start_battle()
   capture("battle")
+# QA flavor only (export preset "Web QA"): a banner, the state hook the browser driver reads, and a missions-screen button that starts Episode 3 (clearing 1-1/1-2 in the QA save first).
+func add_qa_tools() -> void:
+ temp_notice.text="QA BUILD  /  NOT FOR RELEASE  /  EPISODE 3 UNLOCKED FOR TESTING"
+ var hook=load("res://scripts/qa/qa_hook.gd").new()
+ hook.main=self
+ add_child(hook)
+func qa_play_episode3() -> void:
+ for id in ["1-1","1-2"]:
+  if not Profile.data.completed.has(id):
+   Profile.data.completed.append(id)
+ Profile.persist()
+ start_episode("1-3")
 # The 2.5D Neon District demonstration is a separate, non-canon sandbox: it never touches saves or episode progress.
 # Start it with the command-line flag --demo-neon, or on the web with ?demo=neon.
 func demo_requested() -> bool:
@@ -270,10 +284,13 @@ On a phone, use the matching touch buttons.",Vector2(294,383),17,UI.MUTED,690)
  UI.button(node,("RESUME " if resuming else "BEGIN ")+mission.number,Rect2(294,551,348,75),func(): start_episode(mission.id),true)
  if not mission.battle_only_waves.is_empty():
   UI.button(node,"BATTLE ONLY",Rect2(656,568,170,58),func(): start_battle(false,mission.id))
-# QA only: lets work-in-progress episodes (1-3) start from a save flag. It needs a debug/editor build, so release exports (the web build uses --export-release)
-# ignore the flag and a hand-edited save cannot start an unreleased episode. `debug_build` is a parameter only so tests can exercise the release branch.
-func dev_unlock_enabled(debug_build:bool=OS.is_debug_build()) -> bool:
- return debug_build and Profile.flag(Profile.data.settings,"dev_unlock")
+# QA only: lets work-in-progress episodes (1-3) start. Two routes, both closed in production:
+#  - a debug/editor build plus `settings.dev_unlock` in the save (tests, local runs);
+#  - the separate "Web QA" export preset, which carries the custom feature `qa_unlock` (the production "Web" preset never does, and excludes scripts/qa/*).
+# Release exports without the feature ignore the save flag, so a hand-edited save cannot start an unreleased episode. The parameters exist so tests can exercise each branch.
+const QA_FEATURE = "qa_unlock"
+func dev_unlock_enabled(debug_build:bool=OS.is_debug_build(), qa_build:bool=OS.has_feature(QA_FEATURE)) -> bool:
+ return qa_build or (debug_build and Profile.flag(Profile.data.settings,"dev_unlock"))
 func start_episode(mission_id:String="1-1") -> void:
  close_modal()
  if not dev_unlock_enabled() and (not MissionDefs.is_unlocked(mission_id,Profile.data.completed) or not MissionDefs.is_playable(mission_id)):
@@ -480,6 +497,8 @@ func show_missions() -> void:
   var title=mission.id+"  "+mission.title
   UI.label(node,title,Vector2(294+col*350,208+row*63),16,Color.WHITE if i==0 else UI.MUTED,320)
   UI.label(node,mission_status(mission.id),Vector2(294+col*350,233+row*63),13,UI.GOLD if i==0 else Color("68738c"))
+ if OS.has_feature(QA_FEATURE):
+  UI.button(node,"QA: PLAY EPISODE 3",Rect2(294,512,300,46),func(): qa_play_episode3())
  UI.button(node,"PLAY EPISODE 1",Rect2(294,568,240,58),func(): show_mission("1-1"),true)
  if MissionDefs.is_playable("1-2") and MissionDefs.is_unlocked("1-2",Profile.data.completed):
   UI.button(node,"PLAY EPISODE 2",Rect2(544,568,240,58),func(): show_mission("1-2"),true)

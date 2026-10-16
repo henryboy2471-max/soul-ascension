@@ -222,7 +222,9 @@ func rail_tap(cell:Vector2i) -> void:
   elif blk[3]=="v" and cell.x==bx:
    dir=1 if cell.y>=by+l else (-1 if cell.y<by else 0)
   if dir==0:
-   return
+   if guard==1:
+    return   # a tap that is not on the block's own rail does nothing
+   break     # the block now covers the tapped cell: finish below (refresh, save, solved check) like any other slide
   var next=PuzzleLogic.rail_move(state,sel,dir)
   if next==state:
    break

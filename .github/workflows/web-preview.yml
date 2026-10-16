@@ -48,6 +48,9 @@ jobs:
           godot --version
           ls "$TEMPLATES"
 
+      - name: Release gate guard (production preset only, no QA flavor)
+        run: python3 tools/test_release_gate.py
+
       - name: Import project
         run: godot --headless --editor --import --quit
 
@@ -93,6 +96,11 @@ jobs:
           mkdir -p build/web
           godot --headless --export-release "Web" build/web/index.html
           ls -la build/web
+
+      - name: Verify the published build carries no QA tooling
+        run: |
+          # a packed file entry (not the "res://..." reference string the project cache keeps) means the QA hook was exported
+          if grep -a -q -P '(?<!res://)scripts/qa/qa_hook' build/web/index.pck; then echo "QA tooling found in the production export"; exit 1; fi
 
       - uses: actions/upload-pages-artifact@v3
         with:
