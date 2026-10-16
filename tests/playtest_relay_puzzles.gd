@@ -1,7 +1,7 @@
 extends SceneTree
 # Real-window playtest of Episode 3 M3 (needs a display):
 #   xvfb-run -a -s "-screen 0 1280x720x24" godot --rendering-driver opengl3 --path . --resolution 1280x720 --script res://tests/playtest_relay_puzzles.gd -- OUTDIR LABEL
-# Resumes in the tower with the M2 evidence in the save, then plays the three resonator puzzles with injected key events (the keyboard path): walks to each
+# Resumes in the tower with the M2 evidence and the M4 door/map keys in the save, then plays the three resonator puzzles with injected key events (the keyboard path): walks to each
 # resonator, presses Enter, solves the puzzle with arrows/Enter (including a hint and a leave-and-return), climbs the unlocked stairs, takes the sealed fragment
 # and examines the archive. Screenshots land in OUTDIR; the report lists every check.
 var out := "/tmp"
@@ -81,7 +81,7 @@ func run() -> void:
  profile.data.completed = ["1-1", "1-2"]
  profile.data.settings.sound = false
  profile.data.settings.dev_unlock = true
- var clues := ["tx_1","tx_2","tx_3","terminal","anselm_met","anselm_admits","records","scraped_entry","teo_met","decoded","theory"]
+ var clues := ["tx_1","tx_2","tx_3","terminal","anselm_met","anselm_admits","records","scraped_entry","teo_met","decoded","theory","puzzle_rail","puzzle_map","seen_exposure","seen_teo_reveal"]
  profile.data.mission_progress = {"1-3":{"intro":true,"zone":"workshop","visited":["market","station","alleys","workshop"],"unlocks":["shortcut","tower"],"discoveries":[],"clues":clues}}
  main = load("res://scenes/main.tscn").instantiate()
  root.add_child(main)
@@ -176,7 +176,7 @@ func run() -> void:
   await tap(KEY_UP)
  await tap(KEY_C)
  await shot("14_memory_wrong_order", 0.3)
- expect(sc.feedback.text.contains("OF 4 IN PLACE") and not sc.done, "wrong order: feedback says how many are in place")
+ expect(sc.feedback.text == "NOT YET  /  THE ORDER IS WRONG" and not sc.done, "wrong order: feedback says only that the order is wrong (no count)")
  for i in range(4):
   var want: String = PuzzleLogic.MEMORY_ORDER[i]
   if sc.state.slots[i] != want:
@@ -200,7 +200,7 @@ func run() -> void:
  expect(ep.progress.clues.has("puzzle_memory"), "fragments in clue order: memory restored")
  await shot("16_memory_restored", 0.5)
  await use("archive_gate")
- expect(ep.progress.clues.has("archive_examined") and Episode3Data.next_step(ep.progress.clues).is_empty(), "archive stirs; the M3 quest line is complete")
+ expect(ep.progress.clues.has("archive_examined") and Episode3Data.next_step(ep.progress.clues).id == "warden", "archive stirs; the quest line moves on to the Warden (M4)")
  await shot("17_archive_stirs", 0.6)
  expect(profile.data.completed == ["1-1", "1-2"], "Episode 1-2 completion untouched")
  note("RESULT: %d failures" % fails)

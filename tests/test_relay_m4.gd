@@ -66,6 +66,28 @@ func run() -> void:
  var full=Episode3Data.cine_lines("recording",["w_a","w_b","w_c","journal","hidden_registry","first_memory_fragment","pip_done"]).size()
  check(full==plain+5 and Episode3Data.finale_extras(["pip_done"]).size()==1 and Episode3Data.finale_extras([]).is_empty(),"The finale adds one extra line per investigated payoff (5 here); an uninvestigated run adds none")
  check(Episode3Data.cine_lines("recording",["pip_done"]).back().text.contains("ECHO"),"The extras play before the closing line: the Meridian screens flicker to ECHO")
+ # ---- owner-approved wording revisions stay in place
+ var chamber=Episode3Data.respond("sealed_chamber",[])
+ var chamber_text=" ".join(chamber.lines.map(func(l): return str(l.text)))
+ var extra_text=" ".join(Episode3Data.finale_extras(["first_memory_fragment"]).map(func(l): return str(l.text)))
+ var codex_text=""
+ for entry in Episode3Data.CODEX:
+  if entry.id=="first_memory": codex_text=str(entry.text)
+ check(chamber_text.contains("voice counts seven") and not chamber_text.contains("lamp") and not chamber_text.contains("kept it safe"),"Sealed chamber: only the voice counting seven (no lamp, no \"We kept it safe in the towers\")")
+ check(extra_text.contains("voice counting seven") and not extra_text.contains("lamp") and not extra_text.contains("kept it safe") and not codex_text.contains("lamp") and not codex_text.contains("kept it safe"),"Finale payoff and Codex text for the sealed fragment keep only the voice counting seven")
+ check(PuzzleLogic.MEMORY_CARDS.tone.text.contains("tonight") and not PuzzleLogic.memory_feedback(PuzzleLogic.memory_default()).contains("IN PLACE"),"The long-tone card keeps \"tonight\"; the memory feedback has no count")
+ var all_cine=""
+ for id in Episode3Data.CINE:
+  for l in Episode3Data.CINE[id]: all_cine+=" "+str(l.text)+" "+str(l.who)
+ var opening=" ".join(Episode3Data.CINE.opening.map(func(l): return str(l.text)))
+ check(not opening.contains("morning") and not opening.contains("sunrise") and opening.contains("shortly after the Rain Array fell silent"),"The opening asserts no time of day: 'shortly after', not 'the morning after' or 'since sunrise'")
+ var rec=" ".join(Episode3Data.CINE.recording.map(func(l): return str(l.text)))
+ var rec_wake=" ".join(Episode3Data.CINE.recognition.map(func(l): return str(l.text)))
+ check(rec.contains("exact") and rec.contains("matches yours exactly") and rec.contains("Vaust") and rec.contains("Then who is the First Echo?"),"The recording keeps the exact signature match and the Vaust hook, and ends on the open question")
+ check(not rec.contains("That's you.") and not rec.contains("whoever I came from") and not rec.contains("the one who first sang it") and not rec_wake.contains("FILED FIRST") and not rec_wake.contains("RETURN") and not rec_wake.contains("Return?"),"Nothing in the finale states that Echo is, or came from, the First Echo")
+ check(not rec.contains("lamp") and not rec_wake.contains("lamp"),"The recording and recognition scenes mention no lamp (the removed sealed-chamber detail)")
+ var rw=MissionDefs.get_def("1-3").rewards
+ check(rw.first.xp==180 and rw.first.gold==340 and rw.replay.xp==80 and rw.replay.gold==150 and bool(rw.get("provisional",false)),"Rewards stay 180 XP / 340 gold and 80 / 150, flagged provisional in the data")
  # ---- the sealed archive door (spatial rail puzzle) and Anselm's exposure
  var ep=await start_episode(profile,["tx_1","tx_2","tx_3","terminal","anselm_admits"],"station")
  ep.on_interact("archive_door")

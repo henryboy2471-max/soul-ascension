@@ -56,13 +56,13 @@ Mechanic as built: the evidence the player already found becomes fragment cards;
 | 3 | THE LONG TONE | Heard in the market tonight, in Echo's own note. | clue `tx_3` |
 | 4 | CRASH BULLETIN | Tram forty-one. Dated tomorrow evening. | clue `tx_2` |
 
-- Feedback: incomplete → `PLACE ALL FOUR FRAGMENTS, THEN CHECK`; wrong order → `0 OF 4 IN PLACE  /  THE REST ARE OUT OF ORDER` (the number varies); solved → `THE MEMORY HOLDS  /  IN ORDER`.
+- Feedback (**revised per owner**: the "N OF 4 IN PLACE" count is removed): incomplete → `PLACE ALL FOUR FRAGMENTS, THEN CHECK`; wrong order → `NOT YET  /  THE ORDER IS WRONG`; solved → `THE MEMORY HOLDS  /  IN ORDER`.
 - Hints: hint 1 `Oldest first. Look for the words that say WHEN.`; hint 2 `The oldest fragment is the one about the registry.`.
 - On-screen text: **MEMORY RESONATOR**: "Place the four fragments from the oldest to the newest. Select a fragment, then choose its slot."
 
 Review notes (be critical here):
-- The order is decided by the time words on the cards ("years before", "six nights ago", "tonight", "tomorrow evening"). Those words come from the M2 dialogue you approved (registry "years before the first recorded awakening"; terminal "six nights ago"; bulletin "tomorrow evening"); "tonight" for the long tone is my addition, since the plan gives no date.
-- [Inference] This is the easiest of the three: there is no decoy fragment, only one of 24 orders is right, and the "N OF 4 IN PLACE" feedback lets a player brute-force it. Options if you want it harder: add a decoy from an optional clue, drop the count feedback, or word the cards without explicit time words. If you want it to matter for story, the order could instead follow the plan's chain (counted, kept, replayed, answered), but that would need new canon wording from you.
+- The order is decided by the time words on the cards ("years before", "six nights ago", "tonight", "tomorrow evening"). Those words come from the M2 dialogue you approved (registry "years before the first recorded awakening"; terminal "six nights ago"; bulletin "tomorrow evening"); "tonight" for the long tone is my addition, since the plan gives no date. **Owner decision: keep "tonight".**
+- [Inference] This is the easiest of the three: there is no decoy fragment, only one of 24 orders is right, and (before the owner-approved revision) an "N OF 4 IN PLACE" count let a player narrow it down. That count is now removed; CHECK only says solved or not. [Inference] A player can still brute-force it with CHECK, just more slowly. Further options if you want it harder: add a decoy from an optional clue, or word the cards without explicit time words. If you want it to matter for story, the order could instead follow the plan's chain (counted, kept, replayed, answered), but that would need new canon wording from you.
 - All four cards come from main-path clues, so the puzzle can never be blocked by skipping optional content.
 
 ---
@@ -92,10 +92,10 @@ Repeat visit: > **NARRATOR**: The resonator waits for you.
 > **MIRA**: Evidence in order is a story. I don't like how this one ends.
 
 **Sealed chamber (optional quest; appears after the power resonator is restored)**
-> **NARRATOR**: Behind the panel the power just woke, a sealed chamber: one cradle, holding a recording crystal, mostly static. A voice counts seven, softly, and then there is a lamp. 'We kept it safe in the towers.'
-> **PLAYER**: Kept what safe?
+> **NARRATOR**: Behind the panel the power just woke, a sealed chamber: one cradle, holding a recording crystal, mostly static. A voice counts seven, softly.
+> **PLAYER**: Counting what?
 > **MIRA**: I don't know. But I don't think it's ours to take apart.
-Plan §6 names this: *"a sealed relay chamber containing an additional fragment of the First Memory."* The content ("a voice counting seven", "a lamp", "We kept it safe in the towers") is my invention and deliberately vague; please confirm or replace it, since it touches the First Memory.
+Plan §6 names this: *"a sealed relay chamber containing an additional fragment of the First Memory."* **Owner revision applied:** only the voice counting seven remains; the lamp and "We kept it safe in the towers" are removed here, from the finale payoff and from the Codex text.
 
 **Archive gate**, while a resonator is silent:
 > **NARRATOR**: A sealed archive gate. Three resonators feed it: 1 of 3 restored.

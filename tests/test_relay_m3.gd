@@ -154,7 +154,7 @@ func run() -> void:
   sc.pick_card(wrong[i])
   sc.press_slot(i)
  sc.check_memory()
- check(sc.feedback.text.contains("OF 4 IN PLACE") and not sc.done,"A wrong order reports how many fragments are in place and keeps the puzzle open")
+ check(sc.feedback.text=="NOT YET  /  THE ORDER IS WRONG" and not sc.feedback.text.contains("IN PLACE") and not sc.done,"A wrong order says only that the order is wrong (no count) and keeps the puzzle open")
  sc.press_slot(0)
  check(sc.state.slots[0]=="" and PuzzleLogic.memory_tray(sc.state,sc.clues).size()==1,"Tapping a placed fragment takes it back")
  # keyboard: cursor to the tray card, select, move down to slot 1, place

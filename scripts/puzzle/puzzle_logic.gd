@@ -341,9 +341,8 @@ static func memory_feedback(state:Dictionary) -> String:
  for s in state.slots:
   if s!="": filled+=1
  if filled<MEMORY_ORDER.size(): return "PLACE ALL FOUR FRAGMENTS, THEN CHECK"
- var n=memory_score(state)
- if n==MEMORY_ORDER.size(): return "THE MEMORY HOLDS  /  IN ORDER"
- return "%d OF 4 IN PLACE  /  THE REST ARE OUT OF ORDER" % n
+ if memory_score(state)==MEMORY_ORDER.size(): return "THE MEMORY HOLDS  /  IN ORDER"
+ return "NOT YET  /  THE ORDER IS WRONG"   # no count of correct cards: the owner removed that feedback
 static func memory_hint(state:Dictionary) -> String:
  if int(state.get("hints",0))<=1:
   return "Oldest first. Look for the words that say WHEN."

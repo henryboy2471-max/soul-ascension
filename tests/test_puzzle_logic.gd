@@ -76,7 +76,7 @@ func run() -> void:
  var m=PuzzleLogic.memory_default()
  for i in range(4):
   m=PuzzleLogic.memory_place(m,PuzzleLogic.MEMORY_ORDER[(i+1)%4],i)
- check(not PuzzleLogic.memory_solved(m) and PuzzleLogic.memory_score(m)<4 and PuzzleLogic.memory_feedback(m).contains("OF 4 IN PLACE"),"Memory: a wrong order is not solved and says how many are in place")
+ check(not PuzzleLogic.memory_solved(m) and PuzzleLogic.memory_score(m)<4 and PuzzleLogic.memory_feedback(m)=="NOT YET  /  THE ORDER IS WRONG","Memory: a wrong order is not solved and says only that the order is wrong (no count of correct cards)")
  for i in range(4):
   m=PuzzleLogic.memory_place(m,PuzzleLogic.MEMORY_ORDER[i],i)
  check(PuzzleLogic.memory_solved(m) and PuzzleLogic.memory_feedback(m).begins_with("THE MEMORY HOLDS") and PuzzleLogic.memory_tray(m,all_clues).is_empty(),"Memory: the clue order solves it and empties the tray")

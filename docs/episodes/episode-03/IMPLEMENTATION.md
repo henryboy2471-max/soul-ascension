@@ -61,7 +61,7 @@ Branch `episode-3/the-relay-keeper`. Not merged to `main`, not deployed; mission
 One puzzle per tower floor, at the resonator that M1 placed there. Rules are pure (`scripts/puzzle/puzzle_logic.gd`), the overlay is `scripts/puzzle/puzzle_screen.gd`, and the episode wiring is in `relay_episode.gd` (`run_puzzle`, `puzzle_done`).
 1. **Signal Frequency** (floor 1): three rounds, one per transmission the player scanned (the lullaby, the bulletin, the long tone). Tune FREQUENCY (waves) and HEIGHT (amplitude) until the live wave overlays the recorded one, then LOCK. Feedback is proximity only (OFF / CLOSE / VERY CLOSE / LOCKED).
 2. **Power Routing** (floor 2): a 6×4 conduit board. Turn tiles to carry current from the source to the relay lamp; two tiles are burnt out; most tiles are decoys. Powered tiles glow, and the header counts how far the current reaches.
-3. **Memory Reconstruction** (floor 3): the evidence the player already found (registry line, deleted index, the long tone, the crash bulletin) becomes four fragment cards; place them oldest to newest using the "when" in each. A fragment only appears if its clue was found. CHECK reports "N OF 4 IN PLACE".
+3. **Memory Reconstruction** (floor 3): the evidence the player already found (registry line, deleted index, the long tone, the crash bulletin) becomes four fragment cards; place them oldest to newest using the "when" in each. A fragment only appears if its clue was found. CHECK says only whether the order is right (the "N OF 4 IN PLACE" count was removed after owner review; see "Revisions after owner review").
 - **Hints (optional, tiered, never the answer)**: H or the HINT button. Signal: a description of the pattern, then a direction (too high / too low). Power: a general rule, then the first wrong tile on the intended path is marked. Memory: "look for the words that say WHEN", then which fragment is oldest. Mira introduces each puzzle but never solves it.
 - **Controls**: keyboard (arrows/WASD, Enter/Space/E, H, C, Esc), mouse and touch (every control is a large button; the power board takes taps/clicks). All three are tested.
 - **Persistence**: every move is saved (`mission_progress["1-3"].puzzles`); leaving with Esc/BACK and returning resumes the same board, tuning, placement and hint count. A solved resonator stays solved and does not reopen.
@@ -124,7 +124,7 @@ Branch `episode-3/the-relay-keeper`. Not merged to `main`, not deployed. Mission
 - **Finale payoffs from the investigation** (§6): up to five extra lines in the recording scene, one per investigated payoff (all three witnesses, the journal, the hidden registry, the sealed fragment, Pip's quest).
 - **Quest line** now: transmissions → terminal → Anselm → records → sealed door → Teo → decoder → board → relay map → tower → three resonators → archive → Warden → recording. The archive gate also needs the map and the door.
 - **Codex**: four new secret entries (Echo's Registry Entry, The Seven Arrays, The Relay Warden, The First Echo).
-- Placeholder rewards unchanged (180 XP / 340 gold, replay 80 / 150), pending your confirmation.
+- Rewards unchanged at 180 XP / 340 gold (replay 80 / 150) and now explicitly **PROVISIONAL** (flagged in `mission_defs.gd` and the review document) until you confirm them.
 
 ## Defects found and fixed during M4
 1. `next_step` indexed past the mechanism list in the moment between the third mechanism and the recognition scene (caught by the flow test).
@@ -148,3 +148,14 @@ Branch `episode-3/the-relay-keeper`. Not merged to `main`, not deployed. Mission
 - No quest-log screen; hints for the fight itself are Mira's two lines and the plaque.
 - Touch was exercised only through Godot's mouse emulation and the keyboard path in the window runs; no web export, Android or device run (M5, §12).
 - Mission 1-3 stays unplayable; the home screen and mission card do not show it (M5 release decision).
+
+
+---
+# Revisions after owner review (between M4 and M5; nothing from M5 started)
+
+Requested by Henry after M4; applied on `episode-3/the-relay-keeper`. Not merged, not deployed.
+- **M3 revisions (owner-approved):** keep "tonight" on the long-tone card; the memory puzzle no longer reports how many cards are in place (wrong order now says `NOT YET  /  THE ORDER IS WRONG`); the sealed-chamber clue keeps only the voice counting seven. The lamp and "We kept it safe in the towers" are removed from the chamber, the finale payoff line and the Codex text.
+- **M4 draft revisions:** the opening no longer asserts "the morning after" or "since sunrise" (now "shortly after the Rain Array fell silent" and "the third time today"); the Warden and recording scenes keep the exact signature match and the Vaust hook but no longer state or imply that Echo is, or came from, the First Echo (the recording ends on Echo's question "Then who is the First Echo?").
+- **Rewards** stay 180 XP / 340 gold and 80 / 150 and are flagged PROVISIONAL (`"provisional":true` in the mission data, a comment beside it, and a labelled table in `M4_REVIEW_DRAFTS.md`).
+- One judgment call to confirm: Pip's "Lio's lamp glass" line in the finale payoff (the approved M2 keepsake) was left, since it is not the removed chamber lamp.
+- Tests updated and extended: `test_puzzle_logic`, `test_relay_m3`, `playtest_relay_puzzles` (feedback text); `test_relay_m4` gained data checks that pin each wording change (no lamp / no "kept it safe" in the chamber, finale payoff and Codex; "tonight" kept; no time-of-day in the opening; the exact match, the Vaust hook and the open question kept; nothing says Echo is the First Echo; rewards unchanged and provisional).

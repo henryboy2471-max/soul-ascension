@@ -93,7 +93,8 @@ static func defs() -> Dictionary:
    "flow":"relay",
    "energy":0,"playable":false,
    "unlock":{"requires":["1-2"]},
-   "rewards":{"first":{"xp":180,"gold":340},"replay":{"xp":80,"gold":150}},
+   # PROVISIONAL: these reward values are placeholders awaiting the owner's sign-off (docs/episodes/episode-03/APPROVAL.md); do not treat them as final.
+   "rewards":{"first":{"xp":180,"gold":340},"replay":{"xp":80,"gold":150},"provisional":true},
    "codex":["relay_voices","teo","anselm","false_register","earlier_candidates","relay_journal","first_memory","echo_entry","seven_arrays","relay_warden","first_echo","pips_trail"],
    "intro_card_length":3.6,
    "objectives":[{"text":"Explore Lantern Market","x":1000.0}],

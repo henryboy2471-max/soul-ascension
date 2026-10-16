@@ -25,8 +25,8 @@ const CODEX = [
  {"id":"echo_entry","title":"ECHO'S REGISTRY ENTRY","text":"The original card from the sealed archive door: a signature that hums one long note, filed years before the first awakening. The handler column is blank.","secret":true},
  {"id":"seven_arrays","title":"THE SEVEN ARRAYS","text":"Seven relay arrays on one line. Not antennas but a memory network: everything said in the rain is kept, and someone changed what it keeps and replays.","secret":true},
  {"id":"relay_warden","title":"THE RELAY WARDEN","text":"The guardian of the Central Relay. Its first instruction was to keep, never to choose. It recognised Echo's signature on sight.","secret":true},
- {"id":"first_echo","title":"THE FIRST ECHO","text":"Recording 0001: the first resonance that held, the one every other signature learned from. Its note is exactly Echo's.","secret":true},
- {"id":"first_memory","title":"A SEALED FRAGMENT","text":"A recording crystal in a sealed relay chamber: a voice counting seven, and a lamp. Older than the arrays.","secret":true},
+ {"id":"first_echo","title":"THE FIRST ECHO","text":"Recording 0001 carries the signature of the First Echo, the resonance every other signature learned from. It matches Echo's exactly. Who the First Echo is has not been said.","secret":true},
+ {"id":"first_memory","title":"A SEALED FRAGMENT","text":"A recording crystal in a sealed relay chamber holds a voice counting seven.","secret":true},
  {"id":"pips_trail","title":"PIP'S TRAIL","text":"Lio drew three marks in the alleyways before he went to answer the voices in the central tower. His sister Pip still waits.","secret":true}
 ]
 # clue id -> main-quest requirement order (first missing step is the current objective)
@@ -297,7 +297,7 @@ static func respond(id:String, clues:Array) -> Dictionary:
    if clues.has("first_memory_fragment"):
     r.lines=[nar("The cradle is empty now. The static in the wall has gone quiet.")]
    else:
-    r.lines=[nar("Behind the panel the power just woke, a sealed chamber: one cradle, holding a recording crystal, mostly static. A voice counts seven, softly, and then there is a lamp. 'We kept it safe in the towers.'"),line("PLAYER","Kept what safe?"),line("MIRA","I don't know. But I don't think it's ours to take apart.")]
+    r.lines=[nar("Behind the panel the power just woke, a sealed chamber: one cradle, holding a recording crystal, mostly static. A voice counts seven, softly."),line("PLAYER","Counting what?"),line("MIRA","I don't know. But I don't think it's ours to take apart.")]
     r.add=["first_memory_fragment"]
     r.codex=["first_memory"]
     r.toast="HIDDEN CLUE  /  A SEALED FRAGMENT"
@@ -328,9 +328,9 @@ static func respond(id:String, clues:Array) -> Dictionary:
 # ---------------------------------------------------------------- M4 cinematics (drafts; wording needs owner review)
 const CINE = {
  "opening":[
-  {"who":"NARRATOR","text":"Lantern Quarter, the morning after the Rain Array fell silent. The violet rain has thinned to a drizzle, and every Meridian screen still loops the same announcement: forty-eight hours."},
+  {"who":"NARRATOR","text":"Lantern Quarter, shortly after the Rain Array fell silent. Every Meridian screen still loops the same announcement: forty-eight hours."},
   {"who":"NARRATOR","text":"Up on the rooftops the old relay towers stand dark. Down in the market, the speakers have started to talk."},
-  {"who":"MIRA","text":"Echo. Third time since sunrise: the tower on Ninth spoke again. People are standing in the street, listening."},
+  {"who":"MIRA","text":"Echo. The tower on Ninth just spoke again, the third time today. People are standing in the street, listening."},
   {"who":"PLAYER","text":"Listening to who?"},
   {"who":"MIRA","text":"That's what we're here to find out. Stay close, and don't flinch when you hear your own name."}
  ],
@@ -362,21 +362,21 @@ const CINE = {
  ],
  "recognition":[
   {"who":"NARRATOR","text":"The last mechanism turns. The Warden's light flickers, steadies, and finds you."},
-  {"who":"WARDEN","text":"SIGNATURE... ECHO. CONFIRMED."},
-  {"who":"WARDEN","text":"RETURN... NOT EXPECTED."},
-  {"who":"PLAYER","text":"Return? I've never been here."},
-  {"who":"WARDEN","text":"ORIGINAL INSTRUCTION RESTORED: KEEP. NEVER CHOOSE. THE ARCHIVE OPENS FOR THE SIGNATURE THAT WAS FILED FIRST."},
-  {"who":"MIRA","text":"Filed first. Echo..."},
+  {"who":"WARDEN","text":"SIGNATURE CONFIRMED: ECHO."},
+  {"who":"WARDEN","text":"MATCH: ARCHIVE RECORD 0001. EXACT."},
+  {"who":"PLAYER","text":"Exact? Whose record?"},
+  {"who":"WARDEN","text":"ORIGINAL INSTRUCTION RESTORED: KEEP. NEVER CHOOSE. THE ARCHIVE OPENS FOR THIS SIGNATURE."},
+  {"who":"MIRA","text":"This signature. Echo..."},
   {"who":"NARRATOR","text":"At the end of the chamber, the sealed archive latch lets go."}
  ],
  "recording":[
   {"who":"NARRATOR","text":"A single crystal cradle, and static. Then a voice, calm and tired and a very long time ago."},
   {"who":"RECORDING","text":"Recording zero. If you are hearing this, the arrays have been changed, and the keeping has become a choosing."},
-  {"who":"RECORDING","text":"The signature in this recording is exact. It is the first resonance that held, the one all the others learned from. We called it the First Echo."},
-  {"who":"RECORDING","text":"Whoever carries it now will come looking for the one who first sang it. Do not let Vaust find them first."},
-  {"who":"NARRATOR","text":"The note rolls out of the crystal. It is your note, to the last decimal."},
-  {"who":"MIRA","text":"Echo. That isn't a copy. That's you."},
-  {"who":"PLAYER","text":"Or whoever I came from."},
+  {"who":"RECORDING","text":"The signature in this recording is exact. It belongs to the First Echo, the resonance all the others learned from."},
+  {"who":"RECORDING","text":"If the note in your chest answers it, then Vaust is listening for the same note. Do not let Vaust find the First Echo."},
+  {"who":"NARRATOR","text":"The note rolls out of the crystal. It matches yours exactly."},
+  {"who":"MIRA","text":"Echo. That's your signature. Exactly."},
+  {"who":"PLAYER","text":"Then who is the First Echo?"},
   {"who":"NARRATOR","text":"Far above, every Meridian screen in the Quarter flickers to the same word: ECHO."}
  ]
 }
@@ -390,7 +390,7 @@ static func finale_extras(clues:Array) -> Array:
  if clues.has("hidden_registry"):
   out.append(line("MIRA","The candidates ledger had a dozen names, each marked RETAINED or LOST. This voice isn't one of them."))
  if clues.has("first_memory_fragment"):
-  out.append(nar("The crystal from the sealed chamber answers it: the voice counting seven, and then, clearly, 'We kept it safe in the towers.'"))
+  out.append(nar("The crystal from the sealed chamber answers it: the voice counting seven."))
  if clues.has("pip_done"):
   out.append(nar("In your pocket, Lio's lamp glass hums, very faintly, on the same note. Somewhere in the static behind the recording a boy laughs: 'Pip, catch!'"))
  return out
