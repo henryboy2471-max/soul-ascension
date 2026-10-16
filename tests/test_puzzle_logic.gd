@@ -98,5 +98,71 @@ func run() -> void:
   for i in range(4): st2=PuzzleLogic.memory_place(st2,PuzzleLogic.MEMORY_ORDER[p[i]],i)
   if PuzzleLogic.memory_score(st2)==4 and p==[0,1,2,3] or PuzzleLogic.memory_score(st2)<4 and p!=[0,1,2,3]: solvable+=1
  check(solvable==24 and perms.size()==24,"Memory: exactly one of the 24 orders is correct")
+ # ---- relay map (M4): seven lamps, same mechanic as the power board on a second level
+ var mp=PuzzleLogic.route_default("map")
+ check(PuzzleLogic.LEVELS.map.targets.size()==7 and PuzzleLogic.route_certificate("map") and PuzzleLogic.route_certificate("power"),"Map: seven lamps; the stored solution lights every lamp (and the power board's still does)")
+ check(not PuzzleLogic.route_solved(mp) and PuzzleLogic.route_unpowered_targets(mp).size()>=5,"Map: starts with most lamps dark")
+ var mapply=mp.duplicate(true)
+ for cell in PuzzleLogic.MAP_SOLUTION: mapply.rots[cell]=PuzzleLogic.MAP_SOLUTION[cell]
+ var wrong_one=mapply.duplicate(true)
+ var victim=-1
+ for cell in PuzzleLogic.MAP_SOLUTION:
+  var t=wrong_one.rots[cell]
+  wrong_one.rots[cell]=(t+1)%4
+  if not PuzzleLogic.route_solved(wrong_one) and PuzzleLogic.route_unpowered_targets(wrong_one).size()>=1:
+   victim=cell
+   break
+  wrong_one.rots[cell]=t
+ check(PuzzleLogic.route_solved(mapply) and victim>=0 and not PuzzleLogic.route_solved(wrong_one),"Map: one mis-turned tile on the line keeps a lamp dark")
+ var map_taps=0
+ var mplay=mp.duplicate(true)
+ for cell in PuzzleLogic.MAP_SOLUTION:
+  var want=PuzzleLogic.rotate_mask(PuzzleLogic.base_mask(PuzzleLogic.cell_kind(cell,"map")),int(PuzzleLogic.MAP_SOLUTION[cell]))
+  var guard2=0
+  while PuzzleLogic.cell_mask(cell,mplay.rots,"map")!=want and guard2<4:
+   mplay=PuzzleLogic.route_rotate(mplay,cell)
+   map_taps+=1
+   guard2+=1
+ check(PuzzleLogic.route_solved(mplay) and map_taps>=10,"Map: solvable by turning tiles (%d turns), and not trivial" % map_taps)
+ var wrong_start=0
+ for cell in PuzzleLogic.MAP_SOLUTION:
+  var want2=PuzzleLogic.rotate_mask(PuzzleLogic.base_mask(PuzzleLogic.cell_kind(cell,"map")),int(PuzzleLogic.MAP_SOLUTION[cell]))
+  if PuzzleLogic.cell_mask(cell,mp.rots,"map")!=want2: wrong_start+=1
+ check(wrong_start>=15,"Map: most solution tiles start turned the wrong way (%d of %d)" % [wrong_start,PuzzleLogic.MAP_SOLUTION.size()])
+ var mh=PuzzleLogic.route_hint_cell(mp)
+ check(mh>=0 and PuzzleLogic.MAP_SOLUTION.has(mh) and PuzzleLogic.route_hint_cell(mapply)==-1 and PuzzleLogic.route_rotate(mp,PuzzleLogic.LEVELS.map.source)==mp,"Map: the hint marks a tile the current needs and goes quiet when solved; the source is fixed")
+ check(PuzzleLogic.route_hint(mp).begins_with("Seven lamps") and not PuzzleLogic.route_hint(mp).contains("cell"),"Map: hint 1 describes the rule without naming a tile")
+ # ---- sliding rails (M4): the station's sealed archive door
+ var rl=PuzzleLogic.rail_default()
+ var occ=PuzzleLogic.rail_cells(rl.blocks)
+ var cells=0
+ for b in rl.blocks: cells+=int(b[2])
+ check(occ.size()==cells and not PuzzleLogic.rail_solved(rl),"Rails: the blocks do not overlap and the carriage starts locked in")
+ var sol=PuzzleLogic.rail_solve(rl)
+ check(sol!=null and sol.size()>=9 and sol.size()<=14,"Rails: solvable by search, shortest solution is %d moves" % (sol.size() if sol!=null else -1))
+ var replay=PuzzleLogic.rail_default()
+ for mv in sol: replay=PuzzleLogic.rail_move(replay,int(mv[0]),int(mv[1]))
+ check(PuzzleLogic.rail_solved(replay) and replay.moves==sol.size(),"Rails: replaying the shortest solution frees the carriage")
+ check(PuzzleLogic.rail_move(rl,4,1)==rl and PuzzleLogic.rail_move(rl,0,-1)==rl,"Rails: a blocked move (into another block) and an edge move change nothing")
+ var bad_axis=PuzzleLogic.rail_move(rl,4,-1)   # the tall block moves only along its own column (up is blocked here too)
+ check(bad_axis==rl or (bad_axis.blocks[4][0]==rl.blocks[4][0]),"Rails: blocks slide only along their own axis")
+ var hb=PuzzleLogic.rail_hint_block(rl)
+ check(hb>=0 and hb<rl.blocks.size() and PuzzleLogic.rail_hint_block(replay)==-1 and not PuzzleLogic.rail_hint(rl).contains("block 3"),"Rails: the hint names no answer; hint 2 marks the next block to slide")
+ # every reachable position of the first 200 searched states is solvable too (no way to paint yourself into a dead end)
+ var dead=false
+ var frontier=[rl]
+ var seen={str(rl.blocks):true}
+ var checked=0
+ while not frontier.is_empty() and checked<150:
+  var cur=frontier.pop_front()
+  checked+=1
+  if PuzzleLogic.rail_solve(cur)==null: dead=true
+  for i in range(cur.blocks.size()):
+   for dir in [-1,1]:
+    var nx=PuzzleLogic.rail_move(cur,i,dir)
+    if nx!=cur and not seen.has(str(nx.blocks)):
+     seen[str(nx.blocks)]=true
+     frontier.append(nx)
+ check(not dead,"Rails: any position reached by sliding can still be solved (checked %d)" % checked)
  print("RESULT: %d passed / %d failed" % [passed,failed])
  quit(1 if failed>0 else 0)

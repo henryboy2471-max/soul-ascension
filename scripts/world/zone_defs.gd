@@ -11,7 +11,8 @@ const WORKSHOP = "workshop"
 const TOWER_1 = "tower_1"
 const TOWER_2 = "tower_2"
 const TOWER_3 = "tower_3"
-const AREAS = {"market":"A","station":"B","alleys":"C","workshop":"D","tower_1":"E","tower_2":"E","tower_3":"E"}
+const ARENA = "arena"
+const AREAS = {"market":"A","station":"B","alleys":"C","workshop":"D","tower_1":"E","tower_2":"E","tower_3":"E","arena":"E"}
 static func zones() -> Dictionary:
  return {
   "market":{
@@ -85,7 +86,19 @@ static func zones() -> Dictionary:
    "spots":[
     {"id":"exit_down_3","x":70.0,"label":"GO  /  STAIRS DOWN","kind":"talk","range":100.0,"visual":"stairs","exit":{"to":"tower_2","spawn_x":2460.0}},
     {"id":"resonator_3","x":1300.0,"label":"EXAMINE  /  MEMORY RESONATOR","kind":"talk","range":120.0,"visual":"resonator"},
-    {"id":"archive_gate","x":2300.0,"label":"EXAMINE  /  SEALED ARCHIVE","kind":"talk","range":120.0,"visual":"door"}
+    {"id":"archive_gate","x":2300.0,"label":"EXAMINE  /  SEALED ARCHIVE","kind":"talk","range":120.0,"visual":"door"},
+    {"id":"exit_arena","x":2500.0,"label":"GO  /  THE CENTRAL RELAY","kind":"talk","range":100.0,"visual":"exit","exit":{"to":"arena","spawn_x":170.0},"hidden":true}
+   ]},
+  "arena":{
+   "name":"CENTRAL RELAY TOWER  /  THE WARDEN'S CHAMBER","world_w":2400.0,"start_px":170.0,"interior":true,"objective":"Wake the three mechanisms in order","objective_x":330.0,
+   "npcs":[{"id":"warden","x":1700.0,"hue":0.55,"tint":Color(0.35,0.5,0.72),"scale":1.7,"facing":-1}],
+   "spots":[
+    {"id":"exit_back","x":70.0,"label":"GO  /  BACK TO THE ARCHIVE GATE","kind":"talk","range":100.0,"visual":"exit","exit":{"to":"tower_3","spawn_x":2380.0}},
+    {"id":"inscription","x":330.0,"label":"READ  /  BRASS PLAQUE","kind":"talk","range":110.0,"visual":"board"},
+    {"id":"mech_1","x":700.0,"label":"HOLD  /  RESTORE THE SEAL","kind":"channel","range":110.0,"visual":"resonator"},
+    {"id":"mech_2","x":1250.0,"label":"HOLD  /  RESTORE THE VALVE","kind":"channel","range":110.0,"visual":"resonator"},
+    {"id":"mech_3","x":1800.0,"label":"HOLD  /  RESTORE THE BELL","kind":"channel","range":110.0,"visual":"resonator"},
+    {"id":"archive_core","x":2300.0,"label":"EXAMINE  /  THE ARCHIVE CORE","kind":"talk","range":110.0,"visual":"door","hidden":true}
    ]}
  }
 static func zone(id:String) -> Dictionary:

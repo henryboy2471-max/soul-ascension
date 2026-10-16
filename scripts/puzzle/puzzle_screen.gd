@@ -9,6 +9,8 @@ const PANEL = Rect2(190,50,900,620)
 const CYAN = Color("6fd7e4")
 const BOARD_ORIGIN = Vector2(230,212)
 const CELL = 82.0
+const MAP_CELL = 62.0
+const RAIL_CELL = 54.0
 var kind="signal"
 var state:Dictionary={}
 var clues:Array=[]
@@ -24,6 +26,7 @@ var cursor=0
 var selected=""
 var time=0.0
 var done=false
+var sel=0   # rail: the selected block
 class Canvas extends Control:
  var host
  func _draw() -> void:
@@ -33,12 +36,19 @@ class Canvas extends Control:
 func setup(k:String, saved:Dictionary, found_clues:Array) -> void:
  kind=k
  clues=found_clues
- var base=PuzzleLogic.signal_default() if k=="signal" else (PuzzleLogic.route_default() if k=="power" else PuzzleLogic.memory_default())
+ var base=PuzzleLogic.memory_default()
+ match k:
+  "signal": base=PuzzleLogic.signal_default()
+  "power": base=PuzzleLogic.route_default()
+  "map": base=PuzzleLogic.route_default("map")
+  "rail": base=PuzzleLogic.rail_default()
  state=base.duplicate(true)
  for key in saved:
   state[key]=saved[key]
  if k=="power":
   cursor=PuzzleLogic.ROUTE_PATH[1]
+ elif k=="map":
+  cursor=15
  elif k=="memory":
   cursor=0
 func _ready() -> void:
@@ -55,11 +65,13 @@ func _ready() -> void:
  canvas=Canvas.new()
  canvas.host=self
  canvas.size=Vector2(1280,720)
- canvas.mouse_filter=Control.MOUSE_FILTER_STOP if kind=="power" else Control.MOUSE_FILTER_IGNORE
+ canvas.mouse_filter=Control.MOUSE_FILTER_STOP if kind in ["power","map","rail"] else Control.MOUSE_FILTER_IGNORE
  add_child(canvas)
  var titles={"signal":["SIGNAL RESONATOR","Match the live wave to the recorded transmission. Turn FREQUENCY (how many waves) and HEIGHT (how tall), then LOCK."],
   "power":["POWER RESONATOR","The relay is dead. Tap a tile to turn it and send current from the source (left) to the relay lamp (right side). Burnt tiles carry nothing."],
-  "memory":["MEMORY RESONATOR","Place the four fragments from the oldest to the newest. Select a fragment, then choose its slot."]}
+  "memory":["MEMORY RESONATOR","Place the four fragments from the oldest to the newest. Select a fragment, then choose its slot."],
+  "map":["RELAY MAP","Teo's chalk map is dead: seven array lamps hang on one line. Turn tiles to carry the current from the source on the left to every lamp. Burnt tiles carry nothing."],
+  "rail":["ARCHIVE DOOR","A rail lock holds the sealed door. Slide the blocks to free the gold carriage so it can run out of the right edge."]}
  UI.chip(self,titles[kind][0],Rect2(230,86,230,28),UI.VIOLET,14)
  UI.label(self,titles[kind][1],Vector2(230,122),17,UI.MUTED,820)
  header=UI.label(self,"",Vector2(230,172),20,UI.GOLD,820)
@@ -78,6 +90,15 @@ func _ready() -> void:
   action_button=UI.button(self,"LOCK SIGNAL",Rect2(560,608,260,52),func(): lock_signal(),true)
  elif kind=="power":
   UI.label(self,"Keys: arrows move, Enter turns the tile.",Vector2(860,520),14,UI.MUTED,200)
+ elif kind=="map":
+  UI.label(self,"Keys: arrows move, Enter turns the tile.",Vector2(780,500),14,UI.MUTED,260)
+ elif kind=="rail":
+  UI.label(self,"Tap a block, then tap the empty rail to slide it, or use the buttons. Keys: Enter picks the next block, arrows slide it.",Vector2(640,200),15,UI.MUTED,400)
+  UI.button(self,"NEXT BLOCK",Rect2(640,290,200,56),func(): rail_pick(1))
+  UI.button(self,"<",Rect2(640,370,92,60),func(): rail_slide(-1,"h"))
+  UI.button(self,">",Rect2(748,370,92,60),func(): rail_slide(1,"h"))
+  UI.button(self,"^",Rect2(640,444,92,60),func(): rail_slide(-1,"v"))
+  UI.button(self,"v",Rect2(748,444,92,60),func(): rail_slide(1,"v"))
  else:
   UI.label(self,"OLDEST",Vector2(230,362),15,UI.MUTED)
   UI.label(self,"NEWEST",Vector2(960,362),15,UI.MUTED)
@@ -97,7 +118,8 @@ func leave() -> void:
 func is_solved() -> bool:
  match kind:
   "signal": return PuzzleLogic.signal_solved(state)
-  "power": return PuzzleLogic.route_solved(state)
+  "power", "map": return PuzzleLogic.route_solved(state)
+  "rail": return PuzzleLogic.rail_solved(state)
  return PuzzleLogic.memory_solved(state)
 func succeed(message:String) -> void:
  if done:
@@ -133,21 +155,83 @@ func lock_signal() -> void:
  elif int(state.round)>before:
   feedback.text="LOCKED  /  NEXT TRANSMISSION"
 # ---------------------------------------------------------------- power
+func board_cell() -> float:
+ return CELL if kind=="power" else (MAP_CELL if kind=="map" else RAIL_CELL)
 func board_input(event:InputEvent) -> void:
- if kind!="power" or done:
+ if done or not (event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_LEFT):
   return
- if event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_LEFT:
-  var p=event.position-BOARD_ORIGIN
-  if p.x<0 or p.y<0 or p.x>=CELL*PuzzleLogic.COLS or p.y>=CELL*PuzzleLogic.ROWS:
+ var p=event.position-BOARD_ORIGIN
+ var cell=board_cell()
+ if kind=="rail":
+  var rx=int(p.x/cell)
+  var ry=int(p.y/cell)
+  if p.x<0 or p.y<0 or rx>=PuzzleLogic.RAIL_SIZE or ry>=PuzzleLogic.RAIL_SIZE:
    return
-  cursor=int(p.y/CELL)*PuzzleLogic.COLS+int(p.x/CELL)
-  turn_tile()
+  rail_tap(Vector2i(rx,ry))
+  return
+ if kind!="power" and kind!="map":
+  return
+ var lv=PuzzleLogic.level_of(state)
+ var cols=int(lv.cols)
+ var rows=int(lv.rows)
+ if p.x<0 or p.y<0 or p.x>=cell*cols or p.y>=cell*rows:
+  return
+ cursor=int(p.y/cell)*cols+int(p.x/cell)
+ turn_tile()
 func turn_tile() -> void:
  state=PuzzleLogic.route_rotate(state,cursor)
  refresh()
  emit_changed()
  if PuzzleLogic.route_solved(state):
   succeed("POWER RESTORED  /  THE RELAY LAMP BURNS")
+# ---------------------------------------------------------------- rails
+func rail_pick(step:int) -> void:
+ if done:
+  return
+ sel=posmod(sel+step,state.blocks.size())
+ refresh()
+func rail_slide(dir:int, axis:String) -> void:
+ if done or str(state.blocks[sel][3])!=axis:
+  return
+ var next=PuzzleLogic.rail_move(state,sel,dir)
+ if next==state:
+  feedback.text="BLOCKED  /  SOMETHING IS IN THE WAY"
+  return
+ state=next
+ refresh()
+ emit_changed()
+ if PuzzleLogic.rail_solved(state):
+  succeed("THE LOCK RELEASES  /  THE ARCHIVE DOOR SLIDES OPEN")
+# a tap on a block selects it; a tap on an empty cell slides the selected block towards that cell along its own rail
+func rail_tap(cell:Vector2i) -> void:
+ var occ=PuzzleLogic.rail_cells(state.blocks)
+ if occ.has(cell):
+  sel=int(occ[cell])
+  refresh()
+  return
+ var blk=state.blocks[sel]
+ var guard=0
+ while guard<PuzzleLogic.RAIL_SIZE:
+  guard+=1
+  var bx=int(blk[0])
+  var by=int(blk[1])
+  var l=int(blk[2])
+  var dir=0
+  if blk[3]=="h" and cell.y==by:
+   dir=1 if cell.x>=bx+l else (-1 if cell.x<bx else 0)
+  elif blk[3]=="v" and cell.x==bx:
+   dir=1 if cell.y>=by+l else (-1 if cell.y<by else 0)
+  if dir==0:
+   return
+  var next=PuzzleLogic.rail_move(state,sel,dir)
+  if next==state:
+   break
+  state=next
+  blk=state.blocks[sel]
+ refresh()
+ emit_changed()
+ if PuzzleLogic.rail_solved(state):
+  succeed("THE LOCK RELEASES  /  THE ARCHIVE DOOR SLIDES OPEN")
 # ---------------------------------------------------------------- memory
 # A card/slot is a Button (keyboard, mouse and touch all work) with its text on child Labels, so long text wraps inside the card instead of stretching the button.
 func card_button(rect:Rect2, title:String, text:String, lit:bool, callback:Callable) -> Button:
@@ -214,6 +298,17 @@ func refresh(show_check:bool=false) -> void:
   header.text="CURRENT REACHES %d TILES" % lit
   feedback.text="The relay is dark." if not PuzzleLogic.route_solved(state) else feedback.text
   hint_label.text=PuzzleLogic.route_hint(state) if int(state.hints)>0 else ""
+ elif kind=="map":
+  var total=PuzzleLogic.level_of(state).targets.size()
+  var lamps=total-PuzzleLogic.route_unpowered_targets(state).size()
+  header.text="ARRAY LAMPS LIT: %d OF %d" % [lamps,total]
+  feedback.text="The map is dark." if lamps==0 else ("%d arrays answer. The rest are still cut off." % lamps if lamps<total else feedback.text)
+  hint_label.text=PuzzleLogic.route_hint(state) if int(state.hints)>0 else ""
+ elif kind=="rail":
+  header.text="MOVES: %d" % int(state.moves)
+  if not PuzzleLogic.rail_solved(state):
+   feedback.text="The carriage is locked in. Clear its rail."
+  hint_label.text=PuzzleLogic.rail_hint(state) if int(state.hints)>0 else ""
  else:
   header.text="FRAGMENTS FOUND: %d OF 4" % PuzzleLogic.memory_cards_for(clues).size()
   if show_check or int(state.checks)>0:
@@ -248,16 +343,28 @@ func _input(event:InputEvent) -> void:
    KEY_UP, KEY_W: nudge(0,1)
    KEY_DOWN, KEY_S: nudge(0,-1)
   if enter: lock_signal()
- elif kind=="power":
-  var x=cursor%PuzzleLogic.COLS
-  var y=cursor/PuzzleLogic.COLS
+ elif kind=="power" or kind=="map":
+  var lv=PuzzleLogic.level_of(state)
+  var cols=int(lv.cols)
+  var rows=int(lv.rows)
+  var x=cursor%cols
+  var y=cursor/cols
   match code:
    KEY_LEFT, KEY_A: x=maxi(0,x-1)
-   KEY_RIGHT, KEY_D: x=mini(PuzzleLogic.COLS-1,x+1)
+   KEY_RIGHT, KEY_D: x=mini(cols-1,x+1)
    KEY_UP, KEY_W: y=maxi(0,y-1)
-   KEY_DOWN, KEY_S: y=mini(PuzzleLogic.ROWS-1,y+1)
-  cursor=y*PuzzleLogic.COLS+x
+   KEY_DOWN, KEY_S: y=mini(rows-1,y+1)
+  cursor=y*cols+x
   if enter: turn_tile()
+  canvas.queue_redraw()
+ elif kind=="rail":
+  match code:
+   KEY_LEFT, KEY_A: rail_slide(-1,"h")
+   KEY_RIGHT, KEY_D: rail_slide(1,"h")
+   KEY_UP, KEY_W: rail_slide(-1,"v")
+   KEY_DOWN, KEY_S: rail_slide(1,"v")
+   KEY_TAB: rail_pick(1)
+  if enter: rail_pick(1)
   canvas.queue_redraw()
  else:
   var col=cursor%4
@@ -280,8 +387,10 @@ func _input(event:InputEvent) -> void:
 func paint(c:Control) -> void:
  if kind=="signal":
   paint_signal(c)
- elif kind=="power":
+ elif kind=="power" or kind=="map":
   paint_board(c)
+ elif kind=="rail":
+  paint_rails(c)
  else:
   paint_memory_cursor(c)
 func paint_signal(c:Control) -> void:
@@ -307,36 +416,70 @@ func paint_signal(c:Control) -> void:
  c.draw_string(ThemeDB.fallback_font,Vector2(r.position.x+10,r.position.y+22),"RECORDED",HORIZONTAL_ALIGNMENT_LEFT,-1,13,Color(CYAN,0.8))
  c.draw_string(ThemeDB.fallback_font,Vector2(r.position.x+100,r.position.y+22),"LIVE",HORIZONTAL_ALIGNMENT_LEFT,-1,13,UI.GOLD)
 func paint_board(c:Control) -> void:
+ var lv=PuzzleLogic.level_of(state)
+ var level=str(state.get("level","power"))
+ var cols=int(lv.cols)
+ var rows=int(lv.rows)
+ var cell=board_cell()
  var powered=PuzzleLogic.route_powered(state)
  var hint_cell=PuzzleLogic.route_hint_cell(state) if int(state.get("hints",0))>=2 else -1
- for i in range(PuzzleLogic.COLS*PuzzleLogic.ROWS):
-  var x=i%PuzzleLogic.COLS
-  var y=i/PuzzleLogic.COLS
-  var r=Rect2(BOARD_ORIGIN+Vector2(x*CELL,y*CELL),Vector2(CELL-6,CELL-6))
-  var kindname=PuzzleLogic.cell_kind(i)
+ var arm=(cell-6.0)/2.0
+ for i in range(cols*rows):
+  var x=i%cols
+  var y=i/cols
+  var r=Rect2(BOARD_ORIGIN+Vector2(x*cell,y*cell),Vector2(cell-6,cell-6))
+  var kindname=PuzzleLogic.cell_kind(i,level)
   c.draw_rect(r,Color(0.04,0.05,0.1),true)
   c.draw_rect(r,Color(0.25,0.28,0.45,0.8),false,1.5)
   var centre=r.position+r.size/2.0
   var live=powered.has(i)
   var col=UI.GOLD if live else Color(0.38,0.42,0.6)
+  var thick=12.0 if cell>70.0 else 9.0
   if kindname=="none":
-   c.draw_line(centre-Vector2(22,22),centre+Vector2(22,22),Color("a04050"),4)
-   c.draw_line(centre-Vector2(22,-22),centre+Vector2(22,-22),Color("a04050"),4)
+   var q=cell*0.26
+   c.draw_line(centre-Vector2(q,q),centre+Vector2(q,q),Color("a04050"),4)
+   c.draw_line(centre-Vector2(q,-q),centre+Vector2(q,-q),Color("a04050"),4)
   else:
-   var mask=PuzzleLogic.cell_mask(i,state.rots)
+   var mask=PuzzleLogic.cell_mask(i,state.rots,level)
    for side in [[PuzzleLogic.N,Vector2(0,-1)],[PuzzleLogic.E,Vector2(1,0)],[PuzzleLogic.S,Vector2(0,1)],[PuzzleLogic.W,Vector2(-1,0)]]:
     if mask&side[0]!=0:
-     c.draw_line(centre,centre+side[1]*(r.size.x/2.0),col,12)
-   c.draw_circle(centre,9,col)
+     c.draw_line(centre,centre+side[1]*arm,col,thick)
+   c.draw_circle(centre,thick*0.75,col)
   if kindname=="src":
-   c.draw_circle(centre,24,Color(UI.GOLD,0.35+0.2*sin(time*4.0)))
-  if kindname=="relay":
-   c.draw_circle(centre+Vector2(0,-4),20,Color("fff1b0") if live else Color(0.18,0.2,0.3))
-   c.draw_arc(centre+Vector2(0,-4),20,0,TAU,24,Color(UI.GOLD,0.9),2)
+   c.draw_circle(centre,cell*0.25,Color(UI.GOLD,0.35+0.2*sin(time*4.0)))
+  if kindname=="relay" or kindname=="end":
+   c.draw_circle(centre,cell*0.24,Color("fff1b0") if live else Color(0.18,0.2,0.3))
+   c.draw_arc(centre,cell*0.24,0,TAU,24,Color(UI.GOLD,0.9),2)
   if i==hint_cell:
    c.draw_rect(r.grow(2),Color(1.0,0.4,0.45,0.5+0.4*sin(time*6.0)),false,4)
   if i==cursor:
    c.draw_rect(r.grow(1),Color(CYAN,0.95),false,3)
+func paint_rails(c:Control) -> void:
+ var cell=RAIL_CELL
+ var n=PuzzleLogic.RAIL_SIZE
+ var board=Rect2(BOARD_ORIGIN,Vector2(cell*n,cell*n))
+ c.draw_rect(board,Color(0.03,0.04,0.08),true)
+ for i in range(n+1):
+  c.draw_line(board.position+Vector2(i*cell,0),board.position+Vector2(i*cell,cell*n),Color(0.2,0.23,0.4,0.7),1)
+  c.draw_line(board.position+Vector2(0,i*cell),board.position+Vector2(cell*n,i*cell),Color(0.2,0.23,0.4,0.7),1)
+ c.draw_rect(board,Color(UI.VIOLET,0.6),false,2)
+ # the exit gap on the carriage's rail (row 2), right edge
+ var gy=board.position.y+float(state.blocks[0][1])*cell
+ c.draw_rect(Rect2(board.end.x-3,gy+4,8,cell-8),Color("9ff0b0"),true)
+ c.draw_string(ThemeDB.fallback_font,Vector2(board.end.x+10,gy+cell*0.62),"EXIT",HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("9ff0b0"))
+ var hint_block=PuzzleLogic.rail_hint_block(state) if int(state.get("hints",0))>=2 else -1
+ for i in range(state.blocks.size()):
+  var b=state.blocks[i]
+  var w=cell*(int(b[2]) if b[3]=="h" else 1)
+  var h=cell*(int(b[2]) if b[3]=="v" else 1)
+  var r=Rect2(board.position+Vector2(float(b[0])*cell,float(b[1])*cell)+Vector2(3,3),Vector2(w-6,h-6))
+  var fill=Color(UI.GOLD,0.95) if i==0 else Color(0.3,0.26,0.5,0.95)
+  c.draw_rect(r,fill,true)
+  c.draw_rect(r,Color(0.05,0.05,0.12),false,2)
+  if i==hint_block:
+   c.draw_rect(r.grow(2),Color(1.0,0.4,0.45,0.55+0.4*sin(time*6.0)),false,4)
+  if i==sel:
+   c.draw_rect(r.grow(1),Color(CYAN,0.95),false,4)
 func paint_memory_cursor(c:Control) -> void:
  var col=cursor%4
  var row=cursor/4

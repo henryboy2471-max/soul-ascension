@@ -232,7 +232,7 @@ func build_hud() -> void:
 # Cutscene mode: the objective panel, EXIT, toasts and touch hints are hidden and the Hero cannot walk (Episode 2 ending).
 func set_cinematic(on:bool) -> void:
  for node in hud_nodes:
-  if is_instance_valid(node) and node!=toast_panel:
+  if is_instance_valid(node) and node!=toast_panel and node!=prompt_label:   # prompt_label only carries text; the pill draws the prompt, so it stays hidden
    node.visible=not on
  locked=on
  act_block=99.0 if on else 0.0

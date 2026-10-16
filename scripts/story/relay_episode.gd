@@ -3,12 +3,18 @@ class_name RelayEpisode
 # Episode 3 (The Relay Keeper) flow controller. M1: connected exploration. Seven Explore strips (five areas; the tower has three floors) are
 # swapped under a fade; progress (zone, discoveries, unlocked exits, visited zones) is saved per step in mission_progress["1-3"].
 # Episode 1-2 progress keys are never touched. M2 (investigation): what each spot says and changes comes from Episode3Data.respond(); the saved `clues`
-# list drives the quest objective (Episode3Data.next_step), hidden spots, codex entries and the tower lock. Puzzles and the Warden arrive in M3-M4.
+# list drives the quest objective (Episode3Data.next_step), hidden spots, codex entries and the tower lock. M3: the resonator puzzles. M4: the door and map
+# puzzles with their cinematics, the Warden arena (WardenArena + WardenLogic, checkpoints saved as restored mechanisms), the finale and completion.
 const START_ZONE = "market"
 var zone_id=START_ZONE
 var progress:Dictionary={}
 var fade:ColorRect
 var traveling=false
+var arena:WardenArena
+var bars_top:ColorRect
+var bars_bottom:ColorRect
+var failing=false
+var push_tween:Tween
 func load_progress() -> void:
  progress=Profile.mission_progress(mission_id).duplicate(true)
  for key in ["discoveries","unlocks","visited","clues"]:
@@ -27,6 +33,7 @@ func run_intro() -> void:
  progress["intro"]=true
  save_progress()
  begin_zone(START_ZONE,-1.0)
+ await cine("opening")
 func say(lines:Array) -> void:
  var box=DialogueBox.new()
  box.speakers=Episode3Data.SPEAKERS
@@ -54,6 +61,9 @@ func begin_zone(id:String, spawn_x:float) -> void:
  if not zone_valid(id):
   id=START_ZONE
   spawn_x=-1.0
+ if is_instance_valid(arena):
+  arena.queue_free()
+  arena=null
  zone_id=id
  RelayArt.zone=id
  RelayArt.found=progress.discoveries
@@ -64,6 +74,8 @@ func begin_zone(id:String, spawn_x:float) -> void:
  var config=ZoneDefs.explore_config(id,RelayArt)
  if spawn_x>=0.0:
   config["start_px"]=spawn_x
+ elif id=="arena":
+  config["start_px"]=WardenLogic.checkpoint_x(restored_list())   # resuming inside the chamber: back at the last checkpoint
  explore.config=config
  add_child(explore)
  move_child(explore,0)
@@ -75,7 +87,20 @@ func begin_zone(id:String, spawn_x:float) -> void:
  if id.begins_with("tower_") and not progress.clues.has("tower_reached"):
   progress.clues.append("tower_reached")
  save_progress()
+ if id=="arena" and not progress.clues.has("warden_restored"):
+  arena=WardenArena.new()
+  arena.host=self
+  arena.setup(explore,restored_list())
+  arena.failed.connect(on_arena_failed)
+  add_child(arena)
  refresh_objective(false)
+# the mechanisms restored so far, in the order they were restored (saved as clues restored_mech_N)
+func restored_list() -> Array:
+ var out=[]
+ for m in WardenLogic.ORDER:
+  if progress.clues.has("restored_"+m):
+   out.append(m)
+ return out
 # Quest tracking: the objective is derived from the saved clues, so it always matches the save. In the step's own zone the waypoint points at the
 # next spot (the nearest open transmission for the 0/3 counter); elsewhere it points at the exit that leads there.
 func refresh_objective(announce:bool) -> void:
@@ -129,6 +154,11 @@ func travel(spot:Dictionary) -> void:
  begin_zone(str(exit.to),float(exit.spawn_x))
  await fade_to(0.0,0.3)
  traveling=false
+ if zone_id=="arena" and not progress.clues.has("seen_arena"):
+  progress.clues.append("seen_arena")
+  save_progress()
+  await cine("warden_wakes")
+  refresh_objective(true)
 func investigate(id:String) -> void:
  var r=Episode3Data.respond(id,progress.clues)
  await say(r.lines)
@@ -190,7 +220,19 @@ func puzzle_done(kind:String, id:String) -> void:
   progress.unlocks.append(lock)
  save_progress()
  await say(Episode3Data.PUZZLE_DONE[kind])
- explore.toast("RESONATOR RESTORED  /  "+kind.to_upper())
+ if kind=="rail":
+  explore.toast("ARCHIVE DOOR OPEN")
+  await cine("exposure")
+  progress.clues.append("seen_exposure")
+  unlock_clue_codex("echo_entry")
+ elif kind=="map":
+  explore.toast("RELAY MAP RESTORED")
+  await cine("teo_reveal")
+  progress.clues.append("seen_teo_reveal")
+  unlock_clue_codex("seven_arrays")
+ else:
+  explore.toast("RESONATOR RESTORED  /  "+kind.to_upper())
+ save_progress()
  refresh_objective(true)
 func on_interact(id:String) -> void:
  if busy or traveling:
@@ -200,11 +242,135 @@ func on_interact(id:String) -> void:
  var spot=spot_of(id)
  if spot.has("exit"):
   await travel(spot)
- elif Episode3Data.PUZZLES.has(id):
+ elif Episode3Data.PUZZLES.has(id) and puzzle_ready(id):
   await run_puzzle(id)
+ elif id.begins_with("mech_") and is_instance_valid(arena):
+  await arena_activate(id)
+ elif id=="archive_core":
+  await finale()
  else:
   await investigate(id)
  busy=false
  if is_instance_valid(explore):
   explore.act_block=0.45
   explore.locked=false
+func puzzle_ready(id:String) -> bool:
+ var need=str(Episode3Data.PUZZLE_NEEDS.get(id,""))
+ return need=="" or progress.clues.has(need)
+# ---------------------------------------------------------------- cinematics: letterbox, a slow push-in, a flash, a shake; the dialogue box carries the subtitles
+func bars(on:bool) -> void:
+ if bars_top==null:
+  bars_top=ColorRect.new()
+  bars_bottom=ColorRect.new()
+  for b in [bars_top,bars_bottom]:
+   b.color=Color.BLACK
+   b.size=Vector2(1280,0)
+   b.mouse_filter=Control.MOUSE_FILTER_IGNORE
+   add_child(b)
+  bars_bottom.position=Vector2(0,720)
+ var h=66.0 if on else 0.0
+ var tween=create_tween().set_parallel(true)
+ tween.tween_property(bars_top,"size:y",h,0.45)
+ tween.tween_property(bars_bottom,"position:y",720.0-h,0.45)
+ tween.tween_property(bars_bottom,"size:y",h,0.45)
+ await tween.finished
+func push_in(amount:float, seconds:float) -> void:
+ if not is_instance_valid(explore):
+  return
+ explore.pivot_offset=Vector2(640,420)
+ push_tween=create_tween()
+ push_tween.tween_property(explore,"scale",Vector2(amount,amount),seconds).set_trans(Tween.TRANS_SINE)
+func flash_screen(color:Color) -> void:
+ var f=ColorRect.new()
+ f.color=Color(color,0.0)
+ f.size=Vector2(1280,720)
+ f.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ add_child(f)
+ var tween=create_tween()
+ tween.tween_property(f,"color:a",0.55,0.08)
+ tween.tween_property(f,"color:a",0.0,0.5)
+ tween.tween_callback(f.queue_free)
+func shake(amount:float=9.0) -> void:
+ if not is_instance_valid(explore) or Profile.data.settings.get("shake",true)==false:
+  return
+ var tween=create_tween()
+ for i in range(5):
+  tween.tween_property(explore,"position",Vector2(randf_range(-amount,amount),randf_range(-amount,amount)),0.04)
+ tween.tween_property(explore,"position",Vector2.ZERO,0.05)
+func cine(id:String) -> void:
+ var lines=Episode3Data.cine_lines(id,progress.clues)
+ if lines.is_empty():
+  return
+ var was_busy=busy
+ busy=true
+ if is_instance_valid(explore):
+  explore.set_cinematic(true)
+ await bars(true)
+ if id=="opening" or id=="warden_wakes":
+  push_in(1.06,6.0)
+ elif id=="recognition" or id=="recording":
+  flash_screen(Color("bd95ff"))
+  shake(6.0)
+ await say(lines)
+ await bars(false)
+ if push_tween!=null and push_tween.is_valid():
+  push_tween.kill()   # the slow push-in must not outlive its scene
+ if is_instance_valid(explore):
+  explore.scale=Vector2.ONE
+  explore.set_cinematic(false)
+  explore.act_block=0.45
+ busy=was_busy
+# ---------------------------------------------------------------- the Warden encounter
+func arena_activate(id:String) -> void:
+ if progress.clues.has("restored_"+id) or not is_instance_valid(arena):
+  return
+ var events=arena.activate(id)
+ var name=str(WardenLogic.MECHANISMS[id].name)
+ var all_done=false
+ for e in events:
+  if e.type=="restored":
+   progress.clues.append("restored_"+id)
+   if not progress.discoveries.has(id):
+    progress.discoveries.append(id)
+   RelayArt.found=progress.discoveries
+   explore.toast("RESTORED  /  THE %s  /  THE WARDEN IS INTERRUPTED" % name)
+  elif e.type=="wrong":
+   explore.toast("WRONG ORDER  /  THE TOWER ANSWERS WITH ITS FEAR")
+   shake()
+  elif e.type=="restored_all":
+   all_done=true
+ save_progress()
+ refresh_objective(true)
+ if all_done:
+  await arena_complete()
+func arena_complete() -> void:
+ await cine("recognition")
+ progress.clues.append("warden_restored")
+ save_progress()
+ unlock_clue_codex("relay_warden")
+ if is_instance_valid(arena):
+  arena.queue_free()
+  arena=null
+ refresh_objective(true)
+# Echo ran out of resonance: back to the last checkpoint (the entrance, or beside the last restored mechanism) with full resonance
+func on_arena_failed() -> void:
+ if failing or not is_instance_valid(arena):
+  return
+ failing=true
+ busy=true
+ await fade_to(1.0,0.4)
+ var restored=restored_list()
+ arena.reset(restored)
+ explore.px=WardenLogic.checkpoint_x(restored)
+ explore.cam=explore.px-640.0
+ explore.toast("RESONANCE LOST  /  BACK TO THE LAST CHECKPOINT")
+ await fade_to(0.0,0.4)
+ busy=false
+ failing=false
+func finale() -> void:
+ await cine("recording")
+ progress.clues.append("recording_heard")
+ save_progress()
+ unlock_clue_codex("first_echo")
+ await fade_to(1.0,0.9)
+ completed.emit()

@@ -11,7 +11,9 @@ const SPEAKERS = {
  "PIP":{"name":"PIP","color":Color("ffd86b"),"portrait":"none"},
  "RESIDENT":{"name":"MARKET RESIDENT","color":Color("d8a8c8"),"portrait":"none"},
  "VENDOR":{"name":"STALL KEEPER","color":Color("e8b878"),"portrait":"none"},
- "SIGNAL":{"name":"RELAY VOICE","color":Color("6fd7e4"),"portrait":"none"}
+ "SIGNAL":{"name":"RELAY VOICE","color":Color("6fd7e4"),"portrait":"none"},
+ "WARDEN":{"name":"RELAY WARDEN","color":Color("6fd7e4"),"portrait":"none"},
+ "RECORDING":{"name":"RECORDING 0001","color":Color("bd95ff"),"portrait":"none"}
 }
 const CODEX = [
  {"id":"relay_voices","title":"THE RELAY VOICES","text":"Abandoned towers speak to Lantern Quarter: lullabies, bulletins dated tomorrow, and a tone that matches Echo. Replays, not broadcasts."},
@@ -20,6 +22,10 @@ const CODEX = [
  {"id":"false_register","title":"THE MISSING REGISTER","text":"Registrations dated years before the first awakening, one line scraped bare. Someone has counted Ascendants for far longer."},
  {"id":"earlier_candidates","title":"EARLIER CANDIDATES","text":"A ledger headed PRE-AWAKENING: a dozen names, each marked RETAINED or LOST. Someone chose people before the Fracture.","secret":true},
  {"id":"relay_journal","title":"A TECHNICIAN'S JOURNAL","text":"\"The towers are not broadcasting. They are remembering. Do not tell the Directorate.\"","secret":true},
+ {"id":"echo_entry","title":"ECHO'S REGISTRY ENTRY","text":"The original card from the sealed archive door: a signature that hums one long note, filed years before the first awakening. The handler column is blank.","secret":true},
+ {"id":"seven_arrays","title":"THE SEVEN ARRAYS","text":"Seven relay arrays on one line. Not antennas but a memory network: everything said in the rain is kept, and someone changed what it keeps and replays.","secret":true},
+ {"id":"relay_warden","title":"THE RELAY WARDEN","text":"The guardian of the Central Relay. Its first instruction was to keep, never to choose. It recognised Echo's signature on sight.","secret":true},
+ {"id":"first_echo","title":"THE FIRST ECHO","text":"Recording 0001: the first resonance that held, the one every other signature learned from. Its note is exactly Echo's.","secret":true},
  {"id":"first_memory","title":"A SEALED FRAGMENT","text":"A recording crystal in a sealed relay chamber: a voice counting seven, and a lamp. Older than the arrays.","secret":true},
  {"id":"pips_trail","title":"PIP'S TRAIL","text":"Lio drew three marks in the alleyways before he went to answer the voices in the central tower. His sister Pip still waits.","secret":true}
 ]
@@ -29,22 +35,30 @@ const STEPS = [
  {"id":"terminal","text":"Check the access terminal at the Transit Station","zone":"station","spots":["terminal_a"],"needs":["terminal"]},
  {"id":"anselm","text":"Question Anselm about the missing register","zone":"station","spots":["anselm"],"needs":["anselm_admits"]},
  {"id":"records","text":"Search the station records","zone":"station","spots":["records"],"needs":["records"]},
+ {"id":"door","text":"Open the sealed archive door at the station","zone":"station","spots":["archive_door"],"needs":["puzzle_rail"]},
  {"id":"teo","text":"Find Teo Marrow, the Relay Keeper","zone":"workshop","spots":["teo"],"needs":["teo_met"]},
  {"id":"decode","text":"Decode the transmissions at Teo's decoder","zone":"workshop","spots":["decoder"],"needs":["decoded"]},
  {"id":"board","text":"Assemble the evidence on Teo's board","zone":"workshop","spots":["board"],"needs":["theory"]},
+ {"id":"map","text":"Repair Teo's relay map","zone":"workshop","spots":["relay_map"],"needs":["puzzle_map"]},
  {"id":"tower","text":"Enter the Central Relay Tower","zone":"workshop","spots":["exit_tower"],"needs":["tower_reached"]},
  {"id":"signal","text":"Restore the signal resonator on the first floor","zone":"tower_1","spots":["resonator_1"],"needs":["puzzle_signal"]},
  {"id":"power","text":"Restore the power resonator on the second floor","zone":"tower_2","spots":["resonator_2"],"needs":["puzzle_power"]},
  {"id":"memory","text":"Reconstruct the memory resonator on the third floor","zone":"tower_3","spots":["resonator_3"],"needs":["puzzle_memory"]},
- {"id":"archive","text":"Examine the sealed archive at the top of the tower","zone":"tower_3","spots":["archive_gate"],"needs":["archive_examined"]}
+ {"id":"archive","text":"Examine the sealed archive at the top of the tower","zone":"tower_3","spots":["archive_gate"],"needs":["archive_examined"]},
+ {"id":"warden","text":"Enter the chamber and wake the three mechanisms in the right order","zone":"arena","spots":["inscription"],"needs":["warden_restored"]},
+ {"id":"recording","text":"Open the archive and hear the recording","zone":"arena","spots":["archive_core"],"needs":["recording_heard"]}
 ]
 # resonator spot -> puzzle kind; solving a puzzle opens the next floor's stairs; hidden spots appear once their clue exists
-const PUZZLES = {"resonator_1":"signal","resonator_2":"power","resonator_3":"memory"}
+const PUZZLES = {"resonator_1":"signal","resonator_2":"power","resonator_3":"memory","archive_door":"rail","relay_map":"map"}
+# archive_door / relay_map only open their puzzle once the story has reached them (before that they keep their M2 examine text)
+const PUZZLE_NEEDS = {"archive_door":"records","relay_map":"theory"}
 const PUZZLE_UNLOCK = {"signal":"floor2","power":"floor3"}
-const HIDDEN = {"registry_hidden":"records","sealed_chamber":"puzzle_power"}
+const HIDDEN = {"registry_hidden":"records","sealed_chamber":"puzzle_power","exit_arena":"archive_examined","archive_core":"warden_restored"}
 const PUZZLE_DONE = {
  "signal":[{"who":"NARRATOR","text":"The three transmissions lock one after another. The resonator draws breath, and somewhere above, a stairwell door unlatches."},{"who":"MIRA","text":"The lullaby, the bulletin, the tone. They were all pointed at this room."}],
  "power":[{"who":"NARRATOR","text":"Current reaches the relay lamp. Light climbs the stairwell in a flicker, and somewhere in the wall a sealed chamber hums awake."},{"who":"MIRA","text":"Hear that? Something behind the panel just got its power back."}],
+ "rail":[{"who":"NARRATOR","text":"The carriage runs out along the rail and the lock gives with a sound like a held breath."}],
+ "map":[{"who":"NARRATOR","text":"The last tile turns. Seven lamps wake on the chalk map, one after another."}],
  "memory":[{"who":"NARRATOR","text":"The fragments fall into line. For a moment the resonator replays the whole chain, and at the end of the floor the sealed archive gate stirs."},{"who":"MIRA","text":"Evidence in order is a story. I don't like how this one ends."}]
 }
 const TOWER_OBJECTIVE = "Climb the Central Relay Tower"
@@ -70,7 +84,9 @@ static func next_step(clues:Array) -> Dictionary:
  for s in STEPS:
   if not has_all(clues,s.needs):
    var open=[]
-   if s.id=="tx":
+   if s.id=="warden":
+    open=[WardenLogic.ORDER[mini(count_of(clues,["restored_mech_2","restored_mech_3","restored_mech_1"]),WardenLogic.ORDER.size()-1)] if clues.has("inscription_read") else "inscription"]
+   elif s.id=="tx":
     for i in range(3):
      if not clues.has("tx_%d" % (i+1)):
       open.append(s.spots[i])
@@ -177,7 +193,16 @@ static func respond(id:String, clues:Array) -> Dictionary:
    else:
     r.lines=[nar("A bare wall panel.")]
   "archive_door":
-   r.lines=[nar("A sealed archive door. Three brackets glow dim where a key pattern should be."),line("MIRA","A resonance lock. We'll need the right pieces to open it. The old registry is a start.")]
+   if clues.has("puzzle_rail"):
+    r.lines=[nar("The archive door stands open. The drawer inside is empty now.")]
+   elif clues.has("records"):
+    if clues.has("seen_archive_door"):
+     r.lines=[nar("The rail lock still holds the door.")]
+    else:
+     r.add=["seen_archive_door"]
+     r.lines=[nar("With the old registry in your hands, the door's rail lock makes sense: a gold carriage jammed at the left end of a track, blocked by loose bars."),line("MIRA","It's a lock made of blocks. Slide them clear and the carriage can run out the end. Slowly. It's older than both of us.")]
+   else:
+    r.lines=[nar("A sealed archive door. Three brackets glow dim where a key pattern should be."),line("MIRA","A resonance lock. We'll need the right pieces to open it. The old registry is a start.")]
   "pip":
    var frags=count_of(clues,["frag_1","frag_2","frag_3"])
    if clues.has("pip_done"):
@@ -245,8 +270,17 @@ static func respond(id:String, clues:Array) -> Dictionary:
     if not clues.has("records"): missing.append("the old registry")
     r.lines=[nar("The board has gaps. Still missing: "+", ".join(missing)+"."),line("MIRA","We'll know it fits when the pieces line up.")]
   "relay_map":
-   r.lines=[nar("A relay map of the Quarter, seven nodes drawn in chalk. Two are dark, and a torn corner hides the way to the Central Tower.")]
-   r.add=["map_seen"]
+   if clues.has("puzzle_map"):
+    r.lines=[nar("The relay map glows, seven lamps in one line.")]
+   elif clues.has("theory"):
+    if clues.has("seen_relay_map"):
+     r.lines=[nar("Teo's chalk map waits, seven lamps dark.")]
+    else:
+     r.add=["seen_relay_map","map_seen"]
+     r.lines=[line("TEO","Now that you've laid it all out, this is the piece I couldn't mend alone: the old map of the network. Seven arrays on one line, all dark."),line("TEO","Turn the tiles until the current reaches every lamp. I'll hold the chalk."),line("MIRA","Don't look at me. I'm not allowed to solve this one for you.")]
+   else:
+    r.lines=[nar("A relay map of the Quarter, seven nodes drawn in chalk. Two are dark, and a torn corner hides the way to the Central Tower.")]
+    r.add=["map_seen"]
   "resonator_1","resonator_2","resonator_3":
    var kind=str(PUZZLES[id])
    if clues.has("puzzle_"+kind):
@@ -268,14 +302,104 @@ static func respond(id:String, clues:Array) -> Dictionary:
     r.codex=["first_memory"]
     r.toast="HIDDEN CLUE  /  A SEALED FRAGMENT"
   "archive_gate":
-   if has_all(clues,["puzzle_signal","puzzle_power","puzzle_memory"]):
+   if has_all(clues,["puzzle_signal","puzzle_power","puzzle_memory"]) and not has_all(clues,["puzzle_map","puzzle_rail"]):
+    r.lines=[nar("All three resonators answer, but the archive gate keeps two dark lights lit, as though two other keys are still missing: one from the Keeper's workshop, one from the station's sealed archive.")]
+   elif has_all(clues,["puzzle_signal","puzzle_power","puzzle_memory","puzzle_map","puzzle_rail"]):
     r.lines=[nar("The sealed archive gate answers at last. Behind it something large shifts in the dark, a guardian old enough to remember the tower being built."),line("MIRA","Echo... something in there is waking up. Whatever it is, it knows we're here.")]
     r.add=["archive_examined"]
     r.toast="THE ARCHIVE STIRS"
    else:
     r.lines=[nar("A sealed archive gate. Three resonators feed it: %d of 3 restored." % count_of(clues,["puzzle_signal","puzzle_power","puzzle_memory"]))]
+  "mech_1","mech_2","mech_3":
+   r.lines=[nar("A mechanism the size of a house, dark and cold.")]
+  "inscription":
+   r.add=["inscription_read"]
+   r.lines=[nar("A brass plaque is bolted to the wall, worn smooth by a great many hands."),nar("'TO WAKE THE GUARDIAN, WAKE THE TOWER IN THIS ORDER. FIRST THE VALVE, THAT THE TOWER MAY BREATHE. THEN THE BELL, THAT IT MAY BE HEARD. LAST THE SEAL, THAT THE GUARDIAN MAY HEAR ITSELF. WAKE THEM OUT OF ORDER AND THE TOWER WILL ANSWER WITH ITS FEAR.'"),line("MIRA","Valve, bell, seal. And it won't be left to right. Read the machines.")]
+  "archive_core":
+   r.lines=[nar("The archive core: a single cradle in a room no bigger than a closet.")]
+  "exit_arena":
+   r.lines=[nar("The archive gate swings open onto the Central Relay.")]
   _:
    r.lines=[nar("Nothing here.")]
  if id.begins_with("signal_") and not r.add.is_empty() and has_all(clues+r.add,["tx_1","tx_2","tx_3"]):
   r.lines.append(line("MIRA","Three transmissions, three different kinds of wrong. Someone at the Transit Station used to sort these relays. Let's start with their terminal."))
  return r
+
+# ---------------------------------------------------------------- M4 cinematics (drafts; wording needs owner review)
+const CINE = {
+ "opening":[
+  {"who":"NARRATOR","text":"Lantern Quarter, the morning after the Rain Array fell silent. The violet rain has thinned to a drizzle, and every Meridian screen still loops the same announcement: forty-eight hours."},
+  {"who":"NARRATOR","text":"Up on the rooftops the old relay towers stand dark. Down in the market, the speakers have started to talk."},
+  {"who":"MIRA","text":"Echo. Third time since sunrise: the tower on Ninth spoke again. People are standing in the street, listening."},
+  {"who":"PLAYER","text":"Listening to who?"},
+  {"who":"MIRA","text":"That's what we're here to find out. Stay close, and don't flinch when you hear your own name."}
+ ],
+ "exposure":[
+  {"who":"NARRATOR","text":"The rail lock slides home. Behind the door is a single drawer of cards, each stamped with the same faded seal."},
+  {"who":"ANSELM","text":"I told myself these were all burned. I lied, even to myself."},
+  {"who":"NARRATOR","text":"He draws out one card. It is the original of the line someone scraped bare: a signature column, still inked."},
+  {"who":"ANSELM","text":"Hold your hand over the signature."},
+  {"who":"NARRATOR","text":"The card hums on one long, low note. Your note."},
+  {"who":"PLAYER","text":"That's the tone from the market. From the tower."},
+  {"who":"ANSELM","text":"The same signature, filed years before the first awakening on record. Whoever scraped the other copy knew exactly whose it was. I think they knew before you did."},
+  {"who":"MIRA","text":"Someone already knew who you were, Echo. I said it out loud. I just didn't want it to be this."},
+  {"who":"PLAYER","text":"Who filed it?"},
+  {"who":"ANSELM","text":"The handler column is blank. It's the only line anyone ever thought to erase completely. Take the card to Teo. The towers keep what the registry lost."}
+ ],
+ "teo_reveal":[
+  {"who":"NARRATOR","text":"Seven lamps wake on the chalk map, and the old relay network lights up the wall of Teo's workshop."},
+  {"who":"TEO","text":"There. Seven arrays, all on one line. Not antennas. Memory."},
+  {"who":"TEO","text":"Everyone who has stood in the rain in this quarter has been recorded a little: a name, a lullaby, the last thing they said. The towers keep it, and play it back to anyone who listens hard enough."},
+  {"who":"MIRA","text":"That's what the voices are. Somebody's missing family, still talking."},
+  {"who":"TEO","text":"And someone changed the system. It used to keep. Now it chooses what to keep, what to replay, and to whom."},
+  {"who":"PLAYER","text":"My note is in there too."},
+  {"who":"TEO","text":"At the very bottom, older than everything above it. I can't hear the Central Relay. Whatever it holds, it holds from before."}
+ ],
+ "warden_wakes":[
+  {"who":"NARRATOR","text":"The Central Relay is a drowned cathedral of cable. Three huge mechanisms stand dark along its length, and at the far end something very old turns toward you."},
+  {"who":"WARDEN","text":"UNREGISTERED SIGNATURE. HOLD POSITION."},
+  {"who":"MIRA","text":"It isn't threatening us. It's reading us. These machines were meant to be started in some order. Look for a plaque, an inscription, anything."}
+ ],
+ "recognition":[
+  {"who":"NARRATOR","text":"The last mechanism turns. The Warden's light flickers, steadies, and finds you."},
+  {"who":"WARDEN","text":"SIGNATURE... ECHO. CONFIRMED."},
+  {"who":"WARDEN","text":"RETURN... NOT EXPECTED."},
+  {"who":"PLAYER","text":"Return? I've never been here."},
+  {"who":"WARDEN","text":"ORIGINAL INSTRUCTION RESTORED: KEEP. NEVER CHOOSE. THE ARCHIVE OPENS FOR THE SIGNATURE THAT WAS FILED FIRST."},
+  {"who":"MIRA","text":"Filed first. Echo..."},
+  {"who":"NARRATOR","text":"At the end of the chamber, the sealed archive latch lets go."}
+ ],
+ "recording":[
+  {"who":"NARRATOR","text":"A single crystal cradle, and static. Then a voice, calm and tired and a very long time ago."},
+  {"who":"RECORDING","text":"Recording zero. If you are hearing this, the arrays have been changed, and the keeping has become a choosing."},
+  {"who":"RECORDING","text":"The signature in this recording is exact. It is the first resonance that held, the one all the others learned from. We called it the First Echo."},
+  {"who":"RECORDING","text":"Whoever carries it now will come looking for the one who first sang it. Do not let Vaust find them first."},
+  {"who":"NARRATOR","text":"The note rolls out of the crystal. It is your note, to the last decimal."},
+  {"who":"MIRA","text":"Echo. That isn't a copy. That's you."},
+  {"who":"PLAYER","text":"Or whoever I came from."},
+  {"who":"NARRATOR","text":"Far above, every Meridian screen in the Quarter flickers to the same word: ECHO."}
+ ]
+}
+# lines a finished investigation adds to the finale (STORY_PLAN section 6: "Player investigation can unlock extra dialogue during the finale")
+static func finale_extras(clues:Array) -> Array:
+ var out=[]
+ if has_all(clues,["w_a","w_b","w_c"]):
+  out.append(line("MIRA","Three people, three different nights. The towers answer whoever is listening. That's why nobody heard the same thing."))
+ if clues.has("journal"):
+  out.append(nar("The technician's journal was right. The towers aren't broadcasting. They're remembering."))
+ if clues.has("hidden_registry"):
+  out.append(line("MIRA","The candidates ledger had a dozen names, each marked RETAINED or LOST. This voice isn't one of them."))
+ if clues.has("first_memory_fragment"):
+  out.append(nar("The crystal from the sealed chamber answers it: the voice counting seven, and then, clearly, 'We kept it safe in the towers.'"))
+ if clues.has("pip_done"):
+  out.append(nar("In your pocket, Lio's lamp glass hums, very faintly, on the same note. Somewhere in the static behind the recording a boy laughs: 'Pip, catch!'"))
+ return out
+static func cine_lines(id:String, clues:Array) -> Array:
+ var lines=CINE.get(id,[]).duplicate(true)
+ if id=="recording":
+  var extras=finale_extras(clues)
+  # the extras play before the final screen-flicker line
+  var last=lines.pop_back()
+  lines+=extras
+  lines.append(last)
+ return lines

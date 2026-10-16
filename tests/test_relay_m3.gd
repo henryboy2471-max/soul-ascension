@@ -63,7 +63,7 @@ func run() -> void:
  profile.data.onboarded=true
  profile.data.settings.sound=false
  profile.data.completed=["1-1","1-2"]
- var main_clues=["tx_1","tx_2","tx_3","terminal","anselm_met","anselm_admits","records","scraped_entry","teo_met","decoded","theory"]
+ var main_clues=["tx_1","tx_2","tx_3","terminal","anselm_met","anselm_admits","records","scraped_entry","puzzle_rail","seen_exposure","teo_met","decoded","theory","puzzle_map","seen_teo_reveal"]
  profile.data.mission_progress={"1-3":{"intro":true,"zone":"tower_1","visited":["market","tower_1"],"unlocks":["shortcut","tower"],"discoveries":[],"clues":main_clues.duplicate()}}
  var ep=load("res://scripts/story/relay_episode.gd").new()
  ep.mission_id="1-3"
@@ -174,7 +174,7 @@ func run() -> void:
  check(ep.progress.clues.has("puzzle_memory") and ep.explore.objective_text=="Examine the sealed archive at the top of the tower","Objective: examine the archive")
  ep.on_interact("archive_gate")
  await wait_idle(ep)
- check(ep.progress.clues.has("archive_examined") and Episode3Data.next_step(ep.progress.clues).is_empty(),"With all three resonators restored the archive stirs and the M3 quest line is complete")
+ check(ep.progress.clues.has("archive_examined") and Episode3Data.next_step(ep.progress.clues).id=="warden","With all three resonators restored the archive stirs; the quest line moves on to the Warden (M4)")
  # ---- persistence across a restart; Episode 1-2 untouched
  var snap=profile.data.mission_progress["1-3"].duplicate(true)
  ep.queue_free()

@@ -56,14 +56,16 @@ static func signal_hint(state:Dictionary) -> String:
  var f="FREQUENCY: right" if int(state.freq)==int(t.freq) else ("FREQUENCY: too high" if int(state.freq)>int(t.freq) else "FREQUENCY: too low")
  var a="HEIGHT: right" if int(state.amp)==int(t.amp) else ("HEIGHT: too tall" if int(state.amp)>int(t.amp) else "HEIGHT: too short")
  return f+"   /   "+a
-# ---------------------------------------------------------------- power routing
+# ---------------------------------------------------------------- power routing (and the relay map: same mechanic, a second level)
 const N = 1
 const E = 2
 const S = 4
 const W = 8
+# the M3 power board keeps its own constants (tests and saves use them); every routing function takes the level from state.level (default "power")
 const COLS = 6
 const ROWS = 4
-# kind per cell, row-major (y*COLS+x). "src" and "relay" are fixed; "none" is a burnt-out tile that carries nothing; everything else rotates.
+# kind per cell, row-major (y*COLS+x). "src" and "relay" are fixed; "none" is a burnt-out tile that carries nothing; "end" is a one-sided lamp that rotates;
+# everything else rotates.
 const ROUTE_KINDS = [
  "none","straight","corner","corner","straight","corner",
  "corner","corner","tee","corner","tee","relay",
@@ -77,6 +79,17 @@ const ROUTE_SOLUTION = {13:3,7:1,8:0,9:2,15:0,16:1,17:3}
 const ROUTE_START = [0,2,1,3,2,1,0,3,1,0,1,2,0,0,1,1,0,0,1,2,3,1,0,0]
 const RELAY_CELL = 11
 const SOURCE_CELL = 12
+# Episode 3 M4 relay map (Teo's workshop): seven array lamps, one source, a tree of 23 tiles that must all be turned right; the rest are decoys.
+const MAP_KINDS = ["tee", "corner", "corner", "straight", "end", "corner", "straight", "end", "tee", "tee", "straight", "none", "straight", "end", "src", "tee", "corner", "end", "tee", "corner", "corner", "end", "corner", "tee", "tee", "tee", "corner", "none", "corner", "straight", "corner", "end", "end", "straight", "none"]
+const MAP_SOLUTION = {2:1, 3:1, 4:3, 7:1, 8:0, 9:1, 13:2, 15:1, 16:0, 17:3, 19:1, 20:3, 21:2, 22:0, 23:0, 24:0, 25:0, 26:3, 28:0, 29:1, 30:3, 31:0, 32:0}
+const MAP_START = [1, 0, 0, 2, 1, 0, 1, 0, 3, 2, 0, 0, 1, 3, 0, 3, 3, 1, 0, 0, 0, 3, 1, 2, 2, 1, 2, 0, 3, 2, 2, 3, 1, 0, 1]
+const MAP_LAMPS = [4, 7, 13, 17, 21, 31, 32]
+const LEVELS = {
+ "power":{"cols":6,"rows":4,"kinds":ROUTE_KINDS,"start":ROUTE_START,"solution":ROUTE_SOLUTION,"source":SOURCE_CELL,"targets":[RELAY_CELL]},
+ "map":{"cols":7,"rows":5,"kinds":MAP_KINDS,"start":MAP_START,"solution":MAP_SOLUTION,"source":14,"targets":MAP_LAMPS}
+}
+static func level_of(state:Dictionary) -> Dictionary:
+ return LEVELS[str(state.get("level","power"))]
 static func base_mask(kind:String) -> int:
  match kind:
   "straight": return N|S
@@ -84,52 +97,70 @@ static func base_mask(kind:String) -> int:
   "tee": return E|S|W
   "src": return E
   "relay": return S
+  "end": return N
  return 0
 static func rotate_mask(mask:int, turns:int) -> int:
  var m=mask
  for i in range(posmod(turns,4)):
   m=((m<<1)&15)|(m>>3)
  return m
-static func route_default() -> Dictionary:
- return {"rots":ROUTE_START.duplicate(),"hints":0}
-static func cell_kind(i:int) -> String:
- return ROUTE_KINDS[i]
-static func cell_mask(i:int, rots:Array) -> int:
- var k=cell_kind(i)
- if k=="src" or k=="relay" or k=="none":
+static func route_default(level:String="power") -> Dictionary:
+ return {"level":level,"rots":LEVELS[level].start.duplicate(),"hints":0}
+static func cell_kind(i:int, level:String="power") -> String:
+ return LEVELS[level].kinds[i]
+static func is_fixed(kind:String) -> bool:
+ return kind=="src" or kind=="relay" or kind=="none"
+static func cell_mask(i:int, rots:Array, level:String="power") -> int:
+ var k=cell_kind(i,level)
+ if is_fixed(k):
   return base_mask(k)
  return rotate_mask(base_mask(k),int(rots[i]))
 static func route_rotate(state:Dictionary, i:int) -> Dictionary:
- var k=cell_kind(i)
- if k=="src" or k=="relay" or k=="none":
+ if is_fixed(cell_kind(i,str(state.get("level","power")))):
   return state
  var s=state.duplicate(true)
  s.rots[i]=(int(s.rots[i])+1)%4
  return s
 # cells carrying current: flood from the source through tiles whose open sides meet
 static func route_powered(state:Dictionary) -> Array:
+ var lv=level_of(state)
+ var level=str(state.get("level","power"))
  var rots=state.rots
- var seen=[SOURCE_CELL]
- var queue=[SOURCE_CELL]
+ var cols=int(lv.cols)
+ var rows=int(lv.rows)
+ var seen=[int(lv.source)]
+ var queue=[int(lv.source)]
  while not queue.is_empty():
   var c=queue.pop_front()
-  var x=c%COLS
-  var y=c/COLS
-  var m=cell_mask(c,rots)
+  var x=c%cols
+  var y=c/cols
+  var m=cell_mask(c,rots,level)
   for side in [[N,0,-1,S],[E,1,0,W],[S,0,1,N],[W,-1,0,E]]:
    if m&side[0]==0: continue
    var nx=x+side[1]
    var ny=y+side[2]
-   if nx<0 or nx>=COLS or ny<0 or ny>=ROWS: continue
-   var n=ny*COLS+nx
+   if nx<0 or nx>=cols or ny<0 or ny>=rows: continue
+   var n=ny*cols+nx
    if seen.has(n): continue
-   if cell_mask(n,rots)&side[3]!=0:
+   if cell_mask(n,rots,level)&side[3]!=0:
     seen.append(n)
     queue.append(n)
  return seen
+static func route_unpowered_targets(state:Dictionary) -> Array:
+ var lit=route_powered(state)
+ var out=[]
+ for t in level_of(state).targets:
+  if not lit.has(t): out.append(t)
+ return out
 static func route_solved(state:Dictionary) -> bool:
- return route_powered(state).has(RELAY_CELL)
-# is there ANY rotation of the rotatable tiles that connects source to relay? (DFS over tile orientations; tests use this to prove solvability)
+ return route_unpowered_targets(state).is_empty()
+# the stored solution rotations connect every target (a certificate; the power board is additionally proven by search below)
+static func route_certificate(level:String) -> bool:
+ var s=route_default(level)
+ for cell in LEVELS[level].solution:
+  s.rots[cell]=LEVELS[level].solution[cell]
+ return route_solved(s)
+# is there ANY rotation of the rotatable tiles that connects source to relay? (DFS over tile orientations; tests use this to prove solvability of the power board)
 static func route_solvable() -> bool:
  return _dfs(SOURCE_CELL,-1,[SOURCE_CELL])
 static func _dfs(c:int, from_side:int, seen:Array) -> bool:
@@ -163,9 +194,18 @@ static func _dfs(c:int, from_side:int, seen:Array) -> bool:
   if seen.has(n): continue
   if _dfs(n,back,seen+[n]): return true
  return false
-# first tile on the intended path that does not yet connect to its next tile (hint level 2 pulses it)
+# first tile that is not yet right: the power board follows its intended path; the map names the first wrong solution tile in index order
 static func route_hint_cell(state:Dictionary) -> int:
+ var level=str(state.get("level","power"))
  var rots=state.rots
+ if level=="map":
+  if route_solved(state): return -1
+  var sol=LEVELS["map"].solution
+  var keys=sol.keys()
+  keys.sort()
+  for cell in keys:
+   if cell_mask(cell,rots,"map")!=rotate_mask(base_mask(cell_kind(cell,"map")),int(sol[cell])): return cell
+  return -1
  for i in range(ROUTE_PATH.size()-1):
   var a=ROUTE_PATH[i]
   var b=ROUTE_PATH[i+1]
@@ -180,9 +220,83 @@ static func route_hint_cell(state:Dictionary) -> int:
    return b if cell_mask(a,rots)&side!=0 else a
  return -1
 static func route_hint(state:Dictionary) -> String:
+ if str(state.get("level","power"))=="map":
+  if int(state.get("hints",0))<=1:
+   return "Seven lamps, one current. Every lamp hangs off the same line: follow it out from the source and turn each tile to carry it on."
+  return "A tile that the current needs is turned the wrong way. It is marked."
  if int(state.get("hints",0))<=1:
   return "Follow the current from the source. It stops where a tile does not meet its neighbour."
  return "A tile on the way is turned the wrong way. It is marked."
+# ---------------------------------------------------------------- sliding rails (the station's sealed archive door)
+const RAIL_SIZE = 6
+const RAIL_BLOCKS = [[0, 2, 2, "h"], [3, 4, 2, "h"], [5, 3, 2, "v"], [1, 4, 2, "h"], [3, 1, 3, "v"], [3, 0, 3, "h"], [0, 5, 2, "h"]]
+static func rail_default() -> Dictionary:
+ var b=[]
+ for blk in RAIL_BLOCKS: b.append(blk.duplicate())
+ return {"blocks":b,"moves":0,"hints":0}
+static func rail_cells(blocks:Array) -> Dictionary:
+ var o={}
+ for i in range(blocks.size()):
+  var blk=blocks[i]
+  for k in range(int(blk[2])):
+   o[Vector2i(int(blk[0])+(k if blk[3]=="h" else 0),int(blk[1])+(k if blk[3]=="v" else 0))]=i
+ return o
+static func rail_can_move(blocks:Array, i:int, dir:int) -> bool:
+ var blk=blocks[i]
+ var l=int(blk[2])
+ var cell=Vector2i(int(blk[0]),int(blk[1]))
+ if blk[3]=="h":
+  cell.x=int(blk[0])+(l if dir>0 else -1)
+ else:
+  cell.y=int(blk[1])+(l if dir>0 else -1)
+ if cell.x<0 or cell.y<0 or cell.x>=RAIL_SIZE or cell.y>=RAIL_SIZE:
+  return false
+ var o=rail_cells(blocks)
+ return not o.has(cell)
+static func rail_move(state:Dictionary, i:int, dir:int) -> Dictionary:
+ if not rail_can_move(state.blocks,i,dir):
+  return state
+ var s=state.duplicate(true)
+ if s.blocks[i][3]=="h":
+  s.blocks[i][0]=int(s.blocks[i][0])+dir
+ else:
+  s.blocks[i][1]=int(s.blocks[i][1])+dir
+ s["moves"]=int(s.get("moves",0))+1
+ return s
+# the key block (0) reaches the right edge
+static func rail_solved(state:Dictionary) -> bool:
+ return int(state.blocks[0][0])+int(state.blocks[0][2])>=RAIL_SIZE
+# breadth-first search over block positions: the shortest list of [block, dir] moves from `state`, or null when unsolvable
+static func rail_solve(state:Dictionary) -> Variant:
+ var start=state.blocks
+ var key=func(b): return str(b)
+ var seen={str(start):true}
+ var queue=[[start,[]]]
+ while not queue.is_empty():
+  var cur=queue.pop_front()
+  var blocks=cur[0]
+  if int(blocks[0][0])+int(blocks[0][2])>=RAIL_SIZE:
+   return cur[1]
+  for i in range(blocks.size()):
+   for dir in [-1,1]:
+    if rail_can_move(blocks,i,dir):
+     var nb=blocks.duplicate(true)
+     if nb[i][3]=="h": nb[i][0]=int(nb[i][0])+dir
+     else: nb[i][1]=int(nb[i][1])+dir
+     var k=str(nb)
+     if not seen.has(k):
+      seen[k]=true
+      queue.append([nb,cur[1]+[[i,dir]]])
+ return null
+static func rail_hint(state:Dictionary) -> String:
+ if int(state.get("hints",0))<=1:
+  return "The gold carriage must slide out of the right edge. Clear the rail in front of it, one block at a time."
+ return "The next block to slide is marked."
+# which block the optimal solution moves next (hint level 2), or -1
+static func rail_hint_block(state:Dictionary) -> int:
+ var path:Variant=rail_solve(state)
+ if path==null or path.is_empty(): return -1
+ return int(path[0][0])
 # ---------------------------------------------------------------- memory reconstruction
 # each card is unlocked by a clue the player found earlier; the order is oldest -> newest
 const MEMORY_CARDS = {

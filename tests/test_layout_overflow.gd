@@ -192,13 +192,52 @@ func run() -> void:
     done_ok=false
    box.queue_free()
  check(done_ok,"Every puzzle-solved dialogue line fits inside the dialogue box")
- for kind in ["signal","power","memory"]:
+ # M4: every cinematic line (with all finale extras) in the real dialogue box
+ var cine_fits=true
+ var cine_worst=""
+ var all_flags=["w_a","w_b","w_c","journal","hidden_registry","first_memory_fragment","pip_done"]
+ for id in Episode3Data.CINE:
+  for line in Episode3Data.cine_lines(id,all_flags):
+   var box=load("res://scripts/story/dialogue_box.gd").new()
+   box.speakers=Episode3Data.SPEAKERS
+   box.setup([line],"Ascendant")
+   main.add_child(box)
+   await process_frame
+   box.advance()
+   await process_frame
+   var need=box.text_label.get_combined_minimum_size()
+   var plate_ok=true
+   if box.name_plate.visible:
+    plate_ok=box.name_label.get_theme_font("font").get_string_size(box.name_label.text,HORIZONTAL_ALIGNMENT_LEFT,-1,21).x<=box.name_plate.size.x-14.0 and box.name_plate.global_position.x+box.name_plate.size.x<=1240.0
+   if box.text_label.global_position.y+need.y>box.box_panel.global_position.y+box.box_panel.size.y-4.0 or need.x>box.text_label.size.x+1.0 or not plate_ok:
+    cine_fits=false
+    cine_worst=id+": "+str(line.text).substr(0,40)
+    print("INFO cinematic line ",id," ",str(line.who)," need=",need," plate_ok=",plate_ok)
+   box.queue_free()
+ check(cine_fits,"Every cinematic line fits inside the dialogue box %s" % cine_worst)
+ var arena_lines_ok=true
+ for sid in ["inscription","mech_1","archive_core","exit_arena"]:
+  for line in Episode3Data.respond(sid,[]).lines:
+   var box=load("res://scripts/story/dialogue_box.gd").new()
+   box.speakers=Episode3Data.SPEAKERS
+   box.setup([line],"Ascendant")
+   main.add_child(box)
+   await process_frame
+   box.advance()
+   await process_frame
+   var need=box.text_label.get_combined_minimum_size()
+   if box.text_label.global_position.y+need.y>box.box_panel.global_position.y+box.box_panel.size.y-4.0 or need.x>box.text_label.size.x+1.0:
+    arena_lines_ok=false
+    print("INFO arena line ",sid," need=",need)
+   box.queue_free()
+ check(arena_lines_ok,"The arena's inscription and spot lines fit inside the dialogue box")
+ for kind in ["signal","power","memory","map","rail"]:
   var screen=load("res://scripts/puzzle/puzzle_screen.gd").new()
   screen.setup(kind,{},["tx_2","tx_3","terminal","records"])
   main.add_child(screen)
   await process_frame
   await process_frame
-  if kind=="signal": screen.request_hint(); screen.request_hint()
+  if kind=="signal" or kind=="map" or kind=="rail": screen.request_hint(); screen.request_hint()
   if kind=="memory": screen.request_hint(); screen.check_memory()
   await process_frame
   report("%s puzzle screen" % kind,screen)

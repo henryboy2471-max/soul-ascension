@@ -107,13 +107,13 @@ func run() -> void:
  s=Episode3Data.next_step(["tx_2"])
  check(s.done==1 and s.spots==["signal_1","signal_3"],"The counter shows 1/3 and points only at the transmissions still unscanned")
  var order_ok=true
- var seq=[["tx_1","tx_2","tx_3"],["terminal"],["anselm_admits"],["records"],["teo_met"],["decoded"],["theory"],["tower_reached"],["puzzle_signal"],["puzzle_power"],["puzzle_memory"],["archive_examined"]]
+ var seq=[["tx_1","tx_2","tx_3"],["terminal"],["anselm_admits"],["records"],["puzzle_rail"],["teo_met"],["decoded"],["theory"],["puzzle_map"],["tower_reached"],["puzzle_signal"],["puzzle_power"],["puzzle_memory"],["archive_examined"],["warden_restored"],["recording_heard"]]
  var have=[]
  var ids=[]
  for group in seq:
   ids.append(Episode3Data.next_step(have).get("id","done"))
   have+=group
- check(Episode3Data.next_step(have).is_empty() and ids==["tx","terminal","anselm","records","teo","decode","board","tower","signal","power","memory","archive"],"Objectives advance tx -> terminal -> Anselm -> records -> Teo -> decoder -> board -> tower -> three resonators -> archive, then finish")
+ check(Episode3Data.next_step(have).is_empty() and ids==["tx","terminal","anselm","records","door","teo","decode","board","map","tower","signal","power","memory","archive","warden","recording"],"Objectives advance tx -> terminal -> Anselm -> records -> sealed door -> Teo -> decoder -> board -> relay map -> tower -> three resonators -> archive -> Warden -> recording, then finish")
  check(ZoneDefs.route_x("market","station")==3330.0 and ZoneDefs.route_x("station","workshop")==70.0 and ZoneDefs.route_x("station","workshop",["shortcut"])==2930.0 and ZoneDefs.route_x("station","tower_1")==-1.0 and ZoneDefs.route_x("station","tower_1",["tower"])==70.0 and ZoneDefs.route_x("market","market")==-1.0,"Waypoints route through open exits: the shortcut is used once open, and the sealed tower is unreachable until unlocked")
  # ---- the real episode flow
  var ep=load("res://scripts/story/relay_episode.gd").new()
@@ -147,7 +147,7 @@ func run() -> void:
  check(profile.data.codex.has("anselm") and profile.data.codex.has("false_register"),"Anselm and the Missing Register enter the Codex")
  await act(ep,"registry_hidden")
  check(ep.progress.clues.has("hidden_registry") and profile.data.codex.has("earlier_candidates"),"The hidden registry ledger is an optional clue with its own Codex entry")
- check(ep.explore.objective_text=="Find Teo Marrow, the Relay Keeper","The objective now leads to Teo")
+ check(ep.explore.objective_text=="Open the sealed archive door at the station","With the records found the objective leads to the sealed archive door (M4)")
  # the tower stays sealed until the board is assembled
  ep.begin_zone("workshop",170.0)
  await wait_idle(ep)
@@ -162,10 +162,10 @@ func run() -> void:
  await wait_idle(ep)
  check(ep.zone_id=="workshop","The tower is still sealed before the theory is assembled")
  await act(ep,"board")
- check(ep.progress.clues.has("theory") and ep.progress.unlocks.has("tower") and ep.explore.objective_text=="Enter the Central Relay Tower","Assembling the board opens the tower and updates the objective")
+ check(ep.progress.clues.has("theory") and ep.progress.unlocks.has("tower") and ep.explore.objective_text=="Open the sealed archive door at the station","Assembling the board opens the tower (the quest still names the unfinished sealed door first)")
  ep.on_interact("exit_tower")
  await wait_idle(ep)
- check(ep.zone_id=="tower_1" and ep.progress.clues.has("tower_reached") and ep.explore.objective_text=="Restore the signal resonator on the first floor","The player can now enter the tower; its objective is the first resonator")
+ check(ep.zone_id=="tower_1" and ep.progress.clues.has("tower_reached") and ep.explore.objective_text=="Open the sealed archive door at the station","The player can enter the tower; the quest still names the unfinished door first (first missing step)")
  # ---- optional quest: Pip
  ep.begin_zone("alleys",170.0)
  await wait_idle(ep)

@@ -12,12 +12,13 @@ const PALETTES = {
  "workshop":{"sky":[Color(0.1,0.06,0.04),Color(0.3,0.18,0.1)],"wall":Color(0.13,0.09,0.07),"accent":Color(1.0,0.78,0.42),"cool":Color(0.6,0.8,1.0),"floor":Color(0.16,0.11,0.08)},
  "tower_1":{"sky":[Color(0.015,0.015,0.05),Color(0.1,0.08,0.22)],"wall":Color(0.04,0.04,0.1),"accent":Color(0.55,0.9,1.0),"cool":Color(0.6,0.5,1.0),"floor":Color(0.05,0.05,0.12)},
  "tower_2":{"sky":[Color(0.02,0.015,0.05),Color(0.14,0.08,0.24)],"wall":Color(0.045,0.04,0.1),"accent":Color(1.0,0.78,0.42),"cool":Color(0.6,0.5,1.0),"floor":Color(0.05,0.045,0.11)},
- "tower_3":{"sky":[Color(0.02,0.012,0.06),Color(0.18,0.08,0.3)],"wall":Color(0.05,0.035,0.11),"accent":Color(0.85,0.6,1.0),"cool":Color(1.0,0.8,0.5),"floor":Color(0.055,0.04,0.12)}
+ "tower_3":{"sky":[Color(0.02,0.012,0.06),Color(0.18,0.08,0.3)],"wall":Color(0.05,0.035,0.11),"accent":Color(0.85,0.6,1.0),"cool":Color(1.0,0.8,0.5),"floor":Color(0.055,0.04,0.12)},
+ "arena":{"sky":[Color(0.012,0.01,0.045),Color(0.14,0.06,0.26)],"wall":Color(0.04,0.04,0.11),"accent":Color(0.45,0.9,1.0),"cool":Color(0.75,0.55,1.0),"floor":Color(0.045,0.04,0.11)}
 }
 func pal() -> Dictionary:
  return PALETTES.get(zone,PALETTES.market)
 func interior() -> bool:
- return zone=="workshop" or zone.begins_with("tower")
+ return zone=="workshop" or zone=="arena" or zone.begins_with("tower")
 func draw_sky() -> void:
  var p=pal()
  gradient_rect(Rect2(0,0,width,520),p.sky[0],p.sky[1])

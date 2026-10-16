@@ -110,3 +110,41 @@ Question: do these two belong to M3? Answer after re-reading `STORY_PLAN.md`: **
 
 ## Gate
 M3 awaits owner approval of the puzzle targets and wording (`M3_REVIEW_DRAFTS.md`). **M4 is not started and stays gated for Henry's sign-off**; its exact scope is in `M4_SCOPE.md`.
+
+---
+# M4: Cinematics and Boss (implemented; awaiting owner approval before M5)
+
+Branch `episode-3/the-relay-keeper`. Not merged to `main`, not deployed. Mission 1-3 is still `playable:false` (the dev-only `settings.dev_unlock` starts it). Signed off by Henry at the start of M4 (see `APPROVAL.md`); the six recommended decisions in `M4_SCOPE.md` section H were followed.
+
+## What was built
+- **Relay Warden encounter** (plan §8, mission 3-6), as a new Explore-style arena (decision 1; the battle scene and frozen combat are untouched). `WardenLogic` (pure rules) + `WardenArena` (live node: floor telegraphs, closing bar, resonance meter) inside a new chamber zone reached through the archive gate on floor 3. Echo restores three mechanisms in the order on a brass plaque (VALVE, BELL, SEAL; deliberately not left to right). A correct one interrupts the Warden (6 s stun); a wrong one shocks Echo (-1 of 5 resonance) and rouses it. Telegraphs are 1.7 s floor zones (slam, sweep, pillars). Running out of resonance returns to the last checkpoint (entrance, or beside the last restored mechanism) with progress kept; reloading mid-fight resumes there (decision 5). The Warden is restored, not destroyed.
+- **The five required cinematics** (§9) plus the chamber's arrival scene: letterbox, slow push-in, flash and shake, name plates (decision 4: no new art), subtitles via the dialogue box, control returned afterwards: opening, Anselm's exposure, Teo's reveal, Warden recognition, First Echo recording.
+- **The two carried-over puzzles** (decision 2): the sealed archive door (a 6x6 sliding-rail puzzle) and the relay map (the power-routing mechanic on a 7x5 board with seven lamps). The door opens after the records; its payoff is the exposure scene. The map opens after the evidence board; its payoff is Teo's reveal. Both save per move and resume.
+- **Finale and completion** (§5 3-7, §11): the archive core plays the recording; the episode completes through the shared rewards screen (first clear paid once; replay pays the replay reward; mission progress, puzzles and checkpoints reset on completion so a replay starts fresh; completion, rewards and the Codex are kept); NEXT EPISODE shows the Episode 4 teaser; no Episode 4 content exists.
+- **Finale payoffs from the investigation** (§6): up to five extra lines in the recording scene, one per investigated payoff (all three witnesses, the journal, the hidden registry, the sealed fragment, Pip's quest).
+- **Quest line** now: transmissions → terminal → Anselm → records → sealed door → Teo → decoder → board → relay map → tower → three resonators → archive → Warden → recording. The archive gate also needs the map and the door.
+- **Codex**: four new secret entries (Echo's Registry Entry, The Seven Arrays, The Relay Warden, The First Echo).
+- Placeholder rewards unchanged (180 XP / 340 gold, replay 80 / 150), pending your confirmation.
+
+## Defects found and fixed during M4
+1. `next_step` indexed past the mechanism list in the moment between the third mechanism and the recognition scene (caught by the flow test).
+2. A cinematic left its slow push-in tween running after the scene (the view stayed zoomed): the tween is now killed; regression test.
+3. `Explore.set_cinematic(false)` re-showed the deliberately hidden prompt-text label, so each cinematic left a doubled prompt under the pill (shared Explore code; Episode 2's single cinematic never exposed it): fixed; regression test.
+4. The arena drew the outdoor skyline (no palette for the zone): it now has an interior palette.
+5. The Warden drifted onto Echo: it now keeps 340 px away; regression test.
+6. The old M1/M2/M3 tests encoded the pre-M4 shape (7 strips, no door/map steps, the opening not holding the episode busy): updated, not loosened.
+
+## Tests actually run
+- **Full runner `tools/run_tests.sh`: 31 Godot test files discovered, 31 run, 0 failing, plus the Python self-tests** (`suite_m4.txt`).
+- **Real-window playthrough `tests/playtest_relay_finale.gd` at 1280x720, 844x390 and 667x375: 0 failures at each** (410 s, 406 s, 406 s; `relay_finale_*.txt`, screenshots in `shots/m4/`). It plays with injected key events from the station through the sealed door, the walk to Teo, the relay map, the tower climb, the archive gate, the Warden fight (a wrong mechanism first, then VALVE, BELL, SEAL, dodging telegraphs the way a player would), the recognition scene, the recording, the rewards screen, NEXT EPISODE and the teaser. The segment before the station (M2 evidence and the three resonators) is seeded into the save; those are covered by the M2/M3 playthroughs.
+- New: `test_warden_logic` (17), `test_relay_m4` (40), extended `test_puzzle_logic` (38), `test_layout_overflow` (27), and the real-window `playtest_relay_finale.gd`.
+- Warden fairness is proven by exhaustive check: for every Warden position, player position and pattern, the player can leave the zone within the telegraph (worst case 161 px of walking against a 331 px reach under a 0.4 s reaction and 85% speed model). The bot in the playthrough walks out of telegraphs from the same state the game exposes.
+- Puzzle solvability: the relay map's stored solution lights all seven lamps and starts mostly wrong; the rail puzzle's shortest solution is 11 moves and every position reachable by sliding can still be solved (checked over the first 150 positions).
+
+## Not done / gaps (honest list)
+- **One unexplained engine abort.** One full-length 1280x720 playthrough (before the fixes above) aborted with an engine segfault (signal 11) right after the Warden was restored; the same run repeated cleanly, and I could not reproduce it in 8 runs of the finale tail and 6 runs of the arena segment (all under the same renderer). The backtrace had no symbols. It may have been a one-off in the software renderer or a real use-after-free in the cinematic/arena teardown; I do not know. If a later run crashes again it needs a debug build.
+- **Art and audio**: the Warden is the pedestrian rig scaled up and tinted (a placeholder; the plan says no generic placeholder in the final build); Teo, Anselm and the Warden have no portraits; the chamber is procedural art; no sound anywhere in M3/M4 content. All M5.
+- Difficulty and pacing of the fight and the two new puzzles are untested with a person. Wording of every cinematic is my draft (`M4_REVIEW_DRAFTS.md`).
+- No quest-log screen; hints for the fight itself are Mira's two lines and the plaque.
+- Touch was exercised only through Godot's mouse emulation and the keyboard path in the window runs; no web export, Android or device run (M5, §12).
+- Mission 1-3 stays unplayable; the home screen and mission card do not show it (M5 release decision).

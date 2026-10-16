@@ -43,7 +43,7 @@ func run() -> void:
  var areas={}
  for id in zones:
   areas[ZoneDefs.AREAS[id]]=true
- check(zones.size()==7 and areas.size()==5 and areas.has("A") and areas.has("B") and areas.has("C") and areas.has("D") and areas.has("E"),"Five areas (A-E) are defined; the Central Relay Tower is three connected floors (7 strips)")
+ check(zones.size()==8 and areas.size()==5 and areas.has("A") and areas.has("B") and areas.has("C") and areas.has("D") and areas.has("E"),"Five areas (A-E) are defined; the Central Relay Tower is three floors plus the Warden's chamber (8 strips)")
  var ok=true
  var unique=true
  var in_bounds=true
@@ -73,7 +73,7 @@ func run() -> void:
    var dz=zones[e.to]
    if e.spawn_x<80.0 or e.spawn_x>dz.world_w-80.0: spawns=false
  check(links and spawns,"Every exit leads to an existing zone that has a way back, and spawns the player inside the walkable range")
- check(ZoneDefs.reachable("market").size()==4 and ZoneDefs.reachable("market",["shortcut","tower"]).size()==5 and ZoneDefs.reachable("market",["shortcut","tower","floor2","floor3"]).size()==7,"Locks work as designed: 4 strips open, 5 with the tower, all 7 once the floor stairs are open too")
+ check(ZoneDefs.reachable("market").size()==4 and ZoneDefs.reachable("market",["shortcut","tower"]).size()==5 and ZoneDefs.reachable("market",["shortcut","tower","floor2","floor3"]).size()==8,"Locks work as designed: 4 strips open, 5 with the tower, all 8 once the floor stairs are open (the chamber hangs off floor 3)")
  # ---- art/config build for every zone
  var art_script=load("res://scripts/world/relay_art.gd")
  var explore_script=load("res://scripts/world/explore.gd")
@@ -100,12 +100,12 @@ func run() -> void:
    print("  zone %s: px %.0f from %.0f, companion %.0f" % [id,ex.px,x0,ex.npc_x])
   ex.queue_free()
   await process_frame
- check(built,"All 7 zones build with their NPCs and spots; the player walks and the companion follows")
+ check(built,"All 8 zones build with their NPCs and spots; the player walks and the companion follows")
  # ---- episode flow
  var ep=load("res://scripts/story/relay_episode.gd").new()
  ep.mission_id="1-3"
  root.add_child(ep)
- await wait_until(func(): return is_instance_valid(ep.explore),ep)
+ await wait_until(func(): return is_instance_valid(ep.explore) and not ep.busy,ep)
  check(is_instance_valid(ep.explore) and ep.zone_id=="market","Episode 3 starts in Lantern Market after the title card")
  check(profile.data.mission_progress["1-3"].zone=="market" and profile.data.mission_progress["1-3"].intro==true,"Opening progress is saved under mission 1-3")
  # inspect something (placeholder content) and a witness

@@ -104,12 +104,14 @@ func settle_story(id:String) -> void:
   flags[key]=MissionDefs.get_def(id).story_flags[key]
  progress["flags"]=flags
  data.mission_progress[id]=progress
-# District-flow episodes (Episode 1) save where the player is (intro seen, objective step, position). Finishing the mission clears that so the next
-# play-through starts the story again; Lantern-flow episodes manage their own progress and are left alone.
+# District-flow (Episode 1) and relay-flow (Episode 3) episodes save where the player is (intro seen, objective step, position, puzzles). Finishing the
+# mission clears that so the next play-through starts the story again; Lantern-flow episodes manage their own progress and are left alone.
 func clear_explore_progress(id:String) -> void:
- if not MissionDefs.has_mission(id) or MissionDefs.get_def(id).get("flow","district")!="district":
+ if not MissionDefs.has_mission(id) or not ["district","relay"].has(MissionDefs.get_def(id).get("flow","district")):
   return
  var progress=mission_progress(id).duplicate(true)
+ if MissionDefs.get_def(id).get("flow","district")=="relay":
+  progress={}   # zone, clues, unlocks, puzzles and checkpoints all start over on a replay (completion, rewards and the Codex stay)
  for key in ["intro","step","px"]:
   progress.erase(key)
  if not data.get("mission_progress") is Dictionary:

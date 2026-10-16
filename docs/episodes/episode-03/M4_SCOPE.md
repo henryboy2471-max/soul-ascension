@@ -1,6 +1,6 @@
 # Episode 3 M4 (Cinematics and Boss): exact remaining scope, for Henry's sign-off
 
-**Status: not started. Gated for Henry's sign-off.** Branch `episode-3/the-relay-keeper` stays unmerged and undeployed. Sources are cited as `§n` of `STORY_PLAN.md` (the official plan, unchanged). "Today" = after M3 at commit `ebc97aa` plus the doc-only reconciliation commit.
+**Status: signed off by Henry and implemented (see `IMPLEMENTATION.md` M4); awaiting his approval of the result before M5. Original scope text follows.** Branch `episode-3/the-relay-keeper` stays unmerged and undeployed. Sources are cited as `§n` of `STORY_PLAN.md` (the official plan, unchanged). "Today" = after M3 at commit `ebc97aa` plus the doc-only reconciliation commit.
 
 ## A. The Relay Warden encounter (§8, §5 mission 3-6 "The Warden's Truth")
 Required by the plan:

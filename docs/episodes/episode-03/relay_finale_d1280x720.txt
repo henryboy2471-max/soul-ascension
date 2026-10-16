@@ -1,0 +1,23 @@
+[   3.7s] OK   resumed at the station; objective is the sealed door
+[  12.3s] OK   the door opens the rail puzzle
+[  34.0s] OK   rail door solved by keyboard; Anselm's exposure played; registry entry in the Codex
+[ 159.3s] OK   walked to the workshop; objective is the relay map
+[ 165.4s] OK   the relay map opens its puzzle
+[ 186.3s] OK   relay map lit all seven lamps; Teo's reveal played; Seven Arrays in the Codex
+[ 311.6s] OK   climbed to the top floor through the unlocked stairs
+[ 321.2s] OK   all keys restored: the archive stirs and the gate to the Central Relay appears
+[ 325.4s] OK   entered the Warden's chamber; the arrival scene played
+[ 328.4s] OK   read the brass plaque (VALVE, BELL, SEAL)
+[ 371.4s] OK   a mechanism out of order shocks Echo
+[ 380.1s] OK   VALVE restored while dodging telegraphs
+[ 384.1s] OK   BELL restored
+[ 393.0s] OK   SEAL restored: the recognition scene played; the Warden is restored, not destroyed
+[ 393.5s] walking to the archive core
+[ 399.1s] at the archive core; pressing Enter
+[ 399.3s] finale started
+[ 403.4s] finale tick 25 scene=episode busy=true
+[ 406.6s] OK   the finale played and the rewards screen is up; mission 1-3 completed
+[ 406.6s] OK   first clear paid the placeholder 340 gold
+[ 408.6s] OK   NEXT EPISODE shows the EPISODE 4 / THE FIRST ECHO teaser
+[ 410.3s] OK   the teaser returns home
+[ 410.3s] RESULT: 0 failures

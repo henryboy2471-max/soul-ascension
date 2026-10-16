@@ -293,7 +293,15 @@ func start_episode(mission_id:String="1-1") -> void:
  episode.mission_id=mission_id
  episode.request_battle=func(): return start_battle(true,mission_id)
  episode.exit_requested.connect(show_home)
+ if flow=="relay":
+  episode.completed.connect(on_relay_completed)
  screen.add_child(episode)
+# Episode 3 has no battle: its run is opened and settled here so the shared rewards screen pays the first clear exactly once.
+func on_relay_completed() -> void:
+ if Profile.active_run=="" and not Profile.begin_run(current_mission):
+  show_home()
+  return
+ show_result(true)
 func on_battle_finished(won:bool, from_episode:bool) -> void:
  if won and from_episode and MissionDefs.get_def(current_mission).get("flow","district")=="lantern":
   Profile.mark_battle_won(current_mission)
@@ -385,12 +393,14 @@ func show_result(won:bool) -> void:
  var teaser=MissionDefs.get_def(reward.id).ending.teaser
  if won:
   if MissionDefs.get_def(reward.id).get("flow","district")=="lantern": UI.chip(screen,"CODEX  /  HOLLOW CANTOR",Rect2(584,399,214,26),UI.VIOLET,13)
+  elif MissionDefs.get_def(reward.id).get("flow","district")=="relay": UI.chip(screen,"CODEX  /  THE FIRST ECHO",Rect2(584,399,214,26),UI.VIOLET,13)
   UI.button(screen,"NEXT EPISODE",Rect2(325,535,280,65),func(): show_teaser(teaser),true)
  else:
   UI.button(screen,"HOME",Rect2(325,535,280,65),show_home)
  if MissionDefs.get_def(reward.id).battle_only_waves.is_empty():
   # Story-only missions have no standalone battle: return to the open breach (the energy is charged again on entry).
-  UI.button(screen,"RETURN TO THE BREACH  /  %d ENERGY" % MissionDefs.energy_cost(reward.id),Rect2(630,535,316,65),func(): start_episode(reward.id),not won)
+  var relay=MissionDefs.get_def(reward.id).get("flow","district")=="relay"
+  UI.button(screen,"REPLAY EPISODE" if relay else "RETURN TO THE BREACH  /  %d ENERGY" % MissionDefs.energy_cost(reward.id),Rect2(630,535,316,65),func(): start_episode(reward.id),not won)
  else:
   UI.button(screen,"REPLAY BATTLE  /  6 ENERGY",Rect2(630,535,316,65),func(): start_battle(false,reward.id),true)
 func show_hero() -> void:
