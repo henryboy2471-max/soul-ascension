@@ -43,6 +43,8 @@ func set_portrait_hint(portrait:bool) -> void:
   rotate_overlay.queue_free()
   rotate_overlay=null
 var temp_notice:Label
+var result_save_label:Label   # the rewards screen's save line (follows Profile.save_state)
+var save_chip:Label           # a small "SAVING…" mark on every screen while a save is not yet confirmed by browser storage
 # Echo V2 is the approved protagonist, but its native artwork is pending: every screen of this preview build says that the Hero/Echo graphics are temporary.
 func add_temp_notice() -> void:
  var layer=CanvasLayer.new()
@@ -51,8 +53,13 @@ func add_temp_notice() -> void:
  temp_notice=UI.label(layer,"PREVIEW BUILD  /  TEMPORARY CHARACTER ART  /  NOT ECHO V2 PRODUCTION ART",Vector2(240,695),14,Color(0.82,0.84,0.94,0.8),800)
  temp_notice.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  temp_notice.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ save_chip=UI.label(layer,"SAVING…",Vector2(560,4),13,UI.GOLD,160)
+ save_chip.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+ save_chip.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ save_chip.visible=false
 func _ready() -> void:
  Profile.changed.connect(refresh_profile)
+ Profile.save_state_changed.connect(refresh_profile)
  add_temp_notice()
  if OS.has_feature(QA_FEATURE):
   add_qa_tools()
@@ -156,7 +163,7 @@ func home_title(def:Dictionary) -> String:
  return "FIRST AWAKENING" if def.id=="1-1" else str(def.title_case).to_upper()
 func home_resume_note(def:Dictionary) -> String:
  if def.get("flow","district")!="district":
-  return "Your investigation is saved"
+  return "Your investigation is saved" if Profile.save_state=="saved" else "Saving your investigation…"
  var step=Profile.mission_progress(def.id).get("step",0)
  var index=int(step) if (step is int or step is float) and is_finite(float(step)) and int(step)>=0 and int(step)<def.objectives.size() else 0
  return "Objective: "+str(def.objectives[index].text)
@@ -238,12 +245,27 @@ func show_home() -> void:
  UI.label(screen,"Plays offline  ·  no purchases",Vector2(1002,524),14,UI.MUTED)
  notice=UI.label(screen,"Progress is saved on this device.",Vector2(31,692),14,UI.MUTED)
  refresh_profile()
+# What the game may say about the save: "saved" only once the browser's storage holds it (Profile.save_state), never merely because it was written.
+func save_line(result_screen:bool=false) -> Array:
+ if not Profile.save_ok:
+  return ["Save failed — check device storage" if result_screen else "SAVE FAILED — keep the game open and check device storage.",Color("ff7188")]
+ match Profile.save_state:
+  "saving": return ["Saving progress…",UI.GOLD]
+  "unconfirmed": return ["Save not confirmed — keep this tab open",Color("ff7188")]
+ return ["Progress saved locally" if result_screen else "Progress is saved on this device.",UI.MUTED]
 func refresh_profile() -> void:
  if is_instance_valid(currency_label):
   currency_label.text="GOLD  "+str(Profile.data.gold)+"      CRYSTALS  "+str(Profile.data.crystals)+"      ENERGY  "+str(Profile.data.energy)+" / 120"
- if is_instance_valid(notice) and not Profile.save_ok:
-  notice.text="SAVE FAILED — keep the game open and check device storage."
-  notice.modulate=Color("ff7188")
+ if is_instance_valid(notice):
+  var line=save_line()
+  notice.text=line[0]
+  notice.modulate=Color(1,1,1) if line[1]==UI.MUTED else line[1]
+ if is_instance_valid(result_save_label):
+  var rl=save_line(true)
+  result_save_label.text=rl[0]
+  result_save_label.add_theme_color_override("font_color",rl[1])
+ if is_instance_valid(save_chip):
+  save_chip.visible=Profile.save_state=="saving"
 func new_modal(title:String, subtitle:String="") -> Control:
  close_modal()
  modal=Control.new()
@@ -409,7 +431,8 @@ func show_result(won:bool) -> void:
  xp.ghost=Profile.data.xp
  xp.readout=str(Profile.data.xp)+" / "+str(Progression.required(int(Profile.data.level)))+" XP"
  xp.readout_size=13
- UI.label(screen,"Progress saved locally" if Profile.save_ok else "Save failed — check device storage",Vector2(326,484),15,UI.MUTED if Profile.save_ok else Color("ff7188"))
+ result_save_label=UI.label(screen,"",Vector2(326,484),15,UI.MUTED)
+ refresh_profile()
  var teaser=MissionDefs.get_def(reward.id).ending.teaser
  if won:
   if MissionDefs.get_def(reward.id).get("flow","district")=="lantern": UI.chip(screen,"CODEX  /  HOLLOW CANTOR",Rect2(584,399,214,26),UI.VIOLET,13)

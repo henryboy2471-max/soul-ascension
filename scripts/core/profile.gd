@@ -1,6 +1,10 @@
 extends Node
 signal changed
+signal save_state_changed
 var backend=LocalSave.new()
+# "saved" (durably stored), "saving" (written, the browser has not confirmed it yet), "unconfirmed" (the browser never confirmed it), "failed" (the write failed)
+var save_state="saved"
+var save_poll=0.0
 var data:Dictionary
 var save_ok=true
 var active_run=""
@@ -16,7 +20,18 @@ func _ready() -> void:
  for key in ["level","xp","gold","crystals","energy","energy_at","vip_xp","battle_pass_xp"]:
   data[key]=int(data[key])
  Economy.regenerate(data,int(Time.get_unix_time_from_system()))
+ if backend.last_source=="mirror":
+  persist()   # the browser's write-ahead copy was newer than the stored file (a reload right after a save): bring the file and IndexedDB up to date
+func refresh_save_state() -> void:
+ var s=backend.durability() if save_ok else "failed"
+ if s!=save_state:
+  save_state=s
+  save_state_changed.emit()
 func _process(delta:float) -> void:
+ save_poll+=delta
+ if save_poll>=0.2 and save_state!="saved":
+  save_poll=0.0
+  refresh_save_state()
  clock+=delta
  if clock>=10:
   clock=0
@@ -26,6 +41,7 @@ func _process(delta:float) -> void:
    persist()
 func persist() -> bool:
  save_ok=backend.write_data(data)
+ refresh_save_state()
  changed.emit()
  return save_ok
 # Strict boolean read for saved flags: only a real `true` counts, so a corrupted value ("yes", 1, [true]) can never mark an attempt paid or an ending pending.

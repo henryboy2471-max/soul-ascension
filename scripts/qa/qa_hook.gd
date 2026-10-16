@@ -10,6 +10,7 @@ func _process(delta:float) -> void:
  if main==null or not OS.has_feature("web"):
   return
  # per frame: only the player's x and the arena dodge direction (the full snapshot lags up to 0.2 s, which is ~80 px of walking)
+ run_command()
  var ep=main.screen.get_child(0) if main.screen!=null and main.screen.get_child_count()>0 else null
  if ep!=null and ep.has_method("spot_of") and ep.get("explore")!=null and is_instance_valid(ep.explore):
   var dodge=0
@@ -23,6 +24,15 @@ func _process(delta:float) -> void:
   return
  acc=0.0
  JavaScriptBridge.eval("window.__qa=JSON.parse("+JSON.stringify(JSON.stringify(snapshot()))+")")
+# the driver sets window.__qa_cmd; QA-only save seeding (the same save shapes the Godot playthroughs start from), through the normal Profile API
+func run_command() -> void:
+ var cmd=JavaScriptBridge.eval("(function(){const c=window.__qa_cmd||'';window.__qa_cmd='';return c})()",true)
+ if str(cmd)=="seed_tower":
+  var clues=["tx_1","tx_2","tx_3","terminal","anselm_met","anselm_admits","records","scraped_entry","teo_met","decoded","theory","puzzle_rail","puzzle_map","seen_exposure","seen_teo_reveal","tower_reached"]
+  for id in ["1-1","1-2"]:
+   if not Profile.data.completed.has(id):
+    Profile.data.completed.append(id)
+  Profile.set_mission_progress("1-3",{"intro":true,"zone":"tower_1","visited":["market","station","alleys","workshop","tower_1"],"unlocks":["shortcut","tower"],"discoveries":[],"clues":clues,"puzzles":{}})
 func rects_of(root:Node) -> Array:
  var out=[]
  if root==null or not is_instance_valid(root):
@@ -33,7 +43,8 @@ func rects_of(root:Node) -> Array:
    out.append({"text":str(b.text),"x":r.position.x,"y":r.position.y,"w":r.size.x,"h":r.size.y})
  return out
 func snapshot() -> Dictionary:
- var d={"scene":main.scene_name,"completed":Profile.data.completed,"gold":int(Profile.data.gold),"xp":int(Profile.data.xp),"buttons":rects_of(main.modal)+rects_of(main.screen)}
+ var d={"scene":main.scene_name,"completed":Profile.data.completed,"gold":int(Profile.data.gold),"xp":int(Profile.data.xp),"buttons":rects_of(main.modal)+rects_of(main.screen),
+  "save":{"state":Profile.save_state,"ok":Profile.save_ok,"sha":Profile.backend.last_sha,"source":Profile.backend.last_source},"progress":Profile.mission_progress("1-3")}
  var ep=main.screen.get_child(0) if main.screen!=null and main.screen.get_child_count()>0 else null
  if ep!=null and ep.has_method("spot_of") and ep.get("explore")!=null and is_instance_valid(ep.explore):
   d["ep"]=episode_state(ep)
@@ -95,7 +106,7 @@ func turns_needed(cell:int, want_rot:int, state:Dictionary, level:String) -> int
  return 0
 func puzzle_state(sc) -> Dictionary:
  var st=sc.state
- var p={"kind":str(sc.kind),"done":bool(sc.done),"cursor":int(sc.cursor),"sel":int(sc.sel),"hints":int(st.get("hints",0)),"buttons":rects_of(sc)}
+ var p={"kind":str(sc.kind),"state":st,"done":bool(sc.done),"cursor":int(sc.cursor),"sel":int(sc.sel),"hints":int(st.get("hints",0)),"buttons":rects_of(sc)}
  match str(sc.kind):
   "signal":
    var t=PuzzleLogic.signal_target(st)
