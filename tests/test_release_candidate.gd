@@ -130,11 +130,11 @@ func run() -> void:
   var n=stack.pop_back()
   if n is CheckButton and n.visible: checks.append(n)
   stack.append_array(n.get_children())
- check(checks.size()==3,"Settings lists Sound, Screen shake and Reduced motion toggles")
+ check(checks.size()==4,"Settings lists Sound, Background music, Screen shake and Reduced motion toggles")
  for c in checks:
   c.button_pressed=not c.button_pressed
   c.toggled.emit(c.button_pressed)
- check(profile.data.settings.sound==true and profile.data.settings.shake==false and profile.data.settings.reduced_motion==true,"Each toggle writes its own setting")
+ check(profile.data.settings.sound==true and profile.data.settings.music==false and profile.data.settings.shake==false and profile.data.settings.reduced_motion==true,"Each toggle writes its own setting")
  check(profile.backend.read_data().settings.shake==false,"Settings are saved")
  sound.loop("city")
  check(sound.loop_kind=="city","Sound on: ambient loop starts")

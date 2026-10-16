@@ -113,6 +113,7 @@ func _ready() -> void:
  rng.seed=9
  for i in range(0 if bool(config.get("no_walkers",false)) else int(config.get("walker_count",5))):
   var walker=Fighter.new()
+  walker.ground_marker=false
   walker.look="ped"
   walker.armed=false
   walker.coat_color=Color.from_hsv(rng.randf(),0.35,0.28)
@@ -126,6 +127,7 @@ func _ready() -> void:
  # Sleepers: the same ambient pedestrian rigs, standing still (no new character art).
  for s in config.get("sleepers",[]):
   var sleeper=Fighter.new()
+  sleeper.ground_marker=false
   sleeper.look="ped"
   sleeper.armed=false
   sleeper.coat_color=Color.from_hsv(rng.randf(),0.3,0.3)
@@ -138,6 +140,7 @@ func _ready() -> void:
   add_child(sleeper)
   walkers.append({"node":sleeper,"x":float(s.x),"dir":sleeper.facing,"speed":0.0,"still":true})
  npc=Fighter.new()
+ npc.ground_marker=false
  npc.look="mira"
  npc.accent=Color("ffd86b")
  npc.hair_color=Color("2b2233")
@@ -155,6 +158,7 @@ func _ready() -> void:
   npc_x=float(config.get("start_px",px))-90.0
  for n in config.get("npcs",[]):
   var extra=Fighter.new()
+  extra.ground_marker=false
   extra.look="ped"
   extra.armed=false
   var tint:Color=n.get("tint",Color.from_hsv(float(n.get("hue",0.6)),0.35,0.3))
@@ -168,6 +172,7 @@ func _ready() -> void:
   add_child(extra)
   extra_npcs.append({"id":n.id,"x":float(n.x),"node":extra})
  player=Fighter.new()
+ player.ground_marker=false
  player.body=Profile.data.body
  player.scale=Vector2(1.2,1.2)
  player.load_sprite_set("res://assets/characters/hero/frames.tres",170.0,Color("4aa3ff"))
@@ -187,6 +192,7 @@ func _ready() -> void:
  hud_nodes=get_children().slice(hud_start)
  update_positions(1.0)
  Sound.loop("city")
+ Sound.music_resume()
  flash_rect=ColorRect.new()
  flash_rect.color=Color(1,1,1,0)
  flash_rect.size=Vector2(1280,720)

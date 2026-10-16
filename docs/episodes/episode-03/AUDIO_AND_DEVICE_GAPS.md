@@ -7,6 +7,8 @@ Review-only documentation; no audio or rendering code was changed for this.
 
 What Episode 3 inherits for free: the `city` loop that `Explore` starts, wet-surface footsteps (the explore code always asks for "wet"), the dialogue-advance tick (`Sound.play("tap")`) and UI button taps. `RelayEpisode`, `PuzzleScreen`, `WardenArena` and the cinematics contain **no Sound calls**.
 
+## Update (presentation pass): background music now exists (three original loops, -20 dB, its own Settings switch) and footsteps were turned down to -24 dB; the gaps below that concern effects and cues are unchanged.
+
 ## Audio: gaps (none are implemented; this is the cue list a sound pass would need)
 - Footstep surfaces: tower floors and the arena are metal, the station is concrete; the existing `metal`/`wood` clips are never selected in Episode 3.
 - Scans and mechanisms: hold-to-channel start, progress, completion (3 scans, VALVE, BELL, SEAL).

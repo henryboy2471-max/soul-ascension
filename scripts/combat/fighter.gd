@@ -1,5 +1,6 @@
 extends Node2D
 class_name Fighter
+var ground_marker=true   # the disc and ring on the floor under the fighter; false in exploration
 signal struck(amount:int, critical:bool)
 signal defeated
 var enemy=false
@@ -194,9 +195,11 @@ func _draw() -> void:
   var fade=g.life/0.24*0.4
   draw_colored_polygon(PackedVector2Array([Vector2(-21,-107),Vector2(23,-102),Vector2(35,-20),Vector2(2,-42),Vector2(-36,-22)]),Color(color,fade))
   draw_circle(Vector2(5,-120),17,Color(color,fade))
- draw_set_transform(Vector2.ZERO,0,Vector2(1,0.32))
- draw_circle(Vector2.ZERO,44,Color(0,0,0,0.45))
- draw_arc(Vector2.ZERO,44,0,TAU,48,Color(color,0.4),2)
+ if ground_marker:
+  # the dark disc and ring on the floor under a fighter (battle); exploration turns it off so walking characters stand on the scene without circles
+  draw_set_transform(Vector2.ZERO,0,Vector2(1,0.32))
+  draw_circle(Vector2.ZERO,44,Color(0,0,0,0.45))
+  draw_arc(Vector2.ZERO,44,0,TAU,48,Color(color,0.4),2)
  draw_set_transform(Vector2.ZERO,0,Vector2(facing,1))
  if sprite!=null:
   draw_sprite_overlays(color)

@@ -10,7 +10,7 @@ var save_ok=true
 var active_run=""
 var clock=0.0
 func defaults() -> Dictionary:
- return {"name":"Ascendant","body":"male","onboarded":false,"level":1,"xp":0,"gold":500,"crystals":0,"energy":60,"energy_at":int(Time.get_unix_time_from_system()),"completed":[],"codex":[],"heroes":{"echo":{"level":1,"stars":1}},"inventory":[],"equipment":{},"achievements":[],"purchases":[],"vip_xp":0,"battle_pass_xp":0,"settings":{"sound":true,"shake":true,"reduced_motion":false},"mission_progress":{}}
+ return {"name":"Ascendant","body":"male","onboarded":false,"level":1,"xp":0,"gold":500,"crystals":0,"energy":60,"energy_at":int(Time.get_unix_time_from_system()),"completed":[],"codex":[],"heroes":{"echo":{"level":1,"stars":1}},"inventory":[],"equipment":{},"achievements":[],"purchases":[],"vip_xp":0,"battle_pass_xp":0,"settings":{"sound":true,"shake":true,"reduced_motion":false,"music":true},"mission_progress":{}}
 func _ready() -> void:
  data=defaults()
  var loaded=backend.read_data()

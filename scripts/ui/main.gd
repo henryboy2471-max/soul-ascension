@@ -120,9 +120,9 @@ func clear_screen() -> void:
  add_child(screen)
  currency_label=null
  notice=null
-func backdrop() -> void:
+func backdrop(mission_id:String="1-1") -> void:
  var texture=TextureRect.new()
- texture.texture=load("res://assets/echo_key_art.png")
+ texture.texture=load(MissionDefs.theme(mission_id).wallpaper)
  texture.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
  texture.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
  texture.size=Vector2(1280,630)
@@ -171,10 +171,12 @@ func show_home() -> void:
  scene_name="home"
  Sound.stop_loop()
  clear_screen()
- backdrop()
+ var home_id=home_mission()
+ backdrop(home_id)
+ Sound.music_play(MissionDefs.theme(home_id).music)
  # lift the art toward bright electric blue / violet (additive, subtle) so the home screen is not dimmed by the shared backdrop shade
  var lift_rect=ColorRect.new()
- lift_rect.color=Color(0.03,0.075,0.2,1.0)
+ lift_rect.color=MissionDefs.theme(home_id).lift
  lift_rect.size=Vector2(1280,720)
  lift_rect.mouse_filter=Control.MOUSE_FILTER_IGNORE
  var lift_material=CanvasItemMaterial.new()
@@ -321,6 +323,7 @@ func start_episode(mission_id:String="1-1") -> void:
   planned("EPISODE LOCKED","Clear the previous episode to unlock "+str(locked.get("number","this episode")).capitalize()+": "+str(locked.get("title_case","")),"LOCKED","")
   return
  current_mission=mission_id
+ Sound.music_play(MissionDefs.theme(mission_id).music)
  if Profile.begin_ending(mission_id):
   # The boss was already beaten and paid for but the ending never finished (reload): resume the ending, no energy, no fight.
   if MissionDefs.get_def(mission_id).get("flow","district")=="lantern":
@@ -378,6 +381,7 @@ func start_battle(from_episode:bool=false, mission_id:String="1-1") -> bool:
    var cost=MissionDefs.energy_cost(mission_id)
    planned("ENERGY RECHARGING","Missions require %d energy. One energy regenerates every five minutes, including while the game is closed. Paid refills are not available." % cost,"MISSIONS  /  %d ENERGY" % cost,"")
   return false
+ Sound.stop_music()   # no music in battles (the realm ambience and the combat sounds carry them)
  current_mission=mission_id
  close_modal()
  clear_screen()
@@ -403,7 +407,8 @@ func show_result(won:bool) -> void:
  if reward.is_empty(): return
  clear_screen()
  scene_name="result"
- backdrop()
+ backdrop(str(reward.id))
+ Sound.music_play(MissionDefs.theme(str(reward.id)).music)
  var tone=UI.GOLD if won else UI.VIOLET
  UI.panel(screen,Rect2(283,84,714,552),Color(0.025,0.035,0.075,0.96),Color(tone,0.7))
  UI.trim(screen,Rect2(283,84,714,552),tone)
@@ -538,7 +543,7 @@ func mission_status(id:String) -> String:
  return d.number+" · UP NEXT"
 func show_settings() -> void:
  var node=new_modal("SETTINGS","SAVED ON THIS DEVICE")
- var options=[["sound","Sound effects"],["shake","Screen shake"],["reduced_motion","Reduced background motion"]]
+ var options=[["sound","Sound effects"],["music","Background music"],["shake","Screen shake"],["reduced_motion","Reduced background motion"]]
  for i in range(options.size()):
   var key=options[i][0]
   var check=CheckButton.new()
@@ -546,11 +551,11 @@ func show_settings() -> void:
   check.position=Vector2(294,211+i*79)
   check.size=Vector2(648,64)
   check.add_theme_font_size_override("font_size",23)
-  check.button_pressed=Profile.data.settings.get(key,false)
+  check.button_pressed=Profile.data.settings.get(key,key=="music")
   node.add_child(check)
-  check.toggled.connect(func(value): Profile.data.settings[key]=value;Profile.persist())
+  check.toggled.connect(func(value): Profile.data.settings[key]=value;Profile.persist();if key=="music": Sound.music_apply())
  UI.label(node,"Saved on this device with a backup copy.
-No analytics, ads or payment services are connected.",Vector2(294,478),17,UI.MUTED,676)
+No analytics, ads or payment services are connected.",Vector2(294,522),17,UI.MUTED,676)
 func onboarding() -> void:
  var node=new_modal("YOUR SIGNAL HAS AWAKENED","SOUL ASCENSION  /  THE FIRST FRACTURE")
  # The onboarding panel cannot be dismissed before choosing an identity.

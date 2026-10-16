@@ -115,6 +115,15 @@ static func is_unlocked(id:String, completed:Array) -> bool:
   if not completed.has(needed):
    return false
  return true
+# Per-episode look and sound: the wallpaper behind the home and rewards screens, the additive colour lift over it, and the background music loop.
+# Episode 1 keeps the original key art; 2 and 3 use grades of the same art (tools/make_wallpapers.py). Unknown ids fall back to Episode 1.
+const THEMES = {
+ "1-1":{"wallpaper":"res://assets/echo_key_art.png","lift":Color(0.03,0.075,0.2),"music":"res://assets/audio/music_ep1.ogg"},
+ "1-2":{"wallpaper":"res://assets/wallpapers/wallpaper_ep2.webp","lift":Color(0.17,0.05,0.03),"music":"res://assets/audio/music_ep2.ogg"},
+ "1-3":{"wallpaper":"res://assets/wallpapers/wallpaper_ep3.webp","lift":Color(0.0,0.09,0.11),"music":"res://assets/audio/music_ep3.ogg"},
+}
+static func theme(id:String) -> Dictionary:
+ return THEMES.get(id,THEMES["1-1"])
 static func is_playable(id:String) -> bool:
  return bool(get_def(id).get("playable",false))
 static func energy_cost(id:String) -> int:

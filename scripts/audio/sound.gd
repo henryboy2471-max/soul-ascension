@@ -4,6 +4,10 @@ var loops={}
 var loop_player:AudioStreamPlayer
 var loop_kind=""
 const STEP_SURFACES = ["wet","wood","metal"]
+const STEP_DB = -24.0     # footsteps sit well under dialogue, combat and UI sounds (was -9 dB, which read as too loud)
+const MUSIC_DB = -20.0    # quiet background music, under the ambience and every effect
+var music_player:AudioStreamPlayer
+var music_path=""
 var step_clips:Dictionary={}
 var step_pool:Array=[]
 var step_last:Dictionary={}
@@ -38,6 +42,9 @@ func _ready() -> void:
  loop_player=AudioStreamPlayer.new()
  loop_player.volume_db=-9.0
  add_child(loop_player)
+ music_player=AudioStreamPlayer.new()
+ music_player.volume_db=MUSIC_DB
+ add_child(music_player)
 func play(kind:String) -> void:
  if not Profile.data.settings.get("sound",true):
   return
@@ -104,6 +111,8 @@ func make_loop(realm:bool) -> AudioStreamWAV:
  stream.data=samples
  return stream
 func loop(kind:String) -> void:
+ if kind=="realm":
+  stop_music()
  if not Profile.data.settings.get("sound",true):
   stop_loop()
   return
@@ -112,6 +121,34 @@ func loop(kind:String) -> void:
  loop_kind=kind
  loop_player.stream=loops.get(kind)
  loop_player.play()
+# Background music: one quiet looping track per episode theme (MissionDefs.theme), its own on/off switch in Settings ("music", default on). It never plays in battles.
+func music_enabled() -> bool:
+ return Profile.data.settings.get("music",true)==true
+func music_play(path:String) -> void:
+ music_path=path
+ music_apply()
+func music_apply() -> void:
+ if music_player==null:
+  return
+ if not music_enabled() or music_path=="" or not ResourceLoader.exists(music_path):
+  music_player.stop()
+  return
+ var stream=load(music_path)
+ if stream is AudioStreamOggVorbis:
+  stream.loop=true
+ if music_player.stream==stream and music_player.playing:
+  return
+ music_player.stream=stream
+ music_player.volume_db=-45.0
+ music_player.play()
+ var fade=create_tween()
+ fade.tween_property(music_player,"volume_db",MUSIC_DB,2.5)
+func music_resume() -> void:
+ if music_path!="" and not (music_player!=null and music_player.playing):
+  music_apply()
+func stop_music() -> void:
+ if music_player!=null:
+  music_player.stop()
 func stop_loop() -> void:
  loop_kind=""
  if is_instance_valid(loop_player):
@@ -178,5 +215,5 @@ func footstep(surface:String="wet", loudness:float=1.0) -> void:
   player=step_pool[0]
  player.stream=list[pick]
  player.pitch_scale=randf_range(0.93,1.07)
- player.volume_db=-9.0+linear_to_db(clampf(loudness,0.05,1.5))+randf_range(-1.5,1.0)
+ player.volume_db=STEP_DB+linear_to_db(clampf(loudness,0.05,1.5))+randf_range(-1.5,1.0)
  player.play()
