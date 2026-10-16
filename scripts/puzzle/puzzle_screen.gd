@@ -58,7 +58,7 @@ func _ready() -> void:
  canvas.mouse_filter=Control.MOUSE_FILTER_STOP if kind=="power" else Control.MOUSE_FILTER_IGNORE
  add_child(canvas)
  var titles={"signal":["SIGNAL RESONATOR","Match the live wave to the recorded transmission. Turn FREQUENCY (how many waves) and HEIGHT (how tall), then LOCK."],
-  "power":["POWER RESONATOR","The relay is dead. Tap a tile to turn it and send current from the source (left) to the relay lamp (top right). Burnt tiles carry nothing."],
+  "power":["POWER RESONATOR","The relay is dead. Tap a tile to turn it and send current from the source (left) to the relay lamp (right side). Burnt tiles carry nothing."],
   "memory":["MEMORY RESONATOR","Place the four fragments from the oldest to the newest. Select a fragment, then choose its slot."]}
  UI.chip(self,titles[kind][0],Rect2(230,86,230,28),UI.VIOLET,14)
  UI.label(self,titles[kind][1],Vector2(230,122),17,UI.MUTED,820)

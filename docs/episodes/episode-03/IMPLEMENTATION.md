@@ -47,7 +47,7 @@ Branch `episode-3/the-relay-keeper`, merged with `dev/ep1-gameplay-polish` first
 
 ## Not done / gaps
 - Third optional quest (**sealed relay chamber fragment**) belongs in the tower: M3/M4.
-- Puzzles (signal, power routing, memory reconstruction), the archive door, resonators, the Relay Warden and the cinematics (Teo's reveal, Anselm exposing Echo's entry, Warden recognition, First Echo recording) are M3–M4. The scraped registry line and Teo's "not here, in the Central Relay" are set-ups only.
+- Puzzles (signal, power routing, memory reconstruction) and the resonators were delivered in M3; the Relay Warden and the cinematics (Teo's reveal, Anselm exposing Echo's entry, Warden recognition, First Echo recording) are M4. The archive door and relay map: see "Scope reconciliation" below. The scraped registry line and Teo's "not here, in the Central Relay" are set-ups only.
 - No separate quest-log screen; no portraits for Teo/Anselm/Pip (no approved art: dialogue shows name plates only); placeholder procedural art.
 - Touch controls were not exercised in the window runs (keyboard path); no browser (web export) or Android run for this milestone; software-GL only.
 - Existing Episode 1–2 Codex entries (up to 5 lines) overlap the next row in the old single-page layout; untouched here (visible only with 7–12 entries).
@@ -78,6 +78,35 @@ One puzzle per tower floor, at the resonator that M1 placed there. Rules are pur
 
 ## Not done / gaps
 - **M4**: the Relay Warden encounter (telegraphed attacks plus mechanisms, a checkpoint), Teo's reveal, Anselm exposing Echo's registry entry, the Warden recognition scene and the First Echo recording. The archive stirring is only the set-up.
-- Gameplay-feel of the puzzles (difficulty, pacing, hint thresholds) is untested with real players; the signal puzzle's targets and the memory puzzle's "when" wording are my draft and need owner review. The spatial puzzle for the station's archive door and the relay-map repair (plan area B/D) are not implemented.
+- Gameplay-feel of the puzzles (difficulty, pacing, hint thresholds) is untested with real players; the signal puzzle's targets and the memory puzzle's "when" wording are my draft and need owner review. The spatial puzzle for the station's archive door and the relay-map repair (plan areas B and D) are not implemented: see "Scope reconciliation" below for why and where they are recorded.
 - Touch input was tested via mouse/button events and Godot's mouse emulation path, not on a real touch device; no web export or Android run for M3; software GL only.
 - No sound for the puzzles; no new art (procedural drawing only).
+
+
+---
+# Scope reconciliation: archive-door spatial puzzle and relay-map repair (after M3, before M4)
+
+Question: do these two belong to M3? Answer after re-reading `STORY_PLAN.md`: **no. The plan does not assign either to any milestone, and M3 as the plan defines it excludes both.** They are recorded as carried to M4 (proposed pairing below), pending Henry's confirmation. No code changed for this reconciliation; the M1/M2 story text was not touched.
+
+## What the plan says (verbatim)
+| Item | Plan text | Where |
+|---|---|---|
+| Archive-door spatial puzzle | "B. Meridian Transit Station: ... meet Anselm and investigate the Ascendant registry; **a spatial puzzle to reach sealed files**." | §4 area B (mission 3-2 "The Missing Register" says only: "question Anselm and locate hidden Ascendant records") |
+| Relay-map repair | "D. Teo's Workshop: central evidence board and signal-decoding equipment; assemble discovered clues into a coherent theory; **restore a broken relay map; reveal the connection between the seven arrays**." and mission 3-4 "The Keeper's Secret: meet Teo, **reconstruct the signal route, and decode the relay map**." | §4 area D, §5 |
+| M3 definition | "M3 Puzzles: **signal, power-routing and memory-reconstruction mechanics**." | §12 |
+| Puzzle designs | "Puzzles and investigation (**three different designs**): 1. Signal Frequency ... 2. Power Routing ... 3. Memory Reconstruction." | §7 |
+| M2 definition | "M2 Investigation: NPC dialogue, quest tracking, discoverable clues, optional side quests, evidence gathering." | §12 |
+| M4 definition | "M4 Cinematics and Boss: Warden encounter, archive reveal, character expressions, story scenes." (required cinematics §9: Teo revealing the memory network; Anselm exposing Echo's registry entry; Warden recognition; First Echo recording) | §9, §12 |
+
+## Mapping (my reading; items marked [Inference] are not stated in the plan)
+- **Neither is an M3 deliverable.** §12 names three mechanics for M3 and §7 caps puzzle designs at three; a "spatial puzzle" is not one of the three, and "restore a broken relay map" is described as area content, not as a mechanic. Building them in M3 would have meant adding a fourth design or duplicating an existing one without the plan asking for it.
+- **Relay-map repair**: its stated payoff is "reveal the connection between the seven arrays", which is the substance of the required Teo cinematic (§9). [Inference] It belongs with that scene in **M4**, and should reuse the M3 power-routing/signal mechanics (the plan's "signal route") rather than add a new design. The M2 board already delivers "assemble discovered clues into a coherent theory"; the map spot currently only describes a chalk map with a torn corner and records the clue `map_seen`.
+- **Archive-door spatial puzzle**: it guards "sealed files" in the station; the required cinematic that exposes Echo's registry entry (§9, Anselm) is the natural payoff. [Inference] It belongs with that scene in **M4**. M2 already set it up (the scraped registry line; the door's "resonance lock" line). Alternative: treat it as an optional extra in M5. Because the plan says "three different designs", a fourth mechanic needs Henry's decision.
+- Not M5: M5 is "artwork integration, performance, saving, regression tests, browser playthroughs" (§12), not new puzzles.
+
+## Current in-game state of the two spots (unchanged)
+- `archive_door` (station): examine text only (a sealed door with a resonance lock; Mira: "We'll need the right pieces to open it. The old registry is a start."). No state.
+- `relay_map` (workshop): examine text only; records clue `map_seen`. No state.
+
+## Gate
+M3 awaits owner approval of the puzzle targets and wording (`M3_REVIEW_DRAFTS.md`). **M4 is not started and stays gated for Henry's sign-off**; its exact scope is in `M4_SCOPE.md`.
