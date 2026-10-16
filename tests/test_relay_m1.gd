@@ -73,7 +73,7 @@ func run() -> void:
    var dz=zones[e.to]
    if e.spawn_x<80.0 or e.spawn_x>dz.world_w-80.0: spawns=false
  check(links and spawns,"Every exit leads to an existing zone that has a way back, and spawns the player inside the walkable range")
- check(ZoneDefs.reachable("market").size()==4 and ZoneDefs.reachable("market",["shortcut","tower"]).size()==7,"Locks work as designed: 4 strips open, all 7 once the shortcut and tower locks are open")
+ check(ZoneDefs.reachable("market").size()==4 and ZoneDefs.reachable("market",["shortcut","tower"]).size()==5 and ZoneDefs.reachable("market",["shortcut","tower","floor2","floor3"]).size()==7,"Locks work as designed: 4 strips open, 5 with the tower, all 7 once the floor stairs are open too")
  # ---- art/config build for every zone
  var art_script=load("res://scripts/world/relay_art.gd")
  var explore_script=load("res://scripts/world/explore.gd")
@@ -140,6 +140,8 @@ func run() -> void:
  await wait_until(func(): return not ep.busy,ep)
  check(ep.zone_id=="workshop","The tower door stays locked in the workshop until opened by progress")
  ep.progress.unlocks.append("tower")
+ ep.progress.unlocks.append("floor2")
+ ep.progress.unlocks.append("floor3")
  for step in ["exit_tower","exit_up_1","exit_up_2"]:
   ep.on_interact(step)
   await wait_until(func(): return not ep.busy,ep)

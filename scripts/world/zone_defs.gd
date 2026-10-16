@@ -70,14 +70,15 @@ static func zones() -> Dictionary:
    "spots":[
     {"id":"exit_down_1","x":70.0,"label":"GO  /  OUT TO THE WORKSHOP","kind":"talk","range":110.0,"visual":"exit","exit":{"to":"workshop","spawn_x":1560.0}},
     {"id":"resonator_1","x":1300.0,"label":"EXAMINE  /  SIGNAL RESONATOR","kind":"talk","range":120.0,"visual":"resonator"},
-    {"id":"exit_up_1","x":2530.0,"label":"GO  /  STAIRS UP","kind":"talk","range":100.0,"visual":"stairs","exit":{"to":"tower_2","spawn_x":170.0}}
+    {"id":"exit_up_1","x":2530.0,"label":"GO  /  STAIRS UP","kind":"talk","range":100.0,"visual":"stairs","exit":{"to":"tower_2","spawn_x":170.0,"lock":"floor2"}}
    ]},
   "tower_2":{
    "name":"CENTRAL RELAY TOWER  /  FLOOR 2","world_w":2600.0,"start_px":170.0,"interior":true,"objective":"Climb the Central Relay Tower","objective_x":1300.0,
    "spots":[
     {"id":"exit_down_2","x":70.0,"label":"GO  /  STAIRS DOWN","kind":"talk","range":100.0,"visual":"stairs","exit":{"to":"tower_1","spawn_x":2460.0}},
     {"id":"resonator_2","x":1300.0,"label":"EXAMINE  /  POWER RESONATOR","kind":"talk","range":120.0,"visual":"resonator"},
-    {"id":"exit_up_2","x":2530.0,"label":"GO  /  STAIRS UP","kind":"talk","range":100.0,"visual":"stairs","exit":{"to":"tower_3","spawn_x":170.0}}
+    {"id":"sealed_chamber","x":1950.0,"label":"EXAMINE  /  SEALED CHAMBER","kind":"talk","range":110.0,"visual":"fragment","hidden":true},
+    {"id":"exit_up_2","x":2530.0,"label":"GO  /  STAIRS UP","kind":"talk","range":100.0,"visual":"stairs","exit":{"to":"tower_3","spawn_x":170.0,"lock":"floor3"}}
    ]},
   "tower_3":{
    "name":"CENTRAL RELAY TOWER  /  FLOOR 3","world_w":2600.0,"start_px":170.0,"interior":true,"objective":"Reach the top of the tower","objective_x":1300.0,

@@ -20,6 +20,7 @@ const CODEX = [
  {"id":"false_register","title":"THE MISSING REGISTER","text":"Registrations dated years before the first awakening, one line scraped bare. Someone has counted Ascendants for far longer."},
  {"id":"earlier_candidates","title":"EARLIER CANDIDATES","text":"A ledger headed PRE-AWAKENING: a dozen names, each marked RETAINED or LOST. Someone chose people before the Fracture.","secret":true},
  {"id":"relay_journal","title":"A TECHNICIAN'S JOURNAL","text":"\"The towers are not broadcasting. They are remembering. Do not tell the Directorate.\"","secret":true},
+ {"id":"first_memory","title":"A SEALED FRAGMENT","text":"A recording crystal in a sealed relay chamber: a voice counting seven, and a lamp. Older than the arrays.","secret":true},
  {"id":"pips_trail","title":"PIP'S TRAIL","text":"Lio drew three marks in the alleyways before he went to answer the voices in the central tower. His sister Pip still waits.","secret":true}
 ]
 # clue id -> main-quest requirement order (first missing step is the current objective)
@@ -31,12 +32,27 @@ const STEPS = [
  {"id":"teo","text":"Find Teo Marrow, the Relay Keeper","zone":"workshop","spots":["teo"],"needs":["teo_met"]},
  {"id":"decode","text":"Decode the transmissions at Teo's decoder","zone":"workshop","spots":["decoder"],"needs":["decoded"]},
  {"id":"board","text":"Assemble the evidence on Teo's board","zone":"workshop","spots":["board"],"needs":["theory"]},
- {"id":"tower","text":"Enter the Central Relay Tower","zone":"workshop","spots":["exit_tower"],"needs":["tower_reached"]}
+ {"id":"tower","text":"Enter the Central Relay Tower","zone":"workshop","spots":["exit_tower"],"needs":["tower_reached"]},
+ {"id":"signal","text":"Restore the signal resonator on the first floor","zone":"tower_1","spots":["resonator_1"],"needs":["puzzle_signal"]},
+ {"id":"power","text":"Restore the power resonator on the second floor","zone":"tower_2","spots":["resonator_2"],"needs":["puzzle_power"]},
+ {"id":"memory","text":"Reconstruct the memory resonator on the third floor","zone":"tower_3","spots":["resonator_3"],"needs":["puzzle_memory"]},
+ {"id":"archive","text":"Examine the sealed archive at the top of the tower","zone":"tower_3","spots":["archive_gate"],"needs":["archive_examined"]}
 ]
+# resonator spot -> puzzle kind; solving a puzzle opens the next floor's stairs; hidden spots appear once their clue exists
+const PUZZLES = {"resonator_1":"signal","resonator_2":"power","resonator_3":"memory"}
+const PUZZLE_UNLOCK = {"signal":"floor2","power":"floor3"}
+const HIDDEN = {"registry_hidden":"records","sealed_chamber":"puzzle_power"}
+const PUZZLE_DONE = {
+ "signal":[{"who":"NARRATOR","text":"The three transmissions lock one after another. The resonator draws breath, and somewhere above, a stairwell door unlatches."},{"who":"MIRA","text":"The lullaby, the bulletin, the tone. They were all pointed at this room."}],
+ "power":[{"who":"NARRATOR","text":"Current reaches the relay lamp. Light climbs the stairwell in a flicker, and somewhere in the wall a sealed chamber hums awake."},{"who":"MIRA","text":"Hear that? Something behind the panel just got its power back."}],
+ "memory":[{"who":"NARRATOR","text":"The fragments fall into line. For a moment the resonator replays the whole chain, and at the end of the floor the sealed archive gate stirs."},{"who":"MIRA","text":"Evidence in order is a story. I don't like how this one ends."}]
+}
 const TOWER_OBJECTIVE = "Climb the Central Relay Tower"
 const LOCKED = {
  "shortcut":"LOCKED  /  SOMETHING HERE CAN BE OPENED FROM ANOTHER SIDE",
- "tower":"LOCKED  /  THE WAY TO THE TOWER IS NOT OPEN YET"
+ "tower":"LOCKED  /  THE WAY TO THE TOWER IS NOT OPEN YET",
+ "floor2":"LOCKED  /  THE STAIRS WAKE WHEN THE SIGNAL RESONATOR SINGS",
+ "floor3":"LOCKED  /  THE STAIRS WAKE WHEN THE POWER RESONATOR BURNS"
 }
 static func has_all(clues:Array, needs:Array) -> bool:
  for n in needs:
@@ -232,9 +248,32 @@ static func respond(id:String, clues:Array) -> Dictionary:
    r.lines=[nar("A relay map of the Quarter, seven nodes drawn in chalk. Two are dark, and a torn corner hides the way to the Central Tower.")]
    r.add=["map_seen"]
   "resonator_1","resonator_2","resonator_3":
-   r.lines=[nar("A silent resonator. Something is missing from it.")]
+   var kind=str(PUZZLES[id])
+   if clues.has("puzzle_"+kind):
+    r.lines=[nar("The resonator hums steadily.")]
+   elif clues.has("seen_"+id):
+    r.lines=[nar("The resonator waits for you.")]
+   else:
+    r.add=["seen_"+id]
+    match kind:
+     "signal": r.lines=[nar("The first resonator stands silent, its dial ring dark. Your scanner stored every transmission you heard. It can be tuned to each of them."),line("MIRA","Line the waves up until they match. I'll hold the lamp, but the dial is yours.")]
+     "power": r.lines=[nar("The power resonator is dead. A relay lamp waits at the far end of a broken conduit board, and current cannot reach it."),line("MIRA","Burnt tiles carry nothing. Find a way around them.")]
+     _: r.lines=[nar("The memory resonator holds fragments of everything you have gathered, scattered out of order."),line("MIRA","Evidence is only a story once it is in order. What happened first?")]
+  "sealed_chamber":
+   if clues.has("first_memory_fragment"):
+    r.lines=[nar("The cradle is empty now. The static in the wall has gone quiet.")]
+   else:
+    r.lines=[nar("Behind the panel the power just woke, a sealed chamber: one cradle, holding a recording crystal, mostly static. A voice counts seven, softly, and then there is a lamp. 'We kept it safe in the towers.'"),line("PLAYER","Kept what safe?"),line("MIRA","I don't know. But I don't think it's ours to take apart.")]
+    r.add=["first_memory_fragment"]
+    r.codex=["first_memory"]
+    r.toast="HIDDEN CLUE  /  A SEALED FRAGMENT"
   "archive_gate":
-   r.lines=[nar("A sealed archive gate. It answers nothing yet.")]
+   if has_all(clues,["puzzle_signal","puzzle_power","puzzle_memory"]):
+    r.lines=[nar("The sealed archive gate answers at last. Behind it something large shifts in the dark, a guardian old enough to remember the tower being built."),line("MIRA","Echo... something in there is waking up. Whatever it is, it knows we're here.")]
+    r.add=["archive_examined"]
+    r.toast="THE ARCHIVE STIRS"
+   else:
+    r.lines=[nar("A sealed archive gate. Three resonators feed it: %d of 3 restored." % count_of(clues,["puzzle_signal","puzzle_power","puzzle_memory"]))]
   _:
    r.lines=[nar("Nothing here.")]
  if id.begins_with("signal_") and not r.add.is_empty() and has_all(clues+r.add,["tx_1","tx_2","tx_3"]):

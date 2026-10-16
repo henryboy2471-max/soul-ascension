@@ -94,7 +94,7 @@ static func defs() -> Dictionary:
    "energy":0,"playable":false,
    "unlock":{"requires":["1-2"]},
    "rewards":{"first":{"xp":180,"gold":340},"replay":{"xp":80,"gold":150}},
-   "codex":["relay_voices","teo","anselm","false_register","earlier_candidates","relay_journal","pips_trail"],
+   "codex":["relay_voices","teo","anselm","false_register","earlier_candidates","relay_journal","first_memory","pips_trail"],
    "intro_card_length":3.6,
    "objectives":[{"text":"Explore Lantern Market","x":1000.0}],
    "waves":[],"battle_only_waves":[],"story_flags":{},

@@ -51,3 +51,33 @@ Branch `episode-3/the-relay-keeper`, merged with `dev/ep1-gameplay-polish` first
 - No separate quest-log screen; no portraits for Teo/Anselm/Pip (no approved art: dialogue shows name plates only); placeholder procedural art.
 - Touch controls were not exercised in the window runs (keyboard path); no browser (web export) or Android run for this milestone; software-GL only.
 - Existing Episode 1–2 Codex entries (up to 5 lines) overlap the next row in the old single-page layout; untouched here (visible only with 7–12 entries).
+
+---
+# M3 — Puzzles (implemented; awaiting owner approval before M4)
+
+Branch `episode-3/the-relay-keeper`. Not merged to `main`, not deployed; mission 1-3 is still `playable:false`.
+
+## What was built (STORY_PLAN §7, "three different designs")
+One puzzle per tower floor, at the resonator that M1 placed there. Rules are pure (`scripts/puzzle/puzzle_logic.gd`), the overlay is `scripts/puzzle/puzzle_screen.gd`, and the episode wiring is in `relay_episode.gd` (`run_puzzle`, `puzzle_done`).
+1. **Signal Frequency** (floor 1): three rounds, one per transmission the player scanned (the lullaby, the bulletin, the long tone). Tune FREQUENCY (waves) and HEIGHT (amplitude) until the live wave overlays the recorded one, then LOCK. Feedback is proximity only (OFF / CLOSE / VERY CLOSE / LOCKED).
+2. **Power Routing** (floor 2): a 6×4 conduit board. Turn tiles to carry current from the source to the relay lamp; two tiles are burnt out; most tiles are decoys. Powered tiles glow, and the header counts how far the current reaches.
+3. **Memory Reconstruction** (floor 3): the evidence the player already found (registry line, deleted index, the long tone, the crash bulletin) becomes four fragment cards; place them oldest to newest using the "when" in each. A fragment only appears if its clue was found. CHECK reports "N OF 4 IN PLACE".
+- **Hints (optional, tiered, never the answer)**: H or the HINT button. Signal: a description of the pattern, then a direction (too high / too low). Power: a general rule, then the first wrong tile on the intended path is marked. Memory: "look for the words that say WHEN", then which fragment is oldest. Mira introduces each puzzle but never solves it.
+- **Controls**: keyboard (arrows/WASD, Enter/Space/E, H, C, Esc), mouse and touch (every control is a large button; the power board takes taps/clicks). All three are tested.
+- **Persistence**: every move is saved (`mission_progress["1-3"].puzzles`); leaving with Esc/BACK and returning resumes the same board, tuning, placement and hint count. A solved resonator stays solved and does not reopen.
+- **Progression**: solving the signal resonator opens the floor-1 stairs; the power resonator opens the floor-2 stairs and wakes a hidden **sealed chamber** (the plan's third optional quest: a recording-crystal fragment, Codex entry "A Sealed Fragment"); the memory resonator makes the **archive gate** stir (clue `archive_examined`). The objective HUD walks signal → power → memory → archive. New clue ids: `puzzle_signal`, `puzzle_power`, `puzzle_memory`, `first_memory_fragment`, `archive_examined`, `seen_resonator_N`.
+- Not changed: Episode 1–2 progress, combat, rewards, mission playability.
+
+## Tests actually run
+- `tests/test_puzzle_logic.gd` 24/24: all three puzzles are solvable (power: a DFS over tile orientations proves a connecting rotation exists; signal: stepping one notch at a time reaches every target; memory: exactly one of the 24 orders is correct), start unsolved, clamp, feedback and hints never state the answer.
+- `tests/test_relay_m3.gd` 36/36: the real `RelayEpisode` + `PuzzleScreen` driven by key events, mouse clicks and button callbacks: floor locks, intros, hints, leave and return, solving each puzzle, the sealed chamber, the archive gate, objectives, resume.
+- `tests/test_layout_overflow.gd` extended (23/23): the three puzzle screens and every new dialogue line fit at 1280×720 logic size. `test_relay_m1/m2` were updated for the new tower rules (stairs lock until a floor's puzzle is solved; objectives continue past the tower).
+- Real-window playthrough `tests/playtest_relay_puzzles.gd` (Godot window under Xvfb, injected key events, software GL): resume at the tower with the M2 evidence, solve all three puzzles by keyboard (including a hint, Esc and return), climb the unlocked stairs, take the sealed fragment, examine the archive. Results per size in the final report and `relay_puzzles_*.txt`.
+- Full runner `tools/run_tests.sh`: see `suite_m3.txt`.
+- The playthrough's first screenshots found two real layout defects, both fixed: the memory cards stretched into one bar (text now lives on wrapped labels inside fixed-size buttons), and the power board overlapped its status line (board and cell size reduced).
+
+## Not done / gaps
+- **M4**: the Relay Warden encounter (telegraphed attacks plus mechanisms, a checkpoint), Teo's reveal, Anselm exposing Echo's registry entry, the Warden recognition scene and the First Echo recording. The archive stirring is only the set-up.
+- Gameplay-feel of the puzzles (difficulty, pacing, hint thresholds) is untested with real players; the signal puzzle's targets and the memory puzzle's "when" wording are my draft and need owner review. The spatial puzzle for the station's archive door and the relay-map repair (plan area B/D) are not implemented.
+- Touch input was tested via mouse/button events and Godot's mouse emulation path, not on a real touch device; no web export or Android run for M3; software GL only.
+- No sound for the puzzles; no new art (procedural drawing only).

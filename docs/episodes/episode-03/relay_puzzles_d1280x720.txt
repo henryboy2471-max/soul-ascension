@@ -1,0 +1,17 @@
+[  35.4s] OK   entered the tower; objective is the first resonator
+[  66.9s] OK   stairs are locked before the signal resonator is restored
+[  73.1s] OK   signal puzzle opened by Enter at the resonator
+[  74.5s] OK   Esc leaves the puzzle unsolved
+[  76.0s] OK   returning resumes the saved puzzle (hint count kept)
+[  82.3s] OK   all three transmissions locked: resonator restored, stairs open
+[ 114.7s] OK   climbed to floor 2
+[ 120.5s] OK   power puzzle opened
+[ 128.0s] OK   relay lamp lit: power restored, stairs to floor 3 open
+[ 132.8s] OK   sealed chamber (optional) gave its fragment
+[ 165.1s] OK   climbed to floor 3
+[ 170.8s] OK   memory puzzle opened
+[ 174.5s] OK   wrong order: feedback says how many are in place
+[ 179.9s] OK   fragments in clue order: memory restored
+[ 185.5s] OK   archive stirs; the M3 quest line is complete
+[ 186.2s] OK   Episode 1-2 completion untouched
+[ 186.2s] RESULT: 0 failures

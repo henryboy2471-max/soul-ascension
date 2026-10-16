@@ -152,7 +152,7 @@ func run() -> void:
  main.close_modal()
  var e3_ok=true
  var e3_worst=""
- var states=[[],["terminal"],["terminal","anselm_admits"],["anselm_admits","records"],["teo_met"],["teo_met","tx_1","tx_2","tx_3"],["teo_met","decoded","records"],["pip_met","frag_1","frag_2","frag_3"],["records","hidden_registry"],["theory","tower_reached"]]
+ var states=[[],["terminal"],["terminal","anselm_admits"],["anselm_admits","records"],["teo_met"],["teo_met","tx_1","tx_2","tx_3"],["teo_met","decoded","records"],["pip_met","frag_1","frag_2","frag_3"],["records","hidden_registry"],["theory","tower_reached"],["seen_resonator_1","seen_resonator_2","seen_resonator_3"],["puzzle_power","puzzle_signal"],["puzzle_signal","puzzle_power","puzzle_memory"]]
  for zone in ZoneDefs.zones():
   for sp in ZoneDefs.zone(zone).spots:
    if sp.has("exit"): continue
@@ -176,6 +176,34 @@ func run() -> void:
       print("INFO e3 dialogue ",sp.id," ",str(line.who)," need=",need," plate_ok=",plate_ok)
      box.queue_free()
  check(e3_ok,"Every Episode 3 investigation line fits inside the dialogue box %s" % e3_worst)
+ # M3: the three puzzle screens and the puzzle-solved dialogue
+ var done_ok=true
+ for kind in Episode3Data.PUZZLE_DONE:
+  for line in Episode3Data.PUZZLE_DONE[kind]:
+   var box=load("res://scripts/story/dialogue_box.gd").new()
+   box.speakers=Episode3Data.SPEAKERS
+   box.setup([line],"Ascendant")
+   main.add_child(box)
+   await process_frame
+   box.advance()
+   await process_frame
+   var need=box.text_label.get_combined_minimum_size()
+   if box.text_label.global_position.y+need.y>box.box_panel.global_position.y+box.box_panel.size.y-4.0 or need.x>box.text_label.size.x+1.0:
+    done_ok=false
+   box.queue_free()
+ check(done_ok,"Every puzzle-solved dialogue line fits inside the dialogue box")
+ for kind in ["signal","power","memory"]:
+  var screen=load("res://scripts/puzzle/puzzle_screen.gd").new()
+  screen.setup(kind,{},["tx_2","tx_3","terminal","records"])
+  main.add_child(screen)
+  await process_frame
+  await process_frame
+  if kind=="signal": screen.request_hint(); screen.request_hint()
+  if kind=="memory": screen.request_hint(); screen.check_memory()
+  await process_frame
+  report("%s puzzle screen" % kind,screen)
+  screen.queue_free()
+  await process_frame
  # explore HUD, counter objective, breach prompt
  await fresh({"intro":true,"depot":true,"mira":true,"resonators":["res_a"]})
  main.start_episode("1-2")

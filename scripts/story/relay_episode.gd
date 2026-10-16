@@ -14,6 +14,8 @@ func load_progress() -> void:
  for key in ["discoveries","unlocks","visited","clues"]:
   if not progress.get(key) is Array:
    progress[key]=[]
+ if not progress.get("puzzles") is Dictionary:
+  progress["puzzles"]={}
 func save_progress() -> void:
  Profile.set_mission_progress(mission_id,progress.duplicate(true))
 func run_intro() -> void:
@@ -81,8 +83,9 @@ func refresh_objective(announce:bool) -> void:
   return
  var def=ZoneDefs.zone(zone_id)
  var step=Episode3Data.next_step(progress.clues)
- if progress.clues.has("records") and explore.enabled.has("registry_hidden"):
-  explore.enabled["registry_hidden"]=true
+ for sid in Episode3Data.HIDDEN:
+  if explore.enabled.has(sid) and progress.clues.has(Episode3Data.HIDDEN[sid]):
+   explore.enabled[sid]=true
  if step.is_empty():
   explore.clear_counter()
   explore.set_objective(str(def.objective) if zone_id!="workshop" else Episode3Data.TOWER_OBJECTIVE,float(def.objective_x))
@@ -156,6 +159,39 @@ func investigate(id:String) -> void:
  elif first and not codex_shown and not gained:
   explore.toast("INVESTIGATED  /  "+id.replace("_"," ").to_upper())
  refresh_objective(true)
+# Resonator puzzle: intro lines (first visit), then the overlay. Every move is saved, so leaving and coming back resumes the same board.
+func run_puzzle(id:String) -> void:
+ var kind=str(Episode3Data.PUZZLES[id])
+ var r=Episode3Data.respond(id,progress.clues)
+ await say(r.lines)
+ for c in r.add:
+  if not progress.clues.has(c):
+   progress.clues.append(c)
+ save_progress()
+ if progress.clues.has("puzzle_"+kind):
+  return
+ var screen=PuzzleScreen.new()
+ screen.setup(kind,progress.puzzles.get(kind,{}),progress.clues)
+ screen.changed.connect(func(k,s): progress.puzzles[k]=s; save_progress())
+ var outcome=[false]
+ screen.finished.connect(func(_k,solved): outcome[0]=solved)
+ add_child(screen)
+ await screen.finished
+ screen.queue_free()
+ if outcome[0]:
+  await puzzle_done(kind,id)
+func puzzle_done(kind:String, id:String) -> void:
+ progress.clues.append("puzzle_"+kind)
+ if not progress.discoveries.has(id):
+  progress.discoveries.append(id)
+ RelayArt.found=progress.discoveries
+ var lock=str(Episode3Data.PUZZLE_UNLOCK.get(kind,""))
+ if lock!="" and not progress.unlocks.has(lock):
+  progress.unlocks.append(lock)
+ save_progress()
+ await say(Episode3Data.PUZZLE_DONE[kind])
+ explore.toast("RESONATOR RESTORED  /  "+kind.to_upper())
+ refresh_objective(true)
 func on_interact(id:String) -> void:
  if busy or traveling:
   return
@@ -164,6 +200,8 @@ func on_interact(id:String) -> void:
  var spot=spot_of(id)
  if spot.has("exit"):
   await travel(spot)
+ elif Episode3Data.PUZZLES.has(id):
+  await run_puzzle(id)
  else:
   await investigate(id)
  busy=false
