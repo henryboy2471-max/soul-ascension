@@ -4,7 +4,8 @@ class_name Explore
 signal interact(id:String)
 signal exit_requested
 const WORLD_W = 2500.0
-const SPEED = 300.0   # the pace the walk/run animations were authored for (the animation reference), NOT the walking speed: see top_speed()
+const SPEED = 300.0   # the ORIGINAL walking speed; normal exploration walks at SPEED x walk_scale (top_speed()), the Warden chamber at the full SPEED
+const ANIM_REF = 170.0   # ground speed (px/s) at which the Hero's 8-frame, 0.8 s walk cycle plants its feet without sliding: one cycle covers ~136 px, measured from the foot spacing in the art (+-25%)
 const WALK_SCALE = 0.3   # exploration walks at 30% of the original 300 px/s = 90 px/s; the Warden chamber config sets 1.0 (its dodge timing is built for full speed)
 const EASE_IN = 0.3   # seconds from standing to full walking speed (slowed exploration)
 const EASE_OUT = 0.25   # seconds from full walking speed to standing
@@ -163,6 +164,7 @@ func _ready() -> void:
  npc.facing=-1
  # World height 155 puts Mira's standing figure about 5% shorter than the Hero's (measured, see tests/test_mira_sprites.gd).
  npc.load_sprite_set("res://assets/characters/mira/frames.tres",155.0,Color("c27bff"))
+ npc.idle_hold=true
  npc.scale=Vector2(1.2,1.2)
  add_child(npc)
  companion=bool(config.get("companion",false))
@@ -189,6 +191,7 @@ func _ready() -> void:
  player.body=Profile.data.body
  player.scale=Vector2(1.2,1.2)
  player.load_sprite_set("res://assets/characters/hero/frames.tres",170.0,Color("4aa3ff"))
+ player.idle_hold=true
  add_child(player)
  if art_script == NeonDistrictArt:
   foreground_plate=NeonDistrictArt.new()
@@ -366,7 +369,8 @@ func _process(delta:float) -> void:
   player.facing=1 if move.x>0 else -1
  var top=top_speed()
  player.moving=vel.length()>(top*0.04 if player.moving else top*0.08)   # starts above 8% of top speed, stays "walking" down to 4%: no walk/idle flicker on a short tap
- player.gait=clampf(vel.length()/SPEED,0.2,1.15)   # the walk cycle plays at the pace the feet actually travel (it was authored for SPEED)
+ var anim_ref=ANIM_REF if walk_scale<1.0 else SPEED   # the full-speed Warden chamber keeps its original animation pace
+ player.gait=clampf(vel.length()/anim_ref,0.2,1.15)   # the walk cycle plays at the pace the feet actually travel
  if player.moving:
   step_timer-=delta*player.gait   # one footfall per half walk cycle: 0.4 s at the authored pace, slower when the feet are slower
   if step_timer<=0:
@@ -381,7 +385,7 @@ func _process(delta:float) -> void:
   npc_x+=step
   var nspeed=absf(step)/maxf(delta,0.0001)
   npc.moving=nspeed>(top*0.027 if npc.moving else top*0.067)
-  npc.gait=clampf(nspeed/SPEED,0.2,1.15)
+  npc.gait=clampf(nspeed/anim_ref,0.2,1.15)
   if absf(npc_x-px)>60.0:
    npc.facing=player.facing
   elif absf(px-npc_x)>12.0:

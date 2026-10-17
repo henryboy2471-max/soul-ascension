@@ -85,7 +85,7 @@ func run() -> void:
    check(idle_range<0.01,tag+": an idle hero is perfectly still on screen (range %.3f px)" % idle_range)
    check(not ex.player.moving and ex.player.sprite!=null and ex.player.sprite.animation=="idle","%s: the hero is in the idle animation once stopped" % tag)
    # --- walking pace: a vertical walk is slower, the cycle slows with it
-   # --- walking pace: the cycle (authored for 300 px/s) plays at 30%, matching the 90 px/s the feet travel
+   # --- walking pace: the 0.8 s cycle plants its feet at 170 px/s, so at 90 px/s it plays at 53%
    ex.stick.direction=Vector2(1,0)
    var walked=0.0
    for dt in dts(kind,80):
@@ -94,7 +94,7 @@ func run() -> void:
     tick(ex,dt)
     walked+=dt
    var g=gait_of(ex.player)
-   check(absf(g-ex.vel.length()/300.0)<0.01 and absf(g-0.3)<0.03 and absf(ex.player.sprite.speed_scale-g)<0.001 and ex.player.sprite.animation=="walk","%s: the walk cycle runs at the pace the feet travel (gait %.2f, speed scale %.2f)" % [tag,g,ex.player.sprite.speed_scale])
+   check(absf(g-ex.vel.length()/170.0)<0.01 and absf(g-0.53)<0.03 and absf(ex.player.sprite.speed_scale-g)<0.001 and ex.player.sprite.animation=="walk","%s: the walk cycle runs at the pace the feet travel (gait %.2f, speed scale %.2f)" % [tag,g,ex.player.sprite.speed_scale])
    ex.stick.direction=Vector2.ZERO
    for dt in dts(kind,60):
     tick(ex,dt)

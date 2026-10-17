@@ -18,6 +18,11 @@ var flash=0.0
 var swing=0.0
 var step=0.0
 var moving=false
+var idle_hold=false   # exploration: stand on ONE steady idle frame with a slight smooth breath instead of cycling the idle frames (which differ by a few pixels and read as trembling)
+var breath_amp=0.0
+var breath_t=0.0
+var base_scale=Vector2.ONE
+const BREATH_PERIOD = 3.6   # seconds per breath
 var gait=1.0   # walking pace relative to the cycle's design speed: scales the walk/run animation and the procedural leg swing so feet do not skate
 var dead=false
 var charge=0.0
@@ -93,7 +98,8 @@ func attach_frames(frames:SpriteFrames, world_height:float=170.0) -> bool:
  # Frames are normalized so the feet sit on the bottom-centre of the canvas: bottom-centre = this node's origin.
  sprite.offset=Vector2(0,-h/2.0)
  var factor=world_height/h
- sprite.scale=Vector2(factor,factor)
+ base_scale=Vector2(factor,factor)
+ sprite.scale=base_scale
  add_child(sprite)
  current_anim=""
  play_animation("idle")
@@ -145,6 +151,20 @@ func update_sprite(delta:float) -> void:
    return
  sprite.flip_h=facing<0
  sprite.speed_scale=gait if current_anim in ["walk","run"] else 1.0
+ # steady idle: hold frame 0 and breathe by under 1% (smooth cosine, anchored at the feet), eased in and out so it never pops
+ var holding=idle_hold and current_anim=="idle" and not dead
+ breath_amp=move_toward(breath_amp,1.0 if holding else 0.0,delta/0.4)
+ if holding:
+  breath_t+=delta
+  if sprite.is_playing():
+   sprite.pause()
+  if sprite.frame!=0:
+   sprite.frame=0
+ if breath_amp>0.0:
+  var b=(0.5-0.5*cos(breath_t*TAU/BREATH_PERIOD))*breath_amp
+  sprite.scale=Vector2(base_scale.x*(1.0-0.004*b),base_scale.y*(1.0+0.01*b))
+ elif sprite.scale!=base_scale:
+  sprite.scale=base_scale
  sprite.self_modulate=Color(2.2,2.2,2.2) if flash>0.0 else Color.WHITE
  var wanted=resolve_animation(desired_animation())
  if wanted==current_anim:

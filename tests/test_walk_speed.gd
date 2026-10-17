@@ -58,11 +58,11 @@ func run() -> void:
     check(is_equal_approx(ex.top_speed(),90.0) and is_equal_approx(ex.walk_scale,0.3),"%s: top walking speed is 90 px/s, 30%% of the original 300" % label)
     check(absf((x3-x2)-90.0)<0.5,"%s: steady speed is 90 px/s (%.2f)" % [label,x3-x2])
     check(t95>0.22 and t95<0.4,"%s: ease-in takes %.2f s (no instant launch)" % [label,t95])
-    # the walk cycle follows the ground speed: authored 8 frames at 10 fps for 240 px of ground, so 30% speed means 3 fps and 2.67 s per cycle
+    # the walk cycle follows the ground speed: 8 frames at 10 fps plant the feet at 170 px/s (one cycle = ~136 px of ground), so 90 px/s plays at 5.3 fps
     var sp=ex.player.sprite
     var fps_eff=sp.sprite_frames.get_animation_speed("walk")*sp.speed_scale
     var ground_per_cycle=90.0*float(sp.sprite_frames.get_frame_count("walk"))/fps_eff
-    check(absf(fps_eff-3.0)<0.1 and absf(ground_per_cycle-240.0)<5.0,"%s: walk animation plays at %.1f fps, covering %.0f px of ground per cycle (authored 240): no foot sliding" % [label,fps_eff,ground_per_cycle])
+    check(absf(fps_eff-5.3)<0.15 and absf(ground_per_cycle-136.0)<4.0,"%s: walk animation plays at %.1f fps, covering %.0f px of ground per cycle (foot spacing in the art: ~136): feet match the ground" % [label,fps_eff,ground_per_cycle])
     # the camera follows at the hero's pace (mid-world, away from both clamps)
     var ex2=make(ep3)
     await process_frame
@@ -128,7 +128,7 @@ func run() -> void:
       peak=maxf(peak,absf(ex3.npc_x-prev)/dt)
       prev=ex3.npc_x
      check(peak<=90.0*1.15+0.5,"Episode 3: Mira never exceeds %.0f px/s even when the hero turns around (%.1f)" % [90.0*1.15,peak])
-     check(ex3.npc.sprite.speed_scale<=0.35,"Episode 3: Mira's run animation is slowed to her pace (x%.2f)" % ex3.npc.sprite.speed_scale)
+     check(ex3.npc.sprite.speed_scale<=0.6,"Episode 3: Mira's run animation is slowed to her pace (x%.2f)" % ex3.npc.sprite.speed_scale)
      ex3.queue_free()
    ex.queue_free()
    await process_frame
