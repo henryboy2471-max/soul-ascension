@@ -41,6 +41,8 @@ const KEY='/userfs/godot/app_userdata/SOUL ASCENSION/soul_ascension_v1.json';
  await shot('01_first_launch');
  await click(640,480); await sleep(3000);        // onboarding -> mission card
  let d=await readSave(); ok('Fresh save written after onboarding',d&&d.onboarded===true&&d.gold===500&&d.energy===60,d&&('gold '+d.gold+' energy '+d.energy));
+ const tOnb=Date.now()-3000;   // energy regenerates +1 per 300 s from the save's creation, so a long run may legitimately show 1+ extra energy
+ const regenOk=(e,base)=>e>=base&&e<=base+Math.floor((Date.now()-tOnb)/300000);
  await shot('02_mission_card_fresh');
  await click(468,588); await sleep(3500);
  for(let i=0;i<14;i++){ await advance(); await sleep(900); }
@@ -77,13 +79,13 @@ const KEY='/userfs/godot/app_userdata/SOUL ASCENSION/soul_ascension_v1.json';
  ok('Episode 1 completed with real input (saved completion)',done,'elapsed '+Math.round((Date.now()-t0)/1000)+' s');
  await sleep(1500); await shot('14_rewards_screen'); await sleep(3500);
  d=await readSave();
- ok('First-clear rewards saved once: +250 gold, +120 XP (level 1 -> 2 with 20 XP left), energy 60 -> 54',d.gold===750&&d.level===2&&d.xp===20&&d.energy===54,`gold ${d.gold} level ${d.level} xp ${d.xp} energy ${d.energy}`);
+ ok('First-clear rewards saved once: +250 gold, +120 XP (level 1 -> 2 with 20 XP left), energy 60 -> 54 (plus regeneration, +1 per 300 s)',d.gold===750&&d.level===2&&d.xp===20&&regenOk(d.energy,54),`gold ${d.gold} level ${d.level} xp ${d.xp} energy ${d.energy}`);
  ok('Codex has all 6 Episode 1 entries, no duplicates',d.codex.length===6&&new Set(d.codex).size===6,JSON.stringify(d.codex));
  ok('Resume state cleared after completion',!('step' in mp(d))&&!('intro' in mp(d))&&!('combat_run' in mp(d))&&!('battle_won' in mp(d)),JSON.stringify(mp(d)));
  // rewards -> NEXT EPISODE (real click/tap) -> teaser card -> home; rewards, completion and energy must not change, and Episode 2 must not start
  const pre=JSON.stringify([d.gold,d.xp,d.level,d.energy,d.completed,d.codex]);
  await click(465,567); await sleep(1500); await shot('14b_teaser_after_next_episode');
- const mid=await readSave(); ok('NEXT EPISODE does not start Episode 2 (no 1-2 run, energy unchanged)',!(mid.mission_progress&&mid.mission_progress['1-2'])&&mid.energy===54&&!mid.active_run);
+ const mid=await readSave(); ok('NEXT EPISODE does not start Episode 2 (no 1-2 run, energy unchanged)',!(mid.mission_progress&&mid.mission_progress['1-2'])&&mid.energy>=d.energy&&mid.energy<=d.energy+1&&!mid.active_run);
  await sleep(5500); await shot('14c_home_after_teaser');
  const post=await readSave(); ok('Teaser -> home leaves rewards, completion and codex unchanged',JSON.stringify([post.gold,post.xp,post.level,post.energy,post.completed,post.codex])===pre);
  ok('All assets loaded (no failed requests or HTTP errors)',bad.length===0,JSON.stringify(bad).slice(0,300));

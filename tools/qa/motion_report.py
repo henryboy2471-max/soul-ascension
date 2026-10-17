@@ -75,7 +75,9 @@ def headline(path):
   if len(tr) < 20: continue
   t = [0.0]
   for r in tr[1:]: t.append(t[-1] + r[0] / 1000.0)
-  rel = max(i for i in range(len(tr)) if abs(tr[i][10]) >= 250)
+  vmax = max(abs(r[10]) for r in tr)
+  if vmax < 20: continue
+  rel = max(i for i in range(len(tr)) if abs(tr[i][10]) >= 0.9 * vmax)   # last frame at (near) top speed = key release
   last = rel
   for i in range(rel + 1, len(tr)):
    if abs(tr[i][3] - tr[i - 1][3]) > 0.01: last = i
