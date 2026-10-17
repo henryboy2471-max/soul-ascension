@@ -36,9 +36,16 @@ async function tapRect(b) { const p = G(b.x + b.w / 2, b.y + b.h / 2); await pag
   const tr0 = await page.evaluate(() => window.__qa_tr || []); const last = tr0[tr0.length - 1];
   const hx = last[3] * kk + ox, hy = last[4] * kk + oy, mx = last[5] * kk + ox;
   const wide = process.env.WALK === '1' ? 1.6 : 1; const rect = { x: Math.max(0, Math.round(hx - 70 * wide * kk)), y: Math.max(0, Math.round(hy - 230 * kk)), width: Math.round(150 * wide * kk), height: Math.round(250 * kk) };
+  if (process.env.TRANS === '1') { rect.x = Math.max(0, Math.round(hx - 60 * kk)); rect.width = Math.round(330 * kk); }   // the Hero walks ~135 px during the sequence
   const rectMira = { x: Math.max(0, Math.round(mx - 70 * kk)), y: rect.y, width: rect.width, height: rect.height };
-  await page.evaluate(() => { window.__qa_tr = []; }); const tStart = Date.now();
-  await sleep(SECS * 1000);
+  await page.evaluate(() => { window.__qa_tr = []; }); const tStart = Date.now(); const events = [];
+  if (process.env.TRANS === '1') {
+    // stand 1 s, walk right 1.5 s, stop, stand 1.5 s, walk left 1.5 s (turn), stop, stand 1.5 s: transitions for tools/qa/transition_report.py
+    const at = n => events.push({ t: (Date.now() - tStart) / 1000, n });
+    await sleep(1000); at('walk right'); await page.keyboard.down('d'); await sleep(1500); at('stop'); await page.keyboard.up('d');
+    await sleep(1500); at('walk left (turn)'); await page.keyboard.down('a'); await sleep(1500); at('stop'); await page.keyboard.up('a'); await sleep(1500);
+    fs.writeFileSync(`${OUT}/${TAG}_events.json`, JSON.stringify(events));
+  } else await sleep(SECS * 1000);
   const tr = await page.evaluate(() => window.__qa_tr || []);
   if (process.env.WALK === '1') await page.keyboard.up('d');
   const vpath = await page.video().path();

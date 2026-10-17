@@ -192,6 +192,7 @@ func run() -> void:
   if dx.player.blend!=null and dx.player.blend.visible and dx.player.blend.flip_h==false:
    saw_blend=true   # the old (right-facing) pose stays underneath while the left-facing one fades in
  check(saw_blend,"Dissolve: turning around keeps the old pose underneath while the new one fades in")
+ check(dx.player.blend.z_index==0 and dx.player.blend.get_index()==dx.player.sprite.get_index()-1,"Dissolve: the old pose is drawn directly under the sprite (not below the scenery)")
  var fx=Fighter.new()
  fx.load_sprite_set("res://assets/characters/hero/frames.tres",170.0)
  root.add_child(fx)

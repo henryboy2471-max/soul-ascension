@@ -142,8 +142,8 @@ func start_blend() -> void:
  if blend==null:
   blend=Sprite2D.new()
   blend.centered=true
-  blend.z_index=-1
   add_child(blend)
+  move_child(blend,sprite.get_index())   # drawn directly under the sprite by tree order (a negative z_index would sink it below the scenery)
  blend.texture=sprite.sprite_frames.get_frame_texture(sprite.animation,sprite.frame)
  blend.flip_h=sprite.flip_h
  blend.offset=sprite.offset
