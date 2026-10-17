@@ -18,8 +18,14 @@ async function tapRect(b) { const p = G(b.x + b.w / 2, b.y + b.h / 2); await pag
   for (let i = 0; i < 3; i++) { s = await S(); const c = s.buttons.find(x => x.text === 'CLOSE'); if (!c) break; await tapRect(c); await sleep(700); }
   s = await S(); await tapRect(s.buttons.find(x => x.text === 'MISSIONS'));
   s = await waitFor(s => s.buttons.some(b => b.text.startsWith('QA:')), 8000);
-  if (EP === '3') { await tapRect(s.buttons.find(b => b.text.startsWith('QA:'))); }
-  else { await tapRect(s.buttons.find(b => b.text === 'PLAY EPISODE 1')); s = await waitFor(s => s.buttons.some(b => b.text === 'BEGIN EPISODE 1'), 8000); await tapRect(s.buttons.find(b => b.text === 'BEGIN EPISODE 1')); }
+  if (EP === '2') {   // Episode 2 needs 1-1 cleared: the QA hook's seed (Episodes 1-2 cleared) through the normal Profile API
+    await page.evaluate(() => { window.__qa_cmd = 'seed_tower'; }); await sleep(1500);
+    s = await S(); await tapRect(s.buttons.find(x => x.text === 'CLOSE')); await sleep(800);   // reopen the list so it shows the seeded progress
+    s = await S(); await tapRect(s.buttons.find(x => x.text === 'MISSIONS')); await sleep(1500); s = await S();
+    await tapRect(s.buttons.find(b => b.text === 'PLAY EPISODE 2')); s = await waitFor(s => s.buttons.some(b => /^BEGIN EPISODE|^PLAY|^RESUME|^REPLAY|^START/.test(b.text)), 8000);
+    const go = s && s.buttons.find(b => /^(BEGIN EPISODE 2|REPLAY|START|RESUME)/.test(b.text)); if (go) await tapRect(go);
+  } else if (EP === '3') { await tapRect(s.buttons.find(b => b.text.startsWith('QA:'))); }
+  else if (EP === '1') { await tapRect(s.buttons.find(b => b.text === 'PLAY EPISODE 1')); s = await waitFor(s => s.buttons.some(b => b.text === 'BEGIN EPISODE 1'), 8000); await tapRect(s.buttons.find(b => b.text === 'BEGIN EPISODE 1')); }
   await waitFor(s => s.scene === 'episode', 15000);
   for (let i = 0; i < 120; i++) {   // advance dialogue until the probe reports an unlocked exploration scene
     await page.evaluate(() => { window.__qa_tr = []; }); await sleep(900);
@@ -36,7 +42,7 @@ async function tapRect(b) { const p = G(b.x + b.w / 2, b.y + b.h / 2); await pag
   const tr0 = await page.evaluate(() => window.__qa_tr || []); const last = tr0[tr0.length - 1];
   const hx = last[3] * kk + ox, hy = last[4] * kk + oy, mx = last[5] * kk + ox;
   const wide = process.env.WALK === '1' ? 1.6 : 1; const rect = { x: Math.max(0, Math.round(hx - 70 * wide * kk)), y: Math.max(0, Math.round(hy - 230 * kk)), width: Math.round(150 * wide * kk), height: Math.round(250 * kk) };
-  if (process.env.TRANS === '1') { rect.x = Math.max(0, Math.round(hx - 60 * kk)); rect.width = Math.round(330 * kk); }   // the Hero walks ~135 px during the sequence
+  if (process.env.TRANS === '1' || process.env.WALK === '1') { rect.x = Math.max(0, Math.round(hx - 60 * kk)); rect.width = Math.round(330 * kk); }   // the Hero walks ~135 px during the sequence
   const rectMira = { x: Math.max(0, Math.round(mx - 70 * kk)), y: rect.y, width: rect.width, height: rect.height };
   await page.evaluate(() => { window.__qa_tr = []; }); const tStart = Date.now(); const events = [];
   if (process.env.TRANS === '1') {

@@ -1,72 +1,86 @@
 {
  "idle_00.png": {
-  "feet_centre_before": 63.5,
+  "anchor": "feet",
+  "centre_before": 63.5,
   "shift_px": 4,
-  "feet_centre_after": 67.5
+  "centre_after": 67.5
  },
  "idle_01.png": {
-  "feet_centre_before": 60.5,
+  "anchor": "feet",
+  "centre_before": 60.5,
   "shift_px": 8,
-  "feet_centre_after": 68.5
+  "centre_after": 68.5
  },
  "idle_02.png": {
-  "feet_centre_before": 64.5,
+  "anchor": "feet",
+  "centre_before": 64.5,
   "shift_px": 4,
-  "feet_centre_after": 68.5
+  "centre_after": 68.5
  },
  "idle_03.png": {
-  "feet_centre_before": 66.0,
+  "anchor": "feet",
+  "centre_before": 66.0,
   "shift_px": 2,
-  "feet_centre_after": 68.0
+  "centre_after": 68.0
  },
  "idle_04.png": {
-  "feet_centre_before": 64.5,
+  "anchor": "feet",
+  "centre_before": 64.5,
   "shift_px": 4,
-  "feet_centre_after": 68.5
+  "centre_after": 68.5
  },
  "idle_05.png": {
-  "feet_centre_before": 69.5,
+  "anchor": "feet",
+  "centre_before": 69.5,
   "shift_px": -2,
-  "feet_centre_after": 67.5
+  "centre_after": 67.5
  },
  "walk_00.png": {
-  "feet_centre_before": 69.0,
+  "anchor": "feet",
+  "centre_before": 69.0,
   "shift_px": -1,
-  "feet_centre_after": 68.0
+  "centre_after": 68.0
  },
  "walk_01.png": {
-  "feet_centre_before": 70.5,
+  "anchor": "feet",
+  "centre_before": 70.5,
   "shift_px": -2,
-  "feet_centre_after": 68.5
+  "centre_after": 68.5
  },
  "walk_02.png": {
-  "feet_centre_before": 64.5,
+  "anchor": "feet",
+  "centre_before": 64.5,
   "shift_px": 4,
-  "feet_centre_after": 68.5
+  "centre_after": 68.5
  },
  "walk_03.png": {
-  "feet_centre_before": 66.5,
+  "anchor": "feet",
+  "centre_before": 66.5,
   "shift_px": 2,
-  "feet_centre_after": 68.5
+  "centre_after": 68.5
  },
  "walk_04.png": {
-  "feet_centre_before": 61.5,
+  "anchor": "feet",
+  "centre_before": 61.5,
   "shift_px": 6,
-  "feet_centre_after": 67.5
+  "centre_after": 67.5
  },
  "walk_05.png": {
-  "feet_centre_before": 68.0,
+  "anchor": "feet",
+  "centre_before": 68.0,
   "shift_px": 0,
-  "feet_centre_after": 68.0
+  "centre_after": 68.0
  },
  "walk_06.png": {
-  "feet_centre_before": 66.5,
+  "anchor": "feet",
+  "centre_before": 66.5,
   "shift_px": 2,
-  "feet_centre_after": 68.5
+  "centre_after": 68.5
  },
  "walk_07.png": {
-  "feet_centre_before": 67.5,
+  "anchor": "feet",
+  "centre_before": 67.5,
   "shift_px": 0,
-  "feet_centre_after": 67.5
+  "centre_after": 67.5
  }
 }

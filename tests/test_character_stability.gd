@@ -46,6 +46,27 @@ func feet_centre(img:Image) -> float:
    lo=mini(lo,x)
    hi=maxi(hi,x)
  return (lo+hi)/2.0
+# x centroid of dark clothing pixels in the torso band (25-62% of the figure height): the anchor tools/align_character_frames.py uses for Mira's run cycle
+func torso_centre(img:Image) -> float:
+ var w=img.get_width()
+ var h=img.get_height()
+ var y0=h
+ var y1=-1
+ for y in range(h):
+  for x in range(w):
+   if img.get_pixel(x,y).a>0.157:
+    y0=mini(y0,y)
+    y1=maxi(y1,y)
+ var hh=float(y1-y0)
+ var sum=0.0
+ var n=0
+ for y in range(int(y0+hh*0.25)+1,int(y0+hh*0.62)+1):
+  for x in range(w):
+   var c=img.get_pixel(x,y)
+   if c.a>0.47 and maxf(maxf(c.r,c.g),c.b)<0.431:
+    sum+=x
+    n+=1
+ return sum/maxf(1.0,float(n))
 func run() -> void:
  var profile=root.get_node("Profile")
  profile.data=profile.defaults()
@@ -64,6 +85,19 @@ func run() -> void:
    worst=maxf(worst,absf(feet_centre(img)-img.get_width()/2.0))
  check(using_aligned,"The Hero's idle and walk frames come from the aligned set (originals untouched)")
  check(worst<=1.0,"Every aligned idle and walk frame has its feet midpoint within 1 px of the canvas centre (worst %.1f px)" % worst)
+ # ---- Mira's run cycle: the body no longer slides across the canvas (it did by ~105 px, then snapped back at the loop point)
+ var mira=load("res://assets/characters/mira/frames.tres")
+ var tmin=1000.0
+ var tmax=-1000.0
+ var mira_aligned=true
+ for i in range(mira.get_frame_count("run")):
+  var mtex=mira.get_frame_texture("run",i)
+  if not mtex.resource_path.contains("frames_aligned"):
+   mira_aligned=false
+  var tc=torso_centre(Image.load_from_file(ProjectSettings.globalize_path(mtex.resource_path)))
+  tmin=minf(tmin,tc)
+  tmax=maxf(tmax,tc)
+ check(mira_aligned and tmax-tmin<=2.0,"Mira's run frames come from the aligned set and keep the torso steady (range %.1f px; it was 105)" % (tmax-tmin))
  for ep3 in [false,true]:
   var label="Episode 3" if ep3 else "Episode 1"
   for kind in ["60","ragged"]:
