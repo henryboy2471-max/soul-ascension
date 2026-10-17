@@ -23,6 +23,9 @@ var breath_amp=0.0
 var breath_t=0.0
 var base_scale=Vector2.ONE
 const BREATH_PERIOD = 3.6   # seconds per breath
+const BLEND_T = 0.12   # seconds a new pose takes to dissolve in over the previous one (walk <-> idle, turning)
+var blend:Sprite2D=null   # the previous pose, kept opaque underneath while the new one fades in
+var blend_t=1.0
 var gait=1.0   # walking pace relative to the cycle's design speed: scales the walk/run animation and the procedural leg swing so feet do not skate
 var dead=false
 var charge=0.0
@@ -134,6 +137,20 @@ func play_animation(name:String) -> void:
   return
  current_anim=resolved
  sprite.play(resolved)
+# exploration characters dissolve between poses instead of hard-cutting: the old frame stays opaque underneath while the new frame fades in over BLEND_T
+func start_blend() -> void:
+ if blend==null:
+  blend=Sprite2D.new()
+  blend.centered=true
+  blend.z_index=-1
+  add_child(blend)
+ blend.texture=sprite.sprite_frames.get_frame_texture(sprite.animation,sprite.frame)
+ blend.flip_h=sprite.flip_h
+ blend.offset=sprite.offset
+ blend.scale=sprite.scale
+ blend.position=sprite.position
+ blend.visible=true
+ blend_t=0.0
 func update_sprite(delta:float) -> void:
  if swing>0.0 and last_swing<=0.0:
   combo_step=(combo_step%3)+1
@@ -149,6 +166,8 @@ func update_sprite(delta:float) -> void:
   if not has_animation("defeat"):
    sprite.pause()
    return
+ if idle_hold and not dead and sprite.flip_h!=(facing<0):
+  start_blend()   # turning around
  sprite.flip_h=facing<0
  sprite.speed_scale=gait if current_anim in ["walk","run"] else 1.0
  # steady idle: hold frame 0 and breathe by under 1% (smooth cosine, anchored at the feet), eased in and out so it never pops
@@ -166,9 +185,17 @@ func update_sprite(delta:float) -> void:
  elif sprite.scale!=base_scale:
   sprite.scale=base_scale
  sprite.self_modulate=Color(2.2,2.2,2.2) if flash>0.0 else Color.WHITE
+ if blend_t<1.0:
+  blend_t=minf(1.0,blend_t+delta/BLEND_T)
+  sprite.modulate.a=blend_t*blend_t*(3.0-2.0*blend_t)
+  if blend_t>=1.0:
+   sprite.modulate.a=1.0
+   blend.visible=false
  var wanted=resolve_animation(desired_animation())
  if wanted==current_anim:
   return
+ if idle_hold and not dead and (wanted in ["walk","run"])!=(current_anim in ["walk","run"]):
+  start_blend()   # walk <-> idle
  # Interrupt one-shot animations only for higher-priority states
  if current_anim in ["defeat"] and not dead:
   current_anim=""

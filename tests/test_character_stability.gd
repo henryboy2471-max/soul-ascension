@@ -162,5 +162,46 @@ func run() -> void:
    check(absf(ex.player.position.x-lx)<0.001,tag+": during a conversation the Hero does not move sideways")
    ex.queue_free()
    await process_frame
+ # ---- dissolves: walk <-> idle and turning fade the new pose in over the old one (exploration only; battle fighters are untouched)
+ var dx=make(false)
+ await process_frame
+ dx.stick.direction=Vector2(1,0)
+ var q=0.0
+ while q<1.5:
+  tick(dx,1.0/60.0)
+  q+=1.0/60.0
+ check(dx.player.sprite.animation=="walk" and dx.player.sprite.modulate.a==1.0,"Dissolve: a walking Hero is fully opaque")
+ dx.stick.direction=Vector2.ZERO
+ var saw_blend=false
+ var min_alpha=1.0
+ q=0.0
+ while q<1.0:
+  tick(dx,1.0/60.0)
+  q+=1.0/60.0
+  if dx.player.blend!=null and dx.player.blend.visible:
+   saw_blend=true
+   min_alpha=minf(min_alpha,dx.player.sprite.modulate.a)
+ check(saw_blend and min_alpha<0.5,"Dissolve: stopping fades the idle pose in over the walk pose (lowest alpha %.2f)" % min_alpha)
+ check(not dx.player.blend.visible and dx.player.sprite.modulate.a==1.0 and dx.player.sprite.animation=="idle","Dissolve: it finishes within a second and leaves nothing behind")
+ dx.stick.direction=Vector2(-1,0)
+ q=0.0
+ saw_blend=false
+ while q<0.3:
+  tick(dx,1.0/60.0)
+  q+=1.0/60.0
+  if dx.player.blend!=null and dx.player.blend.visible and dx.player.blend.flip_h==false:
+   saw_blend=true   # the old (right-facing) pose stays underneath while the left-facing one fades in
+ check(saw_blend,"Dissolve: turning around keeps the old pose underneath while the new one fades in")
+ var fx=Fighter.new()
+ fx.load_sprite_set("res://assets/characters/hero/frames.tres",170.0)
+ root.add_child(fx)
+ await process_frame
+ fx.facing=-1
+ fx.update_sprite(1.0/60.0)
+ fx.facing=1
+ fx.update_sprite(1.0/60.0)
+ check(fx.blend==null and fx.sprite.modulate.a==1.0,"Dissolve: fighters outside exploration (battle) never dissolve")
+ dx.queue_free()
+ fx.queue_free()
  print("RESULT: %d passed, %d failed" % [passed,failed])
  quit(1 if failed>0 else 0)
