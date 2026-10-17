@@ -6,7 +6,44 @@ var main
 var acc=0.0
 var rail_key=""
 var rail_plan=null
+# motion probe (QA only): one row per rendered frame while an exploration scene is up, flushed to window.__qa_tr in batches (read by tools/qa/motion_browser.cjs)
+var trace:Array=[]
+var trace_t=0.0
+# frame-time overlay for device passes (QA only): F3 toggles "FPS / average ms / worst ms / frames over 25 ms" for the last second, over every screen
+var perf_label:Label
+var perf_ms:Array=[]
+var perf_t=0.0
+func _unhandled_key_input(event:InputEvent) -> void:
+ if event is InputEventKey and event.pressed and not event.echo and event.keycode==KEY_F3:
+  if perf_label==null:
+   var layer=CanvasLayer.new()
+   layer.layer=100
+   perf_label=Label.new()
+   perf_label.position=Vector2(8,4)
+   perf_label.add_theme_font_size_override("font_size",18)
+   perf_label.add_theme_color_override("font_color",Color(1,1,0.4))
+   perf_label.add_theme_color_override("font_shadow_color",Color(0,0,0))
+   perf_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
+   layer.add_child(perf_label)
+   add_child(layer)
+  else:
+   perf_label.get_parent().visible=not perf_label.get_parent().visible
 func _process(delta:float) -> void:
+ if perf_label!=null and perf_label.get_parent().visible:
+  perf_ms.append(delta*1000.0)
+  perf_t+=delta
+  if perf_t>=1.0:
+   var worst=0.0
+   var slow=0
+   var sum=0.0
+   for m in perf_ms:
+    worst=maxf(worst,m)
+    sum+=m
+    if m>25.0:
+     slow+=1
+   perf_label.text="FPS %d   avg %.1f ms   worst %.0f ms   >25 ms: %d/%d" % [perf_ms.size(),sum/perf_ms.size(),worst,slow,perf_ms.size()]
+   perf_ms.clear()
+   perf_t=0.0
  if main==null or not OS.has_feature("web"):
   return
  # per frame: only the player's x and the arena dodge direction (the full snapshot lags up to 0.2 s, which is ~80 px of walking)
@@ -19,14 +56,28 @@ func _process(delta:float) -> void:
   JavaScriptBridge.eval("window.__qa_f=[%f,%d]" % [float(ep.explore.px),dodge])
  else:
   JavaScriptBridge.eval("window.__qa_f=null")
+ if ep!=null and ep.get("explore")!=null and is_instance_valid(ep.explore):
+  probe(ep.explore,delta)
  acc+=delta
  if acc<0.2:
   return
  acc=0.0
  JavaScriptBridge.eval("window.__qa=JSON.parse("+JSON.stringify(JSON.stringify(snapshot()))+")")
+func probe(ex,delta:float) -> void:
+ var w=ex.walkers[0].node if ex.walkers.size()>0 else null
+ var p=ex.player
+ var sp=p.sprite
+ trace.append([snappedf(delta*1000.0,0.01),snappedf(ex.cam,0.001),snappedf(ex.px,0.001),snappedf(p.position.x,0.001),snappedf(p.position.y,0.001),snappedf(ex.npc.position.x,0.001),snappedf(w.position.x,0.001) if w!=null else 0.0,sp.animation if sp!=null else "-",sp.frame if sp!=null else -1,1 if p.moving else 0,snappedf(ex.vel.x,0.1),snappedf(Performance.get_monitor(Performance.TIME_PROCESS)*1000.0,0.01),int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),int(Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)),int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)),1 if ex.locked else 0])
+ trace_t+=delta
+ if trace_t>=0.5 and trace.size()>0:
+  trace_t=0.0
+  JavaScriptBridge.eval("(window.__qa_tr=window.__qa_tr||[]).push(...JSON.parse("+JSON.stringify(JSON.stringify(trace))+"))")
+  trace.clear()
 # the driver sets window.__qa_cmd; QA-only save seeding (the same save shapes the Godot playthroughs start from), through the normal Profile API
 func run_command() -> void:
  var cmd=JavaScriptBridge.eval("(function(){const c=window.__qa_cmd||'';window.__qa_cmd='';return c})()",true)
+ if str(cmd).begins_with("hide:"):
+  cull(str(cmd).substr(5))
  if str(cmd)=="seed_tower":
   var clues=["tx_1","tx_2","tx_3","terminal","anselm_met","anselm_admits","records","scraped_entry","teo_met","decoded","theory","puzzle_rail","puzzle_map","seen_exposure","seen_teo_reveal","tower_reached"]
   for id in ["1-1","1-2"]:
@@ -171,3 +222,18 @@ func memory_plan(sc) -> Dictionary:
   return {"action":"none"}
  var rc=sc.memory_buttons[idx].get_global_rect()
  return {"action":"click","x":rc.get_center().x,"y":rc.get_center().y}
+# render-cost experiment: hide one group of exploration nodes ("none" shows everything again) so the driver can compare frame times
+func cull(what:String) -> void:
+ var ep=main.screen.get_child(0) if main.screen!=null and main.screen.get_child_count()>0 else null
+ if ep==null or ep.get("explore")==null:
+  return
+ var ex=ep.explore
+ var groups={"layers":ex.layers.duplicate(),"props":[ex.props],"fore":[ex.fore] if ex.get("fore")!=null else [],"plate":[ex.foreground_plate] if ex.foreground_plate!=null else [],
+  "fighters":[ex.player,ex.npc]+ex.walkers.map(func(w): return w.node),"floor":[ex.floor_fill],"hud":ex.hud_nodes}
+ for g in groups:
+  for n in groups[g]:
+   if is_instance_valid(n):
+    n.visible=(what=="none") or g!=what
+ for n in main.screen.find_children("*","Control",false,false):
+  if n.get_script()!=null and str(n.get_script().resource_path).ends_with("atmosphere.gd"):
+   n.visible=(what=="none") or what!="atmo"

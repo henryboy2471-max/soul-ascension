@@ -8,11 +8,14 @@ const SPEED = 300.0
 const ACCEL = 2600.0
 const DECEL = 3600.0
 const LOOK_AHEAD = 70.0
+const MAX_FRAME = 0.1   # a hitch (GC, tab switch, slow frame) slows the walk for one frame instead of teleporting everything and skipping past solid NPCs
+const COMPANION_MAX = 345.0   # the companion never outruns what the hero's own walk cycle looks right at
 const CHANNEL_SECONDS = 1.4
 const NPC_HALF_W = 36.0   # solid footprint around the NPC (x half-width, depth half-height); the Hero walks around, not through
 const NPC_HALF_D = 20.0
 var cam=0.0
 var vel=Vector2.ZERO
+var side=1.0   # which side of the hero the companion trails on (-1..1, eased)
 var lead=0.0
 var px=140.0
 var py=548.0
@@ -309,21 +312,27 @@ func move_input() -> Vector2:
 func update_positions(blend:float) -> void:
  var goal=clampf(px-640.0+(lead if blend<1.0 else 0.0),0.0,world_w-1280.0)
  cam=goal if blend>=1.0 else lerpf(cam,goal,blend)
- # `cam` stays a smooth float; everything on screen is placed from its whole-pixel value so parallax layers and sprites never shimmer between sub-pixel positions.
- var view=roundf(cam)
+ if absf(goal-cam)<0.25:
+  cam=goal   # the exponential ease never quite arrives: stop the endless sub-pixel creep
+ # `cam` stays a smooth float. The scenery is placed on whole DEVICE pixels (a logical pixel is 1.07-2 device pixels on a stretched window, so snapping to logical ones made slow things step unevenly);
+ # characters keep their exact position relative to that view, so a slow walker moves a little every frame instead of 0,1,1,0,1 pixels.
+ var vp=get_viewport()
+ var k=clampf(vp.get_final_transform().get_scale().x if vp!=null else 1.0,1.0,4.0)
+ var view=roundf(cam*k)/k
  for layer in layers:
-  layer.position=Vector2(roundf(-view*layer.get_meta("factor")),lift)
+  layer.position=Vector2(roundf(-view*layer.get_meta("factor")*k)/k,lift)
  props.position=Vector2(-view,lift)
  if foreground_plate != null:
-  foreground_plate.position=Vector2(roundf(-view*1.2),lift)
+  foreground_plate.position=Vector2(roundf(-view*1.2*k)/k,lift)
  # While a conversation is open the whole street lifts so the dialogue box never covers characters.
- npc.position=Vector2(roundf(npc_x)-view,548.0+lift)
+ npc.position=Vector2(npc_x-view,548.0+lift)
  for e in extra_npcs:
-  e.node.position=Vector2(roundf(e.x)-view,548.0+lift)
+  e.node.position=Vector2(e.x-view,548.0+lift)
  for w in walkers:
-  w.node.position=Vector2(roundf(w.x)-view,walker_y+lift)
- player.position=Vector2(roundf(px)-view,py+lift)
+  w.node.position=Vector2(w.x-view,walker_y+lift)
+ player.position=Vector2(px-view,py+lift)
 func _process(delta:float) -> void:
+ delta=minf(delta,MAX_FRAME)
  time+=delta
  act_block=maxf(0.0,act_block-delta)
  for w in walkers:
@@ -345,18 +354,27 @@ func _process(delta:float) -> void:
  advance_motion(move,delta)
  if absf(move.x)>0.1:
   player.facing=1 if move.x>0 else -1
- player.moving=vel.length()>25.0
+ player.moving=vel.length()>(12.0 if player.moving else 25.0)   # starts above 25 px/s, stays "walking" down to 12: no walk/idle flicker on a short tap
+ player.gait=clampf(vel.length()/SPEED,0.35,1.15)   # the walk cycle plays at the pace the feet actually travel
  if player.moving:
   step_timer-=delta*clampf(vel.length()/190.0,0.55,1.3)
   if step_timer<=0:
    Sound.footstep("wet",clampf(vel.length()/230.0,0.5,1.0))
    step_timer=0.30
  if companion:
-  # the companion trails the player at a short distance on the side the player came from, easing so it never snaps
-  var want=px-float(player.facing)*90.0
-  npc_x=lerpf(npc_x,clampf(want,80.0,world_w-80.0),1.0-exp(-delta*4.5))
-  npc.facing=player.facing if absf(npc_x-px)>60.0 else (1 if px>npc_x else -1)
-  npc.moving=absf(want-npc_x)>14.0
+  # the companion trails the hero on the side the hero came from. When the hero turns around she glides across behind them (the side blends over ~0.7 s and her speed is capped)
+  # instead of swooping 180 px at three times the hero's speed.
+  side=move_toward(side,float(player.facing),delta*3.0)
+  var want=clampf(px-side*90.0,80.0,world_w-80.0)
+  var step=clampf((want-npc_x)*(1.0-exp(-delta*4.5)),-COMPANION_MAX*delta,COMPANION_MAX*delta)
+  npc_x+=step
+  var nspeed=absf(step)/maxf(delta,0.0001)
+  npc.moving=nspeed>(8.0 if npc.moving else 20.0)
+  npc.gait=clampf(nspeed/SPEED,0.35,1.15)
+  if absf(npc_x-px)>60.0:
+   npc.facing=player.facing
+  elif absf(px-npc_x)>12.0:
+   npc.facing=1 if px>npc_x else -1
  else:
   npc.facing=1 if px>npc_x else -1
  for e in extra_npcs:
@@ -445,8 +463,9 @@ func advance_motion(move:Vector2, delta:float) -> void:
   if ny==want_y:
    ny=py
  py=ny
- var want=clampf(vel.x/SPEED,-1.0,1.0)*LOOK_AHEAD
- lead=lerpf(lead,want,1.0-exp(-delta*3.5))
+ # the camera leads in the walking direction and HOLDS that lead when the hero stops, so the street does not keep gliding across the screen while the hero stands still
+ if absf(vel.x)>25.0:
+  lead=lerpf(lead,clampf(vel.x/SPEED,-1.0,1.0)*LOOK_AHEAD,1.0-exp(-delta*3.5))
 func spot_accent(id:String) -> Color:
  match id:
   "terminal","res_a","res_b","res_c": return Color("6fd7e4")

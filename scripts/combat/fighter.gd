@@ -18,6 +18,7 @@ var flash=0.0
 var swing=0.0
 var step=0.0
 var moving=false
+var gait=1.0   # walking pace relative to the cycle's design speed: scales the walk/run animation and the procedural leg swing so feet do not skate
 var dead=false
 var charge=0.0
 var aura=false
@@ -143,6 +144,7 @@ func update_sprite(delta:float) -> void:
    sprite.pause()
    return
  sprite.flip_h=facing<0
+ sprite.speed_scale=gait if current_anim in ["walk","run"] else 1.0
  sprite.self_modulate=Color(2.2,2.2,2.2) if flash>0.0 else Color.WHITE
  var wanted=resolve_animation(desired_animation())
  if wanted==current_anim:
@@ -158,7 +160,7 @@ func _process(delta:float) -> void:
  stun=maxf(0,stun-delta)
  flash=maxf(0,flash-delta)
  swing=maxf(0,swing-delta)
- step+=delta*(12 if moving else 2)
+ step+=delta*(12.0*gait if moving else 2.0)
  if sprite!=null:
   update_sprite(delta)
  if trailing:

@@ -113,7 +113,7 @@ func run() -> void:
  await process_frame
  await process_frame
  check(ex.player.facing==1,"Hero turns toward the NPC when starting a conversation")
- # camera: rendered positions are whole pixels, never reverse while walking one way, and respect both world boundaries (variable frame times)
+ # camera: scenery on whole device pixels (1 px here), characters exact; never reverse while walking one way, and respect both world boundaries (variable frame times)
  ex.locked=false
  ex.px=300.0
  ex.py=585.0
@@ -129,11 +129,11 @@ func run() -> void:
   ex.advance_motion(Vector2(1,0),dt)
   ex.update_positions(1.0-exp(-dt*9.0))
   var lx=ex.layers[4].position.x
-  whole=whole and lx==roundf(lx) and ex.props.position.x==roundf(ex.props.position.x) and ex.player.position.x==roundf(ex.player.position.x)
+  whole=whole and lx==roundf(lx) and ex.props.position.x==roundf(ex.props.position.x) and absf(ex.player.position.x-(ex.px+ex.props.position.x))<0.001
   if lx>last_x+0.01:
    reversals+=1
   last_x=lx
- check(whole,"Camera/parallax/sprite positions are whole pixels (no shimmer)")
+ check(whole,"Scenery sits on whole (device) pixels and characters at their exact position in that view (no shimmer, no stepping)")
  check(reversals==0,"Camera never reverses or stutters back while walking one way (variable frame times)")
  check(ex.cam>=0.0 and ex.cam<=ex.world_w-1280.0,"Camera stays inside the world boundaries at the far end (cam %.0f)" % ex.cam)
  ex.px=80.0
