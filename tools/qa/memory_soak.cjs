@@ -11,7 +11,7 @@ async function tapRect(b) { const p = G(b.x + b.w / 2, b.y + b.h / 2); await pag
 function rssMB() { try { return +execSync("ps -eo rss,args | grep '[c]hrome-linux/chrome' | grep -- '--type=renderer' | sort -rn | head -1 | awk '{print $1}'").toString().trim() / 1024; } catch (e) { return NaN; } }
 (async () => {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--no-sandbox'] });
-  page = await (await br.newContext({ viewport: { width: W, height: H } })).newPage(); const cdp = await page.context().newCDPSession(page);
+  page = await (await br.newContext({ viewport: { width: W, height: H } })).newPage(); const cdp = await page.context().newCDPSession(page); await cdp.send('Performance.enable');
   await page.goto(`http://localhost:${PORT}/index.html`); await waitFor(s => s.scene === 'home', 90000); await sleep(1200);
   let s = await S(); const b = s.buttons.find(x => x.text.startsWith('BEGIN YOUR')); if (b) { await tapRect(b); await sleep(2500); }
   for (let i = 0; i < 3; i++) { s = await S(); const c = s.buttons.find(x => x.text === 'CLOSE'); if (!c) break; await tapRect(c); await sleep(700); }

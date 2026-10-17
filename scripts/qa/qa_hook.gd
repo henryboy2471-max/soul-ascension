@@ -67,7 +67,7 @@ func probe(ex,delta:float) -> void:
  var w=ex.walkers[0].node if ex.walkers.size()>0 else null
  var p=ex.player
  var sp=p.sprite
- trace.append([snappedf(delta*1000.0,0.01),snappedf(ex.cam,0.001),snappedf(ex.px,0.001),snappedf(p.position.x,0.001),snappedf(p.position.y,0.001),snappedf(ex.npc.position.x,0.001),snappedf(w.position.x,0.001) if w!=null else 0.0,sp.animation if sp!=null else "-",sp.frame if sp!=null else -1,1 if p.moving else 0,snappedf(ex.vel.x,0.1),snappedf(Performance.get_monitor(Performance.TIME_PROCESS)*1000.0,0.01),int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),int(Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)),int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)),1 if ex.locked else 0])
+ trace.append([snappedf(delta*1000.0,0.01),snappedf(ex.cam,0.001),snappedf(ex.px,0.001),snappedf(p.position.x,0.001),snappedf(p.position.y,0.001),snappedf(ex.npc.position.x,0.001),snappedf(w.position.x,0.001) if w!=null else 0.0,sp.animation if sp!=null else "-",sp.frame if sp!=null else -1,1 if p.moving else 0,snappedf(ex.vel.x,0.1),snappedf(Performance.get_monitor(Performance.TIME_PROCESS)*1000.0,0.01),int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),int(Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)),int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)),1 if ex.locked else 0,snappedf(ex.extra_npcs[0].node.position.x,0.001) if ex.extra_npcs.size()>0 else -1.0])
  trace_t+=delta
  if trace_t>=0.5 and trace.size()>0:
   trace_t=0.0
@@ -78,6 +78,11 @@ func run_command() -> void:
  var cmd=JavaScriptBridge.eval("(function(){const c=window.__qa_cmd||'';window.__qa_cmd='';return c})()",true)
  if str(cmd).begins_with("hide:"):
   cull(str(cmd).substr(5))
+ # QA-only: enter an Episode 3 zone through the normal begin_zone path (to look at the characters standing there without walking for a minute)
+ if str(cmd).begins_with("zone:"):
+  var zep=main.screen.get_child(0) if main.screen!=null and main.screen.get_child_count()>0 else null
+  if zep!=null and zep.has_method("begin_zone"):
+   zep.begin_zone(str(cmd).substr(5),1000.0)
  if str(cmd)=="seed_tower":
   var clues=["tx_1","tx_2","tx_3","terminal","anselm_met","anselm_admits","records","scraped_entry","teo_met","decoded","theory","puzzle_rail","puzzle_map","seen_exposure","seen_teo_reveal","tower_reached"]
   for id in ["1-1","1-2"]:

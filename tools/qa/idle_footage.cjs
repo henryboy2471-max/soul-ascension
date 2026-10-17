@@ -35,6 +35,7 @@ async function tapRect(b) { const p = G(b.x + b.w / 2, b.y + b.h / 2); await pag
   }
   await sleep(3000);   // let the camera settle
   await page.evaluate(() => { window.__qa_tr = []; });
+  if (process.env.ZONE) { await page.evaluate(z => { window.__qa_cmd = 'zone:' + z; }, process.env.ZONE); await sleep(2500); for (let i = 0; i < 40; i++) { const t = await page.evaluate(() => window.__qa_tr || []); if (t.length > 3 && t.every(r => r[15] === 0)) break; await page.keyboard.down('Enter'); await sleep(50); await page.keyboard.up('Enter'); await sleep(500); } await sleep(2500); }
   // WALK=1: hold D (walk right) for 9 s first, so the camera is following, and record the walk instead of standing
   if (process.env.WALK === '1') { await page.keyboard.down('d'); await sleep(9000); }
   // the Hero stands still: one probe read for where to crop, then the page is simply recorded for SECS seconds
@@ -43,6 +44,8 @@ async function tapRect(b) { const p = G(b.x + b.w / 2, b.y + b.h / 2); await pag
   const hx = last[3] * kk + ox, hy = last[4] * kk + oy, mx = last[5] * kk + ox;
   const wide = process.env.WALK === '1' ? 1.6 : 1; const rect = { x: Math.max(0, Math.round(hx - 70 * wide * kk)), y: Math.max(0, Math.round(hy - 230 * kk)), width: Math.round(150 * wide * kk), height: Math.round(250 * kk) };
   if (process.env.TRANS === '1' || process.env.WALK === '1') { rect.x = Math.max(0, Math.round(hx - 60 * kk)); rect.width = Math.round(330 * kk); }   // the Hero walks ~135 px during the sequence
+  const nx = last[16] !== undefined && last[16] > 0 ? last[16] * kk + ox : null;   // first extra NPC (Anselm, Teo, the Warden) when the zone has one
+  const rectNpc = nx === null ? null : { x: Math.max(0, Math.round(nx - 70 * kk)), y: rect.y, width: rect.width, height: rect.height };
   const rectMira = { x: Math.max(0, Math.round(mx - 70 * kk)), y: rect.y, width: rect.width, height: rect.height };
   await page.evaluate(() => { window.__qa_tr = []; }); const tStart = Date.now(); const events = [];
   if (process.env.TRANS === '1') {
@@ -57,7 +60,7 @@ async function tapRect(b) { const p = G(b.x + b.w / 2, b.y + b.h / 2); await pag
   const vpath = await page.video().path();
   await ctx.close();
   fs.renameSync(vpath, `${OUT}/${TAG}.webm`);
-  fs.writeFileSync(`${OUT}/${TAG}_stats.json`, JSON.stringify({ W, H, EP, SECS, rect, rectMira, startedMs: tStart, trace: tr }));
+  fs.writeFileSync(`${OUT}/${TAG}_stats.json`, JSON.stringify({ W, H, EP, SECS, rect, rectMira, rectNpc, startedMs: tStart, trace: tr }));
   console.log('recorded', SECS, 's; trace rows', tr.length, 'hero crop', JSON.stringify(rect));
   await br.close();
 })().catch(e => { console.error(e); process.exit(1); });

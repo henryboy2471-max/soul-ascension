@@ -14,7 +14,7 @@ def frames_of(out, tag, rect, secs, fps=25):
     return np.stack([np.asarray(Image.open(f).convert("RGB"), dtype=np.float32) for f in fs]), fs
 
 def metrics(out, tag, who="hero"):
-    st = json.load(open(f"{out}/{tag}_stats.json")); rect = st["rect"] if who == "hero" else st["rectMira"]
+    st = json.load(open(f"{out}/{tag}_stats.json")); rect = {"hero": st["rect"], "mira": st["rectMira"], "npc": st.get("rectNpc")}[who]
     fr, files = frames_of(out, tag, rect, st["SECS"])
     fr = fr[25:]                                   # skip the first second of the standing period
     med = np.median(fr, axis=0)
