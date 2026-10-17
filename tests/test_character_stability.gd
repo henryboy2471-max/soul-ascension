@@ -238,5 +238,30 @@ func run() -> void:
  check(fx.blend==null and fx.sprite.modulate.a==1.0,"Dissolve: fighters outside exploration (battle) never dissolve")
  dx.queue_free()
  fx.queue_free()
+ # ---- the reduced-motion setting: perfectly still idle, instant pose changes
+ profile.data.settings.reduced_motion=true
+ var rx=make(false)
+ await process_frame
+ rx.stick.direction=Vector2(1,0)
+ var rq=0.0
+ while rq<1.0:
+  tick(rx,1.0/60.0)
+  rq+=1.0/60.0
+ rx.stick.direction=Vector2.ZERO
+ var scale_min=10.0
+ var scale_max=-10.0
+ var saw_dissolve=false
+ rq=0.0
+ while rq<4.0:
+  tick(rx,1.0/60.0)
+  rq+=1.0/60.0
+  if rq>1.0:
+   scale_min=minf(scale_min,rx.player.sprite.scale.y)
+   scale_max=maxf(scale_max,rx.player.sprite.scale.y)
+  if rx.player.blend!=null:
+   saw_dissolve=true
+ check(rx.player.calm and rx.npc.calm and scale_max-scale_min<0.000001 and not saw_dissolve and rx.player.sprite.animation=="idle","Reduced motion: no breath, no dissolve, the idle pose is perfectly still")
+ rx.queue_free()
+ profile.data.settings.reduced_motion=false
  print("RESULT: %d passed, %d failed" % [passed,failed])
  quit(1 if failed>0 else 0)

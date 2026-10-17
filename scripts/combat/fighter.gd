@@ -19,6 +19,7 @@ var swing=0.0
 var step=0.0
 var moving=false
 var idle_hold=false   # exploration: stand on ONE steady idle frame with a slight smooth breath instead of cycling the idle frames (which differ by a few pixels and read as trembling)
+var calm=false   # reduced-motion setting: no breath and no dissolves, poses change instantly
 var breath_amp=0.0
 var breath_t=0.0
 var base_scale=Vector2.ONE
@@ -139,6 +140,8 @@ func play_animation(name:String) -> void:
  sprite.play(resolved)
 # exploration characters dissolve between poses instead of hard-cutting: the old frame stays opaque underneath while the new frame fades in over BLEND_T
 func start_blend() -> void:
+ if calm:
+  return
  if blend==null:
   blend=Sprite2D.new()
   blend.centered=true
@@ -172,7 +175,7 @@ func update_sprite(delta:float) -> void:
  sprite.speed_scale=gait if current_anim in ["walk","run"] else 1.0
  # steady idle: hold frame 0 and breathe by under 1% (smooth cosine, anchored at the feet), eased in and out so it never pops
  var holding=idle_hold and current_anim=="idle" and not dead
- breath_amp=move_toward(breath_amp,1.0 if holding else 0.0,delta/0.4)
+ breath_amp=move_toward(breath_amp,1.0 if (holding and not calm) else 0.0,delta/0.4)
  if holding:
   breath_t+=delta
   if sprite.is_playing():

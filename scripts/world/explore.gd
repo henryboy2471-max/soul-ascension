@@ -165,6 +165,7 @@ func _ready() -> void:
  # World height 155 puts Mira's standing figure about 5% shorter than the Hero's (measured, see tests/test_mira_sprites.gd).
  npc.load_sprite_set("res://assets/characters/mira/frames.tres",155.0,Color("c27bff"))
  npc.idle_hold=true
+ npc.calm=bool(Profile.data.settings.get("reduced_motion",false))
  npc.scale=Vector2(1.2,1.2)
  add_child(npc)
  companion=bool(config.get("companion",false))
@@ -192,6 +193,7 @@ func _ready() -> void:
  player.scale=Vector2(1.2,1.2)
  player.load_sprite_set("res://assets/characters/hero/frames.tres",170.0,Color("4aa3ff"))
  player.idle_hold=true
+ player.calm=bool(Profile.data.settings.get("reduced_motion",false))
  add_child(player)
  if art_script == NeonDistrictArt:
   foreground_plate=NeonDistrictArt.new()
