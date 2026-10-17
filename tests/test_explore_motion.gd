@@ -31,28 +31,28 @@ func run() -> void:
  ex.px=500.0
  ex.py=585.0   # front lane: these motion checks walk past Mira's x (she is solid on her own lane, see the NPC checks below)
  ex.vel=Vector2.ZERO
- # ramp-up: not an instant snap, but at full speed within ~0.15 s
+ # ramp-up: not an instant snap; full (slowed, 30%) speed within EASE_IN = 0.3 s
  ex.advance_motion(Vector2(1,0),1.0/60.0)
- check(ex.vel.x>0.0 and ex.vel.x<ex.SPEED*0.5,"First frame of walking is eased in (%.0f px/s)" % ex.vel.x)
- for i in range(9):
+ check(ex.vel.x>0.0 and ex.vel.x<ex.top_speed()*0.1,"First frame of walking is eased in (%.0f px/s)" % ex.vel.x)
+ for i in range(19):
   ex.advance_motion(Vector2(1,0),1.0/60.0)
- check(is_equal_approx(ex.vel.x,ex.SPEED),"Full walking speed is reached within 10 frames at 60 fps")
+ check(is_equal_approx(ex.vel.x,ex.top_speed()) and is_equal_approx(ex.top_speed(),90.0),"Full walking speed (90 px/s, 30% of the original 300) is reached within 0.33 s at 60 fps")
  var x_run=ex.px
  # camera leads in the facing direction, never beyond the lookahead
  for i in range(120):
   ex.advance_motion(Vector2(1,0),1.0/60.0)
  check(ex.lead>ex.LOOK_AHEAD*0.8 and ex.lead<=ex.LOOK_AHEAD+0.01,"Camera look-ahead builds toward %.0f px while walking (now %.1f)" % [ex.LOOK_AHEAD,ex.lead])
- # stop: decelerates within ~0.1 s and covers only a few pixels
+ # stop: eases out within ~0.27 s and covers about half a ramp (top speed x EASE_OUT / 2 = 11 px)
  var before=ex.px
- for i in range(8):
+ for i in range(17):
   ex.advance_motion(Vector2.ZERO,1.0/60.0)
- check(ex.vel.length()<0.01 and ex.px-before<14.0,"Stops within ~8 frames and slides less than 14 px (%.1f)" % (ex.px-before))
- # distance covered in 1 s of walking is close to the old instant-speed model (within 10 percent)
+ check(ex.vel.length()<0.01 and ex.px-before<14.0 and ex.px-before>5.0,"Eases to a stop within ~17 frames and slides 5-14 px (%.1f)" % (ex.px-before))
+ # one second of walking covers most of the top-speed distance, less the ramp
  ex.px=500.0
  ex.vel=Vector2.ZERO
  for i in range(60):
   ex.advance_motion(Vector2(1,0),1.0/60.0)
- check(ex.px-500.0>ex.SPEED*0.9 and ex.px-500.0<=ex.SPEED+0.5,"One second of walking covers 90-100 percent of the old distance (%.0f px)" % (ex.px-500.0))
+ check(ex.px-500.0>ex.top_speed()*0.8 and ex.px-500.0<=ex.top_speed()+0.5,"One second of walking covers 80-100 percent of the 90 px top-speed distance (%.0f px)" % (ex.px-500.0))
  # world bounds and the locked gate still stop the player (no velocity carried into walls)
  ex.px=ex.world_w-100.0
  for i in range(60):

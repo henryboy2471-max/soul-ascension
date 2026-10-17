@@ -62,7 +62,7 @@ func run() -> void:
  ex.stick.direction=Vector2(1,0)
  await create_timer(0.5).timeout
  ex.stick.direction=Vector2.ZERO
- check(ex.px-x0>110,"Walking covers ground at exploration speed")
+ check(ex.px-x0>20 and ex.px-x0<48,"Walking covers ground at the slowed exploration pace (30% of 300 px/s, with the 0.3 s ease-in)")
  # Optional lore spot does not disturb the main objective
  ex.px=1860.0
  await process_frame

@@ -4,17 +4,22 @@ class_name Explore
 signal interact(id:String)
 signal exit_requested
 const WORLD_W = 2500.0
-const SPEED = 300.0
+const SPEED = 300.0   # the pace the walk/run animations were authored for (the animation reference), NOT the walking speed: see top_speed()
+const WALK_SCALE = 0.3   # exploration walks at 30% of the original 300 px/s = 90 px/s; the Warden chamber config sets 1.0 (its dodge timing is built for full speed)
+const EASE_IN = 0.3   # seconds from standing to full walking speed (slowed exploration)
+const EASE_OUT = 0.25   # seconds from full walking speed to standing
+const WALKER_PACE = 55.0   # pedestrian speed the procedural leg swing matches at gait 1.0
 const ACCEL = 2600.0
 const DECEL = 3600.0
 const LOOK_AHEAD = 70.0
 const MAX_FRAME = 0.1   # a hitch (GC, tab switch, slow frame) slows the walk for one frame instead of teleporting everything and skipping past solid NPCs
-const COMPANION_MAX = 345.0   # the companion never outruns what the hero's own walk cycle looks right at
+const COMPANION_MAX = 1.15   # the companion never outruns the hero by more than this factor of top speed
 const CHANNEL_SECONDS = 1.4
 const NPC_HALF_W = 36.0   # solid footprint around the NPC (x half-width, depth half-height); the Hero walks around, not through
 const NPC_HALF_D = 20.0
 var cam=0.0
 var vel=Vector2.ZERO
+var walk_scale=WALK_SCALE
 var side=1.0   # which side of the hero the companion trails on (-1..1, eased)
 var lead=0.0
 var px=140.0
@@ -84,6 +89,7 @@ func _ready() -> void:
  px=float(config.get("start_px",px))
  npc_x=float(config.get("npc_x",npc_x))
  gate_x=float(config.get("gate_x",gate_x))
+ walk_scale=float(config.get("walk_scale",WALK_SCALE))
  obstacles=config.get("obstacles",[{"x":npc_x,"y":548.0,"hw":NPC_HALF_W,"hd":NPC_HALF_D}])
  var wall=blocker(px,py)
  if not wall.is_empty():
@@ -126,7 +132,11 @@ func _ready() -> void:
   walker.modulate=Color(0.55,0.55,0.7)
   walker.scale=Vector2(0.9,0.9)
   add_child(walker)
-  walkers.append({"node":walker,"x":rng.randf_range(250,2300),"dir":1 if rng.randf()<0.5 else -1,"speed":rng.randf_range(35,70)})
+  var x0=rng.randf_range(250,2300)
+  var dir0=1 if rng.randf()<0.5 else -1
+  var pace=rng.randf_range(35,70)*walk_scale   # the same random draws as before, slowed with the Hero
+  walker.gait=clampf(pace/WALKER_PACE,0.15,1.2)
+  walkers.append({"node":walker,"x":x0,"dir":dir0,"speed":pace})
  # Sleepers: the same ambient pedestrian rigs, standing still (no new character art).
  for s in config.get("sleepers",[]):
   var sleeper=Fighter.new()
@@ -354,23 +364,24 @@ func _process(delta:float) -> void:
  advance_motion(move,delta)
  if absf(move.x)>0.1:
   player.facing=1 if move.x>0 else -1
- player.moving=vel.length()>(12.0 if player.moving else 25.0)   # starts above 25 px/s, stays "walking" down to 12: no walk/idle flicker on a short tap
- player.gait=clampf(vel.length()/SPEED,0.35,1.15)   # the walk cycle plays at the pace the feet actually travel
+ var top=top_speed()
+ player.moving=vel.length()>(top*0.04 if player.moving else top*0.08)   # starts above 8% of top speed, stays "walking" down to 4%: no walk/idle flicker on a short tap
+ player.gait=clampf(vel.length()/SPEED,0.2,1.15)   # the walk cycle plays at the pace the feet actually travel (it was authored for SPEED)
  if player.moving:
-  step_timer-=delta*clampf(vel.length()/190.0,0.55,1.3)
+  step_timer-=delta*player.gait   # one footfall per half walk cycle: 0.4 s at the authored pace, slower when the feet are slower
   if step_timer<=0:
-   Sound.footstep("wet",clampf(vel.length()/230.0,0.5,1.0))
-   step_timer=0.30
+   Sound.footstep("wet",clampf(vel.length()/(top*0.77),0.5,1.0))
+   step_timer=0.4
  if companion:
   # the companion trails the hero on the side the hero came from. When the hero turns around she glides across behind them (the side blends over ~0.7 s and her speed is capped)
   # instead of swooping 180 px at three times the hero's speed.
   side=move_toward(side,float(player.facing),delta*3.0)
   var want=clampf(px-side*90.0,80.0,world_w-80.0)
-  var step=clampf((want-npc_x)*(1.0-exp(-delta*4.5)),-COMPANION_MAX*delta,COMPANION_MAX*delta)
+  var step=clampf((want-npc_x)*(1.0-exp(-delta*4.5)),-COMPANION_MAX*top*delta,COMPANION_MAX*top*delta)
   npc_x+=step
   var nspeed=absf(step)/maxf(delta,0.0001)
-  npc.moving=nspeed>(8.0 if npc.moving else 20.0)
-  npc.gait=clampf(nspeed/SPEED,0.35,1.15)
+  npc.moving=nspeed>(top*0.027 if npc.moving else top*0.067)
+  npc.gait=clampf(nspeed/SPEED,0.2,1.15)
   if absf(npc_x-px)>60.0:
    npc.facing=player.facing
   elif absf(px-npc_x)>12.0:
@@ -433,13 +444,20 @@ func _process(delta:float) -> void:
   hud_node.queue_redraw()
  hud_dirty=hud_active
 # Eased walking: speed ramps up in ~0.12 s and stops in ~0.08 s instead of snapping, and the camera leads slightly in the facing direction.
+# the hero's top walking speed in px/s (90 in normal exploration, 300 in the Warden chamber)
+func top_speed() -> float:
+ return SPEED*walk_scale
 func advance_motion(move:Vector2, delta:float) -> void:
  if locked:
   vel=Vector2.ZERO
   lead=lerpf(lead,0.0,1.0-exp(-delta*6.0))
   return
- var goal=Vector2(move.x*SPEED,move.y*SPEED*0.55)
- var rate=ACCEL if goal.length()>vel.length()*0.98 and goal.length()>1.0 else DECEL
+ var top=top_speed()
+ var goal=Vector2(move.x*top,move.y*top*0.55)
+ # slowed exploration eases in over EASE_IN and out over EASE_OUT; the full-speed Warden chamber keeps its original quick response
+ var accel=ACCEL if walk_scale>=1.0 else top/EASE_IN
+ var decel=DECEL if walk_scale>=1.0 else top/EASE_OUT
+ var rate=accel if goal.length()>vel.length()*0.98 and goal.length()>1.0 else decel
  vel=vel.move_toward(goal,rate*delta)
  var max_x=world_w-80.0
  if gate_locked and gate_x>0.0:
@@ -456,7 +474,7 @@ func advance_motion(move:Vector2, delta:float) -> void:
  px=nx
  var want_y=py+vel.y*delta
  if not wall.is_empty() and absf(move.x)>0.1 and absf(move.y)<0.1:
-  want_y=py+(1.0 if py>=float(wall.y) else -1.0)*140.0*delta   # walking into someone: ease around them instead of sticking
+  want_y=py+(1.0 if py>=float(wall.y) else -1.0)*top*0.47*delta   # walking into someone: ease around them instead of sticking
  var ny=clampf(want_y,515.0,585.0)
  if ny!=want_y or (not inside and blocked(px,ny)):
   vel.y=0.0
@@ -464,8 +482,8 @@ func advance_motion(move:Vector2, delta:float) -> void:
    ny=py
  py=ny
  # the camera leads in the walking direction and HOLDS that lead when the hero stops, so the street does not keep gliding across the screen while the hero stands still
- if absf(vel.x)>25.0:
-  lead=lerpf(lead,clampf(vel.x/SPEED,-1.0,1.0)*LOOK_AHEAD,1.0-exp(-delta*3.5))
+ if absf(vel.x)>top*0.08:
+  lead=lerpf(lead,clampf(vel.x/top,-1.0,1.0)*LOOK_AHEAD,1.0-exp(-delta*3.5))
 func spot_accent(id:String) -> Color:
  match id:
   "terminal","res_a","res_b","res_c": return Color("6fd7e4")

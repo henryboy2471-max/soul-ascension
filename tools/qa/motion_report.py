@@ -97,6 +97,16 @@ def headline(path):
  for seg in d["out"]:
   if seg["seg"] == "stop_and_go":
    tr = seg["tr"]; out["stop_and_go: animation switches (4 taps, ideal 8)"] = sum(1 for i in range(1, len(tr)) if tr[i][7] != tr[i - 1][7])
+ for seg in d["out"]:
+  if seg["seg"] == "travel" and len(seg["tr"]) > 10:
+   tr = seg["tr"]; t = 0.0; x0 = tr[0][2]; t400 = None; top = 0.0
+   for i in range(1, len(tr)):
+    t += tr[i][0] / 1000.0
+    if t400 is None and tr[i][2] - x0 >= 200: t400 = t
+    top = max(top, abs(tr[i][10]))
+   out["browser: world distance walked in 5 s of holding the key (px)"] = f"{tr[-1][2] - x0:.0f}"
+   out["browser: time to walk 200 px from rest (s)"] = f"{t400:.2f}" if t400 else "not reached"
+   out["browser: top velocity reported by the game (px/s)"] = f"{top:.0f}"
  out["console errors"] = len(d["msgs"])
  return out
 

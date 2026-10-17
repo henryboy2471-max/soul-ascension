@@ -85,15 +85,16 @@ func run() -> void:
    check(idle_range<0.01,tag+": an idle hero is perfectly still on screen (range %.3f px)" % idle_range)
    check(not ex.player.moving and ex.player.sprite!=null and ex.player.sprite.animation=="idle","%s: the hero is in the idle animation once stopped" % tag)
    # --- walking pace: a vertical walk is slower, the cycle slows with it
-   ex.py=520.0
-   ex.stick.direction=Vector2(0,1)
+   # --- walking pace: the cycle (authored for 300 px/s) plays at 30%, matching the 90 px/s the feet travel
+   ex.stick.direction=Vector2(1,0)
    var walked=0.0
-   for dt in dts(kind,40):
-    if walked>=0.14:
+   for dt in dts(kind,80):
+    if walked>=0.8:
      break
     tick(ex,dt)
     walked+=dt
-   check(absf(gait_of(ex.player)-0.55)<0.1 and absf(ex.player.sprite.speed_scale-gait_of(ex.player))<0.001 and ex.player.sprite.animation=="walk","%s: the walk cycle runs at the pace the feet travel (gait %.2f, speed scale %.2f)" % [tag,gait_of(ex.player),ex.player.sprite.speed_scale])
+   var g=gait_of(ex.player)
+   check(absf(g-ex.vel.length()/300.0)<0.01 and absf(g-0.3)<0.03 and absf(ex.player.sprite.speed_scale-g)<0.001 and ex.player.sprite.animation=="walk","%s: the walk cycle runs at the pace the feet travel (gait %.2f, speed scale %.2f)" % [tag,g,ex.player.sprite.speed_scale])
    ex.stick.direction=Vector2.ZERO
    for dt in dts(kind,60):
     tick(ex,dt)
@@ -104,7 +105,7 @@ func run() -> void:
     tick(ex,dt)
    var before=ex.px
    tick(ex,0.6)
-   check(absf(ex.px-before)<=300.0*0.1+0.5,"%s: a 600 ms hitch moves the hero at most one capped frame (0.1 s) (%.1f px)" % [tag,absf(ex.px-before)])
+   check(absf(ex.px-before)<=ex.top_speed()*0.1+0.5,"%s: a 600 ms hitch moves the hero at most one capped frame (0.1 s) (%.1f px)" % [tag,absf(ex.px-before)])
    ex.stick.direction=Vector2.ZERO
    # --- companion (Episode 3): reversing direction makes Mira glide, never swoop
    if ep3 and kind!="ragged":
@@ -121,7 +122,7 @@ func run() -> void:
      tick(ex2,dtv)
      maxv=maxf(maxv,absf(ex2.npc_x-prev_npc)/dtv)
      prev_npc=ex2.npc_x
-    check(maxv<=345.0+1.0,tag+": Mira's fastest move after a reversal is %.0f px/s (hero walks 300)" % maxv)
+    check(maxv<=ex2.top_speed()*1.15+1.0,tag+": Mira's fastest move after a reversal is %.0f px/s (hero walks 90)" % maxv)
     ex2.queue_free()
    ex.queue_free()
    await process_frame

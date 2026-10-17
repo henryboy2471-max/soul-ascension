@@ -32,6 +32,7 @@ async function walkScript(label, out) {
   await rec('idle_after_left', () => sleep(1500));
   await rec('diag_up_right', () => hold(['d', 'w'], 1800));
   await rec('diag_down_left', () => hold(['a', 's'], 1800));
+  await rec('travel', () => hold(['d'], 5000));   // 5 s of walking right: real distance covered per second
   await rec('stop_and_go', async () => { for (let i = 0; i < 4; i++) { await hold(['d'], 350); await sleep(250); } });
 }
 (async () => {

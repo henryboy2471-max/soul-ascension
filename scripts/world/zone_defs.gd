@@ -90,7 +90,7 @@ static func zones() -> Dictionary:
     {"id":"exit_arena","x":2500.0,"label":"GO  /  THE CENTRAL RELAY","kind":"talk","range":100.0,"visual":"exit","exit":{"to":"arena","spawn_x":170.0},"hidden":true}
    ]},
   "arena":{
-   "name":"CENTRAL RELAY TOWER  /  THE WARDEN'S CHAMBER","world_w":2400.0,"start_px":170.0,"interior":true,"objective":"Wake the three mechanisms in order","objective_x":330.0,
+   "name":"CENTRAL RELAY TOWER  /  THE WARDEN'S CHAMBER","world_w":2400.0,"walk_scale":1.0,"start_px":170.0,"interior":true,"objective":"Wake the three mechanisms in order","objective_x":330.0,
    "npcs":[{"id":"warden","x":1700.0,"hue":0.55,"tint":Color(0.35,0.5,0.72),"scale":1.7,"facing":-1}],
    "spots":[
     {"id":"exit_back","x":70.0,"label":"GO  /  BACK TO THE ARCHIVE GATE","kind":"talk","range":100.0,"visual":"exit","exit":{"to":"tower_3","spawn_x":2380.0}},
@@ -153,5 +153,8 @@ static func explore_config(id:String, art_script) -> Dictionary:
  for sp in z.spots:
   spots.append(sp)
   enabled[sp.id]=not bool(sp.get("hidden",false))   # hidden spots are switched on by the episode once their condition is met
- return {"world_w":float(z.world_w),"start_px":float(z.start_px),"art":art_script,"npcs":z.get("npcs",[]),"companion":true,"no_walkers":bool(z.get("interior",false)),
+ var cfg={"world_w":float(z.world_w),"start_px":float(z.start_px),"art":art_script,"npcs":z.get("npcs",[]),"companion":true,"no_walkers":bool(z.get("interior",false)),
   "walker_count":2,"spots":spots,"enabled":enabled}
+ if z.has("walk_scale"):
+  cfg.walk_scale=float(z.walk_scale)   # only the Warden chamber overrides the default exploration pace
+ return cfg
