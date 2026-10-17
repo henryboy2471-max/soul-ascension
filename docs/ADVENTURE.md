@@ -21,6 +21,9 @@ Soul Ascension is moving from a single arena fight to an episodic anime action-a
 - `scripts/story/dialogue_box.gd` - typewriter conversation UI (tap/Enter/Space/E/J, SKIP).
 - `scripts/story/title_card.gd` - cinematic cards.
 - `scripts/world/explore.gd` - walkable scene, interaction spots, objective HUD, waypoint, touch controls.
+  - Walking pace: `top_speed()` = `SPEED` (300, the original speed) x `walk_scale` (0.3 by default = 90 px/s; the Warden chamber zone sets `walk_scale: 1.0` because `WardenLogic` timing assumes 300). Ease-in 0.3 s / ease-out 0.25 s. Frame delta is capped at 0.1 s (`MAX_FRAME`). Camera: scenery on whole device pixels, characters at exact positions, look-ahead holds when the hero stops.
+  - Characters (`scripts/combat/fighter.gd`): in exploration `idle_hold` stands on ONE idle frame with a 1% eased breath, walk<->idle and turning dissolve over 0.12 s (`start_blend`); `calm` (reduced-motion setting) turns both off. `gait` scales the walk/run playback (`ANIM_REF` 170 px/s: an estimate; see docs/overnight/STABILITY_QA.md for why the walk art cannot plant its feet at any rate).
+  - Frames: the Hero's idle/walk and Mira's run come from `assets/characters/<name>/frames_aligned/` (pixel-exact shifted COPIES made by `tools/align_character_frames.py hero|mira`; originals untouched). Re-run the tool and `godot --headless --editor --import --quit` if the source frames change.
 - `scripts/world/world_art.gd` - procedural parallax layers, props, breach, rain, vignette.
 - `scripts/combat/battle.gd` - combat, boss intro, Phase 2.
 - `scripts/ui/main.gd` - screen router (`start_episode`, `start_battle(from_episode)`, `show_ending`, `show_result`).
