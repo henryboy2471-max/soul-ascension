@@ -248,8 +248,7 @@ func run() -> void:
  var px0=ex.px
  touch(1,true,Vector2(120,610))
  drag(1,Vector2(200,610),Vector2(80,0))
- for i in range(40):
-  await process_frame
+ await create_timer(1.0).timeout   # real time: the slowed pace covers ~70 px in a second
  check(ex.stick.direction.x>0.7 and ex.px>px0+20.0,"District: dragging the joystick right walks the Hero right")
  touch(1,false,Vector2(200,610))
  var pre_release=ex.px

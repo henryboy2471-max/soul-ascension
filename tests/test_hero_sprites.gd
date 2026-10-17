@@ -81,7 +81,7 @@ func run() -> void:
  await create_timer(0.3).timeout
  check(hero.current_anim=="walk" and not hero.sprite.flip_h,"Walking right plays walk facing right")
  ex.stick.direction=Vector2(-1,0)
- await create_timer(0.3).timeout
+ await create_timer(0.7).timeout   # turning around eases through a stop (about 0.6 s at the slowed pace)
  check(hero.current_anim=="walk" and hero.sprite.flip_h,"Walking left flips the sprite")
  ex.stick.direction=Vector2.ZERO
  await create_timer(0.3).timeout

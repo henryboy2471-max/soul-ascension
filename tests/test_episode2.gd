@@ -198,7 +198,7 @@ func run() -> void:
  ex.px=2300.0
  await process_frame
  ex.stick.direction=Vector2(1,0)
- await create_timer(1.0).timeout
+ await create_timer(2.0).timeout   # 90 px/s with a 0.3 s ease-in: ~165 px
  ex.stick.direction=Vector2.ZERO
  check(ex.px>2420.0,"With the roof open the Hero can walk past the gate")
  # Rain Array opens the breach (no combat)
@@ -265,7 +265,7 @@ func run() -> void:
  key(KEY_D,true)
  await create_timer(0.6).timeout
  key(KEY_D,false)
- check(ex.px-x0>120.0,"Keyboard: D walks the Hero right in the Lantern Quarter")
+ check(ex.px-x0>25.0,"Keyboard: D walks the Hero right in the Lantern Quarter")
  ex.px=470.0
  await process_frame
  await create_timer(0.6).timeout
@@ -282,7 +282,7 @@ func run() -> void:
  touch(1,true,Vector2(120,610))
  drag(1,Vector2(200,610))
  await create_timer(0.6).timeout
- check(ex.stick.direction.x>0.7 and ex.px-x0>100.0,"Touch: dragging the joystick walks the Hero right")
+ check(ex.stick.direction.x>0.7 and ex.px-x0>25.0,"Touch: dragging the joystick walks the Hero right")
  touch(1,false,Vector2(200,610))
  await process_frame
  ex.px=470.0
