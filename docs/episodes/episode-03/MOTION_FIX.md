@@ -33,6 +33,9 @@ Checked and **not** causes: walkers flipping direction at the world edges (they 
 
 Deterministic simulation (`tests/test_motion_smooth.gd`, 60 fps, 30 fps and ragged 30/20 fps, both episode scenes): 44 checks, 28 fail on `2d32183`, 0 fail now. Chart: `tools/qa/motion_chart.py`.
 
+## Regression runs on the final build (all green)
+Full suite 38/38 scripts, 0 failing (incl. `test_motion_smooth`, `test_explore_motion`, `test_release_gate`). Browser: Episode 3 end to end with keyboard at 667x375 (20/20 checks) and touch at 844x390 (20/20), save-reload QA at 1280x720 (26/26) and production at 844x390 touch (12/12), production-gate browser check (no QA hook), and the CI check that the production pck has no packed `scripts/qa/qa_hook` (passes). Zero console errors.
+
 ## What did NOT change (be careful with claims)
 - **Frame pacing / dropped frames: unchanged.** Interleaved before/after runs gave dropped-frame counts of 46 vs 31, 9 vs 17, 31 vs 15, 7 vs 7: noise. No code path that affects render cost was changed.
 - No single render hot spot exists (hiding layers, props, fighters, HUD, atmosphere each saved only a few ms); SwiftShader numbers do not represent a Chromebook GPU.
