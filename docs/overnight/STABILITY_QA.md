@@ -24,6 +24,16 @@ Noise floor (empty street patch, same video): about 1.0 deviation, 0.3 frame-to-
 ## Tests
 `tests/test_character_stability.gd` (56 checks: 30 s standing at 60 fps and ragged pacing in both scenes, smooth breath, walk -> stop -> idle, turning, conversation, aligned frames within 1 px). Full suite 40/40 scripts. Browser: Episode 1 (production export, real input) 12/12; Episode 3 keyboard 20/20; production gate checks pass. Walking in the browser: 90 px/s, pose held ~194 ms (5.3 fps = 189 ms).
 
+## Foot sliding: what the art allows (measured, overnight)
+- Tracking each foot in the aligned walk frames: the planted feet (bottom of the foot on the ground row) move only about 2-5 source px per frame relative to the body (back foot 59.5 -> 55.5 -> 55.0 -> 57.5, front foot 85.5 -> 86 -> 86 -> 84 across frames 1-4), i.e. the hero's 8-frame walk is a near-static foot pattern ("shuffle") with a ~30 px foot spacing.
+- To glue a planted foot to ground moving at 90 px/s at 5.3 fps the body-space foot travel would need to be about 9 source px per frame. It is about 2-5, so roughly 55-75% of the ground speed still shows as foot skate whatever the playback rate (a rate that would glue them, ~19 fps, would be a cartoonish rapid shuffle). Matching playback to the ground (done) and aligning the frames (done) remove the lurching and the timing mismatch, not this.
+- The real fix is art: a walk cycle whose planted feet travel about one step length (~36 source px) per half cycle. Not attempted (approved character art; needs your visual approval).
+- Correction to an earlier figure: the 170 px/s animation reference came from foot SPACING; the foot TRAVEL measurement above shows spacing was not a valid stand-in for stride. The playback rate (5.3 fps) is therefore a judgement call, not a measured match.
+
+## Other characters
+- Procedural NPCs (Anselm 4.1, Teo 2.8 deviation) stand as steadily as the sprite characters (2.6-3.3) in the same footage method; their slow +-2 px sine bob is smooth. No change.
+- Mira's run cycle slid her torso ~105 src px across the canvas and snapped back every loop: aligned on the torso (range now 0.8 px). Her run art also has little foot travel.
+
 ## Limits
 - Static-plus-breath idle is a QA solution. Mira's run cycle art still swings her torso about +-50 px against her feet.
 - Real Chromebook GPU frame pacing is unmeasured (F3 overlay in the QA build).
