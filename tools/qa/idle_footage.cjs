@@ -1,6 +1,6 @@
 // Stillness footage in Chromium against a "Web QA" export: the Hero (and Mira in Episode 3) stands still while the page is photographed repeatedly.
 // Writes <outdir>/<tag>_NN.png crops (hero, then companion) plus <tag>_stats.json, read by tools/qa/idle_report.py. Also records the engine's per-frame node positions (QA hook probe).
-// usage: PORT=8801 EP=1|3 SECS=30 node idle_footage.cjs <outdir> <tag> [w h]
+// usage: PORT=8801 EP=1|2|3 [DPR=2] [WALK=1|TRANS=1] [ZONE=station] SECS=30 node idle_footage.cjs <outdir> <tag> [w h]
 const { chromium } = require(process.env.PW || '/home/user/my-app/node_modules/@playwright/test');
 const fs = require('fs');
 const [,, OUT, TAG, WS = '640', HS = '360'] = process.argv; const W = +WS, H = +HS; const PORT = process.env.PORT || '8801'; const EP = process.env.EP || '3'; const SECS = +(process.env.SECS || 30);
@@ -11,7 +11,7 @@ async function waitFor(pred, t, st = 150) { const t0 = Date.now(); while (Date.n
 async function tapRect(b) { const p = G(b.x + b.w / 2, b.y + b.h / 2); await page.mouse.click(p.x, p.y); await sleep(80); }
 (async () => {
   const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--no-sandbox'] });
-  const ctx = await br.newContext({ viewport: { width: W, height: H }, recordVideo: { dir: OUT, size: { width: W, height: H } } });
+  const ctx = await br.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: +(process.env.DPR || 1), recordVideo: { dir: OUT, size: { width: W, height: H } } });
   page = await ctx.newPage();
   await page.goto(`http://localhost:${PORT}/index.html`); await waitFor(s => s.scene === 'home', 90000); await sleep(1200);
   let s = await S(); const b = s.buttons.find(x => x.text.startsWith('BEGIN YOUR')); if (b) { await tapRect(b); await sleep(2500); }
