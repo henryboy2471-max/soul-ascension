@@ -1,0 +1,61 @@
+{
+ "set": "echo_walk",
+ "canvas": [
+  272,
+  216
+ ],
+ "figure_height_src_px": 190,
+ "screen_scale": 0.9444,
+ "fps": 8,
+ "frames": 8,
+ "ground_speed_px_s": 90.0,
+ "planted_foot_travel_src_px_per_frame": 11.91,
+ "step_length_src_px": 47.65,
+ "cycle_seconds": 1.0,
+ "max_planted_foot_speed_error": 0.0,
+ "planted_segments_checked": 8,
+ "foot_x_from_pelvis_per_frame": {
+  "leg_A": [
+   23.8,
+   11.9,
+   0,
+   -11.9,
+   -23.8,
+   -11.9,
+   0,
+   11.9
+  ],
+  "leg_B": [
+   -23.8,
+   -11.9,
+   0,
+   11.9,
+   23.8,
+   11.9,
+   0,
+   -11.9
+  ]
+ },
+ "foot_lift_src_px_per_frame": {
+  "leg_A": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   6.0,
+   17.1,
+   7.7
+  ]
+ },
+ "pelvis_up_src_px": [
+  0.0,
+  -1.9,
+  0.0,
+  1.9,
+  0.0,
+  -1.9,
+  0.0,
+  1.9
+ ]
+}

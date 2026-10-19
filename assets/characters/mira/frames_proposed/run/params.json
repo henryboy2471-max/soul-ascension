@@ -1,0 +1,61 @@
+{
+ "set": "mira_run",
+ "canvas": [
+  258,
+  153
+ ],
+ "figure_height_src_px": 139,
+ "screen_scale": 1.2157,
+ "fps": 12,
+ "frames": 8,
+ "ground_speed_px_s": 300.0,
+ "planted_foot_travel_src_px_per_frame": 20.56,
+ "step_length_src_px": 41.13,
+ "cycle_seconds": 0.6666666666666666,
+ "max_planted_foot_speed_error": 0.0,
+ "planted_segments_checked": 2,
+ "foot_x_from_pelvis_per_frame": {
+  "leg_A": [
+   20.6,
+   0,
+   -20.6,
+   -47.3,
+   -28.8,
+   0,
+   28.8,
+   39.1
+  ],
+  "leg_B": [
+   -28.8,
+   0,
+   28.8,
+   39.1,
+   20.6,
+   0,
+   -20.6,
+   -47.3
+  ]
+ },
+ "foot_lift_src_px_per_frame": {
+  "leg_A": [
+   0.0,
+   0.0,
+   4.7,
+   27.2,
+   38.9,
+   29.2,
+   11.7,
+   3.1
+  ]
+ },
+ "pelvis_up_src_px": [
+  0.0,
+  -4.2,
+  0.0,
+  4.9,
+  0.0,
+  -4.2,
+  0.0,
+  4.9
+ ]
+}
