@@ -1,5 +1,7 @@
 # Echo V2 native art: specification, acceptance checklist and state replacement plan
 
+**Update (owner decisions):** warm brown eyes in every view; gold-banded ponytail consistent; scar position and bead count not invented (open, see `ECHO_V2_NATIVE_PRODUCTION_PACKAGE.md`); premium anime art direction, no pixel-art downgrade (resolves the style question in section C); the animation requirements in section D are superseded by `ECHO_V2_G4_GAME_CONTRACT.md`; the current in-game Echo stays until the complete V2 replacement is approved.
+
 Preparation only. Nothing here changes the playable game, the current QA build, the idle fix, the 90 px/s pace or any release gate. Companion: `ECHO_V2_NATIVE_AUDIT.md` (what the references do and do not show). No paid service is used or authorised.
 
 ## A. Native master specification (gate G2; numbers are the constants in `tools/check_hero_turnaround.py`)
