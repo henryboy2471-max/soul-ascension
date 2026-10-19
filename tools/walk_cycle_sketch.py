@@ -10,11 +10,13 @@ from PIL import Image, ImageDraw
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets", "characters")
 # screen_scale = world_height / canvas_height of the idle frame x the node scale 1.2 (scripts/combat/fighter.gd attach_frames, scripts/world/explore.gd).
 # Echo's idle canvas stays 108 high, so a 216-high walk canvas needs a per-animation scale of 0.5 when it is wired in (not done yet).
+# Echo V2 (owner-approved design authority, REVIEW-ONLY reference art): the ghost under Echo guides is its right-facing view fitted to the figure height. The in-game Echo sprites are the superseded old design.
+V2_SIDE = ("../approved_anime/review/echo_v2_review/round2_consistency_pass/echo_v2_r2_right_facing_360x887_REVIEW_ONLY.png", 0)
 SETS = {
     "echo_walk": dict(char="hero", anim="walk", canvas=(272, 216), fig=190, scale=170 / 108 * 1.2 * 0.5, fps=8, speed=90.0, kind="walk",
-                      old=("hero/frames_aligned", "walk", 5.3, 170 / 108 * 1.2), idle=("hero/frames/idle_00.png", 2)),
-    "echo_run": dict(char="hero", anim="run", canvas=(240, 108), fig=95, scale=170 / 108 * 1.2, fps=12, speed=300.0, kind="run",
-                     old=("hero/frames_aligned", "walk", 10.0, 170 / 108 * 1.2), idle=("hero/frames/idle_00.png", 1)),
+                      old=("hero/frames_aligned", "walk", 5.3, 170 / 108 * 1.2), idle=V2_SIDE),
+    "echo_run": dict(char="hero", anim="run", canvas=(480, 216), fig=190, scale=170 / 108 * 1.2 * 0.5, fps=12, speed=300.0, kind="run",
+                     old=("hero/frames_aligned", "walk", 10.0, 170 / 108 * 1.2), idle=V2_SIDE),
     "mira_walk": dict(char="mira", anim="walk", canvas=(258, 153), fig=139, scale=155 / 153 * 1.2, fps=8, speed=90.0, kind="walk",
                       old=("mira/frames_aligned", "run", 7.4, 155 / 153 * 1.2), idle=("mira/frames/idle_00.png", 1)),
     "mira_run": dict(char="mira", anim="run", canvas=(258, 153), fig=139, scale=155 / 153 * 1.2, fps=12, speed=300.0, kind="run",
@@ -84,7 +86,9 @@ def draw_pose(d, s, i, k=1.0, ox=0, oy=0):
 
 def idle_ghost(s):
     path, up = s["idle"]; im = Image.open(os.path.join(ROOT, path)).convert("RGBA"); W, H = s["canvas"]
-    if up != 1: im = im.resize((im.width * up, im.height * up), Image.NEAREST)
+    if up == 0:   # fit a reference figure to the guide's figure height
+        im = im.crop(im.getchannel("A").point(lambda v: 255 if v > 24 else 0).getbbox()); k = s["fig"] / im.height; im = im.resize((max(1, round(im.width * k)), s["fig"]), Image.LANCZOS)
+    elif up != 1: im = im.resize((im.width * up, im.height * up), Image.NEAREST)
     g = Image.new("RGBA", (W, H), (0, 0, 0, 0)); g.alpha_composite(im, ((W - im.width) // 2, H - im.height))
     g.putalpha(g.getchannel("A").point(lambda v: int(v * 0.28))); return g
 
@@ -147,7 +151,7 @@ def build(key):
     compare_gif(os.path.join(out, f"compare_{int(s['speed'])}pxs.gif"), s, [sketch_frame(s, i, ghost, False) for i in range(8)])
     err, nseg = validate(s); p = per_frame_travel(s)
     params = dict(set=key, canvas=s["canvas"], figure_height_src_px=s["fig"], screen_scale=round(s["scale"], 4), fps=s["fps"], frames=8, ground_speed_px_s=s["speed"],
-                  planted_foot_travel_src_px_per_frame=round(p, 2), step_length_src_px=round(p * (4 if s["kind"] == "walk" else 2), 2), cycle_seconds=8 / s["fps"],
+                  planted_foot_travel_src_px_per_frame=round(p, 2), step_length_src_px=round(p * 4, 2), cycle_seconds=8 / s["fps"],
                   max_planted_foot_speed_error=err, planted_segments_checked=nseg,
                   foot_x_from_pelvis_per_frame={"leg_A": [round(leg_targets(s, i)[0], 1) for i in range(8)], "leg_B": [round(leg_targets(s, i + 4)[0], 1) for i in range(8)]},
                   foot_lift_src_px_per_frame={"leg_A": [round(leg_targets(s, i)[1], 1) for i in range(8)]},

@@ -1,0 +1,63 @@
+{
+ "set": "mira_run",
+ "note": "originals are referenced, never copied or edited",
+ "palette_source": "assets/characters/mira/frames/idle_00.png",
+ "palette": [
+  "#260f1e",
+  "#442438",
+  "#0b0209",
+  "#99585b",
+  "#793274",
+  "#190e13",
+  "#351430",
+  "#ecc7d7",
+  "#130610",
+  "#4e1665",
+  "#cf93a4",
+  "#622a66"
+ ],
+ "references": [
+  {
+   "path": "assets/_incoming/mira/mira_sprite_sheet.png",
+   "role": "approved original sprite sheet (idle 16, run 15, dash 6 cells; 1774x887 total, so a cell is low resolution)",
+   "status": "approved in-game source",
+   "exists": true,
+   "sha256": "062f09dfc15709bd084c02673297631ebd4a871f1b89a3a5e362924ef55b0da4"
+  },
+  {
+   "path": "assets/characters/mira/frames/idle_00.png",
+   "role": "approved upright standing pose (258x153 canvas, feet on the bottom row)",
+   "status": "approved in-game frame",
+   "exists": true,
+   "sha256": "92237eb02d033bac44a42b54e6ee044172c2c1b85d59d7d1da33c76eaa7e6496"
+  },
+  {
+   "path": "assets/characters/mira/frames/run_00.png",
+   "role": "approved run pose (note: leaned forward, unlike her idle)",
+   "status": "approved in-game frame",
+   "exists": true,
+   "sha256": "d9a9efd472e0d1287607a1187260fff218ee47c2f6e84d3936b07a8374efce2a"
+  },
+  {
+   "path": "assets/characters/mira/frames/run_07.png",
+   "role": "approved run pose, mid-cycle",
+   "status": "approved in-game frame",
+   "exists": true,
+   "sha256": "b7555bc3eca612f33e95a12a230bc05aa5afc0d92a4c442cd6edc499331700c2"
+  },
+  {
+   "path": "assets/characters/mira/frames/dash_00.png",
+   "role": "approved dash pose (cape and coat motion reference)",
+   "status": "approved in-game frame",
+   "exists": true,
+   "sha256": "1f719a032ea678f4ed00aea8adb40164c0c0e9f663964922f15bfbf5a4802a93"
+  },
+  {
+   "path": "assets/approved_anime/reference/02_cast_portrait_montage_2x2.png",
+   "role": "cast montage; [Unverified] whether it contains Mira",
+   "status": "reference, character assignment unconfirmed",
+   "exists": true,
+   "sha256": "6f77b7333d57bac1d5d98de5c2cb508fbc8697c6fc3f059900db37237c526a52"
+  }
+ ]
+}

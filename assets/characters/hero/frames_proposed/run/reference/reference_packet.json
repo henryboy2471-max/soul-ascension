@@ -1,0 +1,63 @@
+{
+ "set": "echo_run",
+ "note": "originals are referenced, never copied or edited",
+ "palette_source": "assets/approved_anime/review/echo_v2_review/round2_consistency_pass/echo_v2_r2_right_facing_360x887_REVIEW_ONLY.png",
+ "palette": [
+  "#34302f",
+  "#242020",
+  "#0a0505",
+  "#1a1515",
+  "#c70614",
+  "#131010",
+  "#70060b",
+  "#f4081c",
+  "#db964d",
+  "#47332e",
+  "#794a33",
+  "#3d2725"
+ ],
+ "references": [
+  {
+   "path": "assets/approved_anime/review/echo_v2_review/round2_consistency_pass/echo_v2_r2_right_facing_360x887_REVIEW_ONLY.png",
+   "role": "primary side reference (the walk/run is drawn facing right)",
+   "status": "REVIEW ONLY; soft alpha; cropped at left/right edges",
+   "exists": true,
+   "sha256": "cdfbbb77bf710a9e2ed49985924a0928aed136a50b6afd5594c29a800a108ee5"
+  },
+  {
+   "path": "assets/approved_anime/review/echo_v2_review/round2_consistency_pass/echo_v2_r2_left_facing_434x887_REVIEW_ONLY.png",
+   "role": "far-side arm/leg and left-forearm band check",
+   "status": "REVIEW ONLY",
+   "exists": true,
+   "sha256": "47a1e3cb49c8521d704904367c481121d9d267407b8818e57d7412592c68780b"
+  },
+  {
+   "path": "assets/approved_anime/review/echo_v2_review/round2_consistency_pass/echo_v2_r2_front_530x887_REVIEW_ONLY.webp",
+   "role": "front: costume, chain/pendant, brow mark; ponytail not clearly visible",
+   "status": "REVIEW ONLY",
+   "exists": true,
+   "sha256": "8ed9a3cc9bf3ef1a54c5dd06ab51aff0dcfdff29637b5432d8a67d58f50a5fce"
+  },
+  {
+   "path": "assets/approved_anime/review/echo_v2_review/round2_consistency_pass/echo_v2_r2_back_450x887_REVIEW_ONLY.png",
+   "role": "back: winged-diamond emblem, ponytail, rear vent lining (cape motion)",
+   "status": "REVIEW ONLY",
+   "exists": true,
+   "sha256": "978ff254a738cf5f5a32cacf05ecb6f90c2a9e25be34ea43d29a19cdac5d4e39"
+  },
+  {
+   "path": "assets/approved_anime/review/echo_v2_review/echo_v2_four_view_composite_1774x887_REVIEW_ONLY.webp",
+   "role": "all four views from one generation (round 1)",
+   "status": "REVIEW ONLY; superseded in detail by round 2",
+   "exists": true,
+   "sha256": "66962c19d25c5e65e1e501276322a633eb316d97c3abc4701e5b93957b2e3adb"
+  },
+  {
+   "path": "docs/demo25d/phase2/ECHO_V2_DESIGN_AUTHORITY.md",
+   "role": "written appearance lock and consistency rules",
+   "status": "authoritative text",
+   "exists": true,
+   "sha256": "05996d6965f4a5594c6c12e80819a9753a8750491954a5224d9f3d13f1a75d10"
+  }
+ ]
+}

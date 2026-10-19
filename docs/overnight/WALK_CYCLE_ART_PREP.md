@@ -1,5 +1,7 @@
 # Walk / run cycle art preparation (owner decisions applied; nothing wired into the game)
 
+**Update (final-art preparation):** Echo's run canvas is now 480x216 (owner decision); the 240x108 numbers further down are superseded by the row below and by `FINAL_ART_PREP.md`.
+
 Supersedes the numbers in `WALK_CYCLE_FRAME_SPEC.md` where they differ (that table assumed Echo's 136x108 canvas). Regenerate everything with `python3 tools/walk_cycle_sketch.py`.
 
 ## Facts read from the code (this turn)
@@ -10,7 +12,7 @@ Supersedes the numbers in `WALK_CYCLE_FRAME_SPEC.md` where they differ (that tab
 | set | canvas | fps | speed | planted travel / frame | step | cycle |
 |---|---|---|---|---|---|---|
 | Echo walk | 272x216 | 8 | 90 | **11.91** | 47.6 | 1.00 s |
-| Echo Warden run | 240x108 | 12 | 300 | **13.24** | 52.9 | 0.67 s |
+| Echo Warden run (REVISED: 480x216, matches the walk's pixel density) | 480x216 | 12 | 300 | **26.47** | 105.9 | 0.67 s |
 | Mira walk | 258x153 | 8 | 90 | **9.25** | 37.0 | 1.00 s |
 | Mira run (Warden chamber) | 258x153 | 12 | 300 | **20.56** | 82.2 | 0.67 s |
 Run cycles: contact on frames 1 and 5, mid-stance 2 and 6, AIR on 3-4 and 7-8 (both feet off the ground in two of every four frames), torso lean about 10 degrees, hardest pelvis drop in mid-stance (about 6% of leg length), rise in flight.

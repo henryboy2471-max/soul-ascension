@@ -10,7 +10,7 @@
  "frames": 8,
  "ground_speed_px_s": 300.0,
  "planted_foot_travel_src_px_per_frame": 20.56,
- "step_length_src_px": 41.13,
+ "step_length_src_px": 82.26,
  "cycle_seconds": 0.6666666666666666,
  "max_planted_foot_speed_error": 0.0,
  "planted_segments_checked": 2,
