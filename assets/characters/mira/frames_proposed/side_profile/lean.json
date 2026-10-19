@@ -1,0 +1,187 @@
+[
+ {
+  "anim": "idle",
+  "file": "idle_00.png",
+  "lean": 0.002
+ },
+ {
+  "anim": "idle",
+  "file": "idle_01.png",
+  "lean": 0.007
+ },
+ {
+  "anim": "idle",
+  "file": "idle_02.png",
+  "lean": 0.011
+ },
+ {
+  "anim": "idle",
+  "file": "idle_03.png",
+  "lean": 0.005
+ },
+ {
+  "anim": "idle",
+  "file": "idle_04.png",
+  "lean": 0.004
+ },
+ {
+  "anim": "idle",
+  "file": "idle_05.png",
+  "lean": 0.025
+ },
+ {
+  "anim": "idle",
+  "file": "idle_06.png",
+  "lean": 0.012
+ },
+ {
+  "anim": "idle",
+  "file": "idle_07.png",
+  "lean": 0.003
+ },
+ {
+  "anim": "idle",
+  "file": "idle_08.png",
+  "lean": -0.011
+ },
+ {
+  "anim": "idle",
+  "file": "idle_09.png",
+  "lean": -0.022
+ },
+ {
+  "anim": "idle",
+  "file": "idle_10.png",
+  "lean": -0.016
+ },
+ {
+  "anim": "idle",
+  "file": "idle_11.png",
+  "lean": -0.014
+ },
+ {
+  "anim": "idle",
+  "file": "idle_12.png",
+  "lean": -0.001
+ },
+ {
+  "anim": "idle",
+  "file": "idle_13.png",
+  "lean": -0.014
+ },
+ {
+  "anim": "idle",
+  "file": "idle_14.png",
+  "lean": -0.009
+ },
+ {
+  "anim": "idle",
+  "file": "idle_15.png",
+  "lean": 0.001
+ },
+ {
+  "anim": "run",
+  "file": "run_00.png",
+  "lean": 0.142
+ },
+ {
+  "anim": "run",
+  "file": "run_01.png",
+  "lean": 0.18
+ },
+ {
+  "anim": "run",
+  "file": "run_02.png",
+  "lean": 0.188
+ },
+ {
+  "anim": "run",
+  "file": "run_03.png",
+  "lean": 0.18
+ },
+ {
+  "anim": "run",
+  "file": "run_04.png",
+  "lean": 0.184
+ },
+ {
+  "anim": "run",
+  "file": "run_05.png",
+  "lean": 0.192
+ },
+ {
+  "anim": "run",
+  "file": "run_06.png",
+  "lean": 0.28
+ },
+ {
+  "anim": "run",
+  "file": "run_07.png",
+  "lean": 0.263
+ },
+ {
+  "anim": "run",
+  "file": "run_08.png",
+  "lean": 0.308
+ },
+ {
+  "anim": "run",
+  "file": "run_09.png",
+  "lean": 0.243
+ },
+ {
+  "anim": "run",
+  "file": "run_10.png",
+  "lean": 0.349
+ },
+ {
+  "anim": "run",
+  "file": "run_11.png",
+  "lean": 0.185
+ },
+ {
+  "anim": "run",
+  "file": "run_12.png",
+  "lean": 0.182
+ },
+ {
+  "anim": "run",
+  "file": "run_13.png",
+  "lean": 0.168
+ },
+ {
+  "anim": "run",
+  "file": "run_14.png",
+  "lean": 0.074
+ },
+ {
+  "anim": "dash",
+  "file": "dash_00.png",
+  "lean": 0.31
+ },
+ {
+  "anim": "dash",
+  "file": "dash_01.png",
+  "lean": 0.397
+ },
+ {
+  "anim": "dash",
+  "file": "dash_02.png",
+  "lean": 0.364
+ },
+ {
+  "anim": "dash",
+  "file": "dash_03.png",
+  "lean": 0.426
+ },
+ {
+  "anim": "dash",
+  "file": "dash_04.png",
+  "lean": 0.242
+ },
+ {
+  "anim": "dash",
+  "file": "dash_05.png",
+  "lean": 0.272
+ }
+]
