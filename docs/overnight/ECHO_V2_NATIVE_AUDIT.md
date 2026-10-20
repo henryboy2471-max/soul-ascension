@@ -1,5 +1,7 @@
 # Echo V2 reference audit (round-2 views) against the G2/G4 requirements
 
+> **Update:** the native master canvas is now **1280x2304** (owner decision, foot midpoint x=640). Figures below that say 1152 and 576 describe the checker as audited at the time; see `ECHO_V2_G2_1280_AUDIT.md` for the revised constants and tests.
+
 Read: `ECHO_V2_DESIGN_AUTHORITY.md`, `ECHO_V2_FRONT_PRODUCTION_READINESS_REPORT.md`, `HERO_PRODUCTION_DELIVERABLES_CHECKLIST.md`, `ARTWORK_VALIDATION_CHECKLIST.md`, `tools/check_hero_turnaround.py` (G2 constants), `tools/validate_approved_art.py` (G4). Views audited: `assets/approved_anime/review/echo_v2_review/round2_consistency_pass/` front 530x887, back 450x887, left-facing 434x887, right-facing 360x887. Visual notes come from crops up to 8x of these 887 px sources, so fine detail is at the limit of what the pixels hold; where I could not see something I say so. Nothing was generated, enlarged or edited, and no paid service was used.
 
 ## 1. Structural result against G2 (`tools/check_hero_turnaround.py`, run on temporary copies renamed as the native views)

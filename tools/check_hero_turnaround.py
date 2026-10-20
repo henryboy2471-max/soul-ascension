@@ -9,10 +9,11 @@ import argparse
 from pathlib import Path
 from PIL import Image, ImageOps
 
-W, H = 1152, 2304
+W, H = 1152, 2304   # DEFAULT profile "legacy"; `--profile 1280` selects the owner-approved wider master (1280x2304, foot midpoint x=640). Every other limit is identical in both profiles.
+PROFILES = {"legacy": (1152, 576), "1280": (1280, 640)}   # canvas width, planted-foot midpoint x
 FIG_H, HEAD_TOP, BASELINE = 2000, 176, 2176
 TOL_TOP, TOL_BASE, MARGIN = 12, 8, 24  # side/top margin 48 -> 24 px: owner-approved (front at 2000 px is ~1095 px wide on a 1152 canvas)
-FOOT_MID_X, FOOT_TOL = 576, 90
+FOOT_MID_X, FOOT_TOL = 576, 90   # set from the profile in main()
 OPAQUE_MIN, SOFT_MAX = 0.90, 0.08
 VIEWS = ("front", "right", "back", "left")
 SHEETS = ("hero_face_detail_sheet.png", "hero_costume_detail_sheet.png")
@@ -71,8 +72,9 @@ def check_view(path: Path, view: str):
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(); ap.add_argument("--dir", type=Path, default=Path("assets/approved_anime/source/hero"))
-    d = ap.parse_args().dir
+    global W, FOOT_MID_X
+    ap = argparse.ArgumentParser(); ap.add_argument("--dir", type=Path, default=Path("assets/approved_anime/source/hero")); ap.add_argument("--profile", choices=sorted(PROFILES), default="legacy")
+    args = ap.parse_args(); d = args.dir; W, FOOT_MID_X = PROFILES[args.profile]
     problems, loaded = [], {}
     for v in VIEWS:
         iss, res = check_view(d / f"hero_turnaround_{v}_native.png", v)

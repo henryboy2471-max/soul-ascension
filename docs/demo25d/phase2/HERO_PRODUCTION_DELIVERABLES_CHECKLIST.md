@@ -1,3 +1,5 @@
+> **CANVAS UPDATE (owner decision):** the G2 native turnaround canvas is **1280 x 2304** with the foot midpoint at x=640 (figure 2000 px, head top y=176, soles y=2176, 24 px margin unchanged). Read every "1152" in this document as 1280 and "x=576" as x=640. `tools/check_hero_turnaround.py --profile 1280` checks it; the default profile and the G4 contract below are unchanged until separately approved. See `docs/overnight/ECHO_V2_G2_1280_AUDIT.md`.
+
 # Hero production deliverables checklist (authoritative design reference: **Echo V2**, `assets/approved_anime/review/echo_v2_review/` — REVIEW ONLY; see `ECHO_V2_DESIGN_AUTHORITY.md`)
 
 > **DESIGN AUTHORITY UPDATE:** Echo V2 is now the official protagonist design (`ECHO_V2_DESIGN_AUTHORITY.md`). Everything in this document describing Hero pack v2, the preview candidate, reference 01 or the white-twist Echo is **SUPERSEDED FOR ECHO** and kept only as a historical record.

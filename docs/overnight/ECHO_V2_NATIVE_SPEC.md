@@ -8,8 +8,8 @@ Preparation only. Nothing here changes the playable game, the current QA build, 
 | item | requirement |
 |---|---|
 | Files | `assets/approved_anime/source/hero/hero_turnaround_{front,right,back,left}_native.png`, plus `hero_face_detail_sheet.png`, `hero_costume_detail_sheet.png`, `PROVENANCE.md` (optional matte-green copies) |
-| Canvas | exactly **1152 x 2304**, PNG RGBA, straight alpha, rendered or painted natively (never enlarged from a smaller image) |
-| Figure | **2000 px** tall (+/-30), head top y = **176** (+/-12), planted soles y = **2176** (+/-8), planted-foot midpoint x = **576** (+/-90) |
+| Canvas | exactly **1280 x 2304** (owner decision: widened from 1152 because the front coat flare is about 1194 px wide at the 2000 px figure height; figure centre and foot midpoint x=640) , PNG RGBA, straight alpha, rendered or painted natively (never enlarged from a smaller image) |
+| Figure | **2000 px** tall (+/-30), head top y = **176** (+/-12), planted soles y = **2176** (+/-8), planted-foot midpoint x = **640** (+/-90) |
 | Margin | at least **24 px** transparent on every side (the coat flare, hem, ponytail and locs must not be clipped) |
 | Alpha | corners transparent; at least **90%** of silhouette pixels fully opaque; at most **8%** soft pixels; no #00FF00 key colour, halo, fringe, baked shadow or reflection |
 | Views | front, right (faces screen-right), back, left (genuinely drawn, not a mirror of right); figure heights within 20 px of each other; identical scale, costume, skin tone, eye colour, hair and ponytail length across views |

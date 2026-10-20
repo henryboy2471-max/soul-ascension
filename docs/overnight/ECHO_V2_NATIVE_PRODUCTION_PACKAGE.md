@@ -1,6 +1,6 @@
 # Echo V2 native art: production checklist and reference package
 
-Decisions applied: warm brown eyes in every view; the approved gold-banded ponytail kept consistent; scar position and bead count NOT invented (flagged); native 1152x2304 views; premium anime art direction (no pixel art); current in-game Echo kept until the complete V2 replacement is approved. Specification: `ECHO_V2_NATIVE_SPEC.md`; audit: `ECHO_V2_NATIVE_AUDIT.md`; animation contract: `ECHO_V2_G4_GAME_CONTRACT.md`. Nothing here is wired into the game, no image service is purchased, and no gate is bypassed.
+Decisions applied: warm brown eyes in every view; the approved gold-banded ponytail kept consistent; scar position and bead count NOT invented (flagged); native 1280x2304 views; premium anime art direction (no pixel art); current in-game Echo kept until the complete V2 replacement is approved. Specification: `ECHO_V2_NATIVE_SPEC.md`; audit: `ECHO_V2_NATIVE_AUDIT.md`; animation contract: `ECHO_V2_G4_GAME_CONTRACT.md`. Nothing here is wired into the game, no image service is purchased, and no gate is bypassed.
 
 ## 1. Reference package (give these to the artist or generator)
 | file | role |
@@ -22,7 +22,7 @@ The owner can mark answers directly on `confirmation_sheet.png`.
 
 ## 3. Production checklist (in order; each line is a gate)
 1. [ ] Owner answers: scar (yes/no and exact description), canonical bead count and placement.
-2. [ ] Four native 1152x2304 views, one image per view, same scale (figure 2000 px, head top y=176, soles y=2176, foot midpoint x=576), 24 px margin, transparent background; right view faces screen-right; left view genuinely drawn.
+2. [ ] Four native 1280x2304 views, one image per view, same scale (figure 2000 px, head top y=176, soles y=2176, foot midpoint x=640), 24 px margin, transparent background; right view faces screen-right; left view genuinely drawn.
 3. [ ] Every view: warm brown eyes with amber highlights; gold-banded ponytail identifiable in the front too; left-forearm band on every view where that arm shows, absent on the right forearm; no scar or beads beyond what the owner specified.
 4. [ ] Face detail sheet and costume detail sheet (long side at least 2048); `PROVENANCE.md` (tool, date, prompts, seeds, edits; `source: native` or disclosed `assisted-native`).
 5. [ ] `python3 tools/check_hero_turnaround.py` STRUCTURAL PASS on the genuine files (never on references), then the owner's visual approval of the four views (G2).

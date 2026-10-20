@@ -1,10 +1,13 @@
 # Echo V2 native FRONT view: painting brief (no art exists yet)
 
-Status: NOT PRODUCED. A faithful native 1152x2304 front view cannot be made by enlarging the 530x887 reference (the pixels do not exist; the reference also has a clipped hem, soft edges, an invisible ponytail and a front eye reading wrong), and I cannot paint it. This folder holds the template for the person who will. References are ONLY the approved round-2 views and `ECHO_V2_DESIGN_AUTHORITY.md`. The navy-and-gold image the owner rejected is not a reference (see `docs/overnight/ECHO_V2_REJECTED_REFERENCES.md`).
+Status: NOT PRODUCED. A faithful native 1280x2304 front view cannot be made by enlarging the 530x887 reference (the pixels do not exist; the reference also has a clipped hem, soft edges, an invisible ponytail and a front eye reading wrong), and I cannot paint it. This folder holds the template for the person who will. References are ONLY the approved round-2 views and `ECHO_V2_DESIGN_AUTHORITY.md`. The navy-and-gold image the owner rejected is not a reference (see `docs/overnight/ECHO_V2_REJECTED_REFERENCES.md`).
 
-Files: `front_template_guides.png` (guide lines: head top y=176, soles y=2176, foot midpoint x=576, 24 px margin) and `front_UNDERLAY_NOT_ART.png` (the approved front reference scaled to the 2000 px figure box at 50% opacity, for painting over on a layer below the linework). Rebuild: `python3 tools/make_echo_v2_front_template.py`.
+Files: `front_template_guides.png` (guide lines: head top y=176, soles y=2176, foot midpoint x=640, 24 px margin) and `front_UNDERLAY_NOT_ART.png` (the approved front reference scaled to the 2000 px figure box at 50% opacity, for painting over on a layer below the linework). Rebuild all four views' templates: `python3 tools/make_echo_v2_front_template.py` (the same brief applies to the right, back and left folders; each view has its own guides and underlay).
 
-## Width problem to decide before painting
+## Canvas (decided: 1280x2304, figure centre and foot midpoint x=640)
+Owner Option 1 applied: all four views use a 1280x2304 canvas. See `../silhouette_report_1280.json` and `docs/overnight/ECHO_V2_G2_1280_AUDIT.md` for the remaining margin spare per view. Superseded text kept below for history.
+
+## (superseded) Width problem
 Scaled to the required 2000 px height, the approved front figure is about **1194 px wide** (the coat flare), wider than the 1152 px canvas and beyond the 24 px margin limit (1104 px usable), and the reference hem is already clipped on the right, so the true width is larger. Options (owner decision; I changed no gate): (a) widen the front (ideally all four views) canvas, for example to 1280x2304, and update the G2 constants; (b) keep 1152 and paint all four views at a smaller figure height of about 1840 px, relaxing the 2000 +/-30 rule; (c) draw a narrower coat flare (a design adjustment that needs your approval). Until you choose, no front view can pass G2 as specified.
 
 ## What the front view must contain (from the locked design)

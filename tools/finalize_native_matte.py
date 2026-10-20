@@ -7,9 +7,10 @@ or that would clip, so a smaller image can never be 'finished' into native art. 
 import argparse, sys
 import numpy as np
 from PIL import Image
-W, H, BASE, FIG = 1152, 2304, 2176, 2000
+W, H, BASE, FIG = 1152, 2304, 2176, 2000   # DEFAULT unchanged; `--width 1280` selects the owner-approved wider master (foot midpoint x=640)
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("inp"); ap.add_argument("out"); ap.add_argument("--clamp", type=int, default=250); a = ap.parse_args()
+    ap = argparse.ArgumentParser(); ap.add_argument("inp"); ap.add_argument("out"); ap.add_argument("--clamp", type=int, default=250); ap.add_argument("--width", type=int, choices=(1152, 1280), default=1152); a = ap.parse_args()
+    global W; W = a.width
     im = Image.open(a.inp).convert("RGBA"); arr = np.array(im); al = arr[:, :, 3]
     bb = Image.fromarray(((al > 16) * 255).astype("uint8")).getbbox()
     if bb is None: print("REFUSED: empty image"); return 1

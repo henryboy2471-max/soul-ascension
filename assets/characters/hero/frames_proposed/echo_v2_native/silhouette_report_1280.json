@@ -1,0 +1,44 @@
+{
+ "front": {
+  "scaled_width": 1194,
+  "left": 27,
+  "right": 1221,
+  "spare_left": 3,
+  "spare_right": 35,
+  "reference_edges_touched": [
+   "right"
+  ]
+ },
+ "right": {
+  "scaled_width": 831,
+  "left": 151,
+  "right": 982,
+  "spare_left": 127,
+  "spare_right": 274,
+  "reference_edges_touched": [
+   "left",
+   "right"
+  ]
+ },
+ "back": {
+  "scaled_width": 1044,
+  "left": 102,
+  "right": 1146,
+  "spare_left": 78,
+  "spare_right": 110,
+  "reference_edges_touched": [
+   "left",
+   "right"
+  ]
+ },
+ "left": {
+  "scaled_width": 990,
+  "left": 116,
+  "right": 1106,
+  "spare_left": 92,
+  "spare_right": 150,
+  "reference_edges_touched": [
+   "left"
+  ]
+ }
+}

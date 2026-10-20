@@ -4,12 +4,12 @@ import shutil, subprocess, sys, tempfile
 from pathlib import Path
 from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parent.parent
-def fig(offset=0, w=380):
-    im = Image.new("RGBA", (1152, 2304), (0, 0, 0, 0))
-    ImageDraw.Draw(im).rectangle([576 - w // 2 + offset, 176, 576 + w // 2 + offset, 2176], fill=(90, 70, 40, 255))
+def fig(offset=0, w=380, cw=1152):
+    im = Image.new("RGBA", (cw, 2304), (0, 0, 0, 0)); c = cw // 2
+    ImageDraw.Draw(im).rectangle([c - w // 2 + offset, 176, c + w // 2 + offset, 2176], fill=(90, 70, 40, 255))
     return im
-def run(d):
-    r = subprocess.run([sys.executable, str(ROOT / "tools/check_hero_turnaround.py"), "--dir", str(d)], capture_output=True, text=True)
+def run(d, *extra):
+    r = subprocess.run([sys.executable, str(ROOT / "tools/check_hero_turnaround.py"), "--dir", str(d), *extra], capture_output=True, text=True)
     return r.returncode, r.stdout
 def main():
     bad = 0
@@ -32,6 +32,28 @@ def main():
         rc, out = run(t); expect("23 px side margin is rejected", rc == 1 and "within 24px of the canvas edge" in out)
         fig().save(t / "hero_turnaround_front_native.png"); (t / "hero_face_detail_sheet.png").unlink()
         rc, out = run(t); expect("missing detail sheet is rejected", rc == 1 and "hero_face_detail_sheet" in out)
+    finally:
+        shutil.rmtree(t, ignore_errors=True)
+    # ---- the owner-approved 1280x2304 profile (opt-in; the default profile above is unchanged)
+    t = Path(tempfile.mkdtemp())
+    try:
+        P = ("--profile", "1280")
+        for i, v in enumerate(("front", "right", "back", "left")):
+            fig(offset=i * 3, w=380 + i * 10, cw=1280).save(t / f"hero_turnaround_{v}_native.png")
+        for s in ("hero_face_detail_sheet.png", "hero_costume_detail_sheet.png"):
+            Image.new("RGB", (2048, 1024), (20, 20, 20)).save(t / s)
+        rc, out = run(t, *P); expect("1280 profile: conformant 1280x2304 set passes", rc == 0)
+        rc, out = run(t); expect("default profile still rejects 1280-wide files (gate not loosened)", rc == 1 and "must be exactly 1152x2304" in out)
+        fig(cw=1152).save(t / "hero_turnaround_front_native.png")
+        rc, out = run(t, *P); expect("1280 profile rejects a 1152-wide file", rc == 1 and "must be exactly 1280x2304" in out)
+        fig(w=1230, cw=1280).save(t / "hero_turnaround_front_native.png")
+        rc, out = run(t, *P); expect("1280 profile: figure with exactly 24 px side margins passes (same geometry as the legacy 1102 px case)", rc == 0)
+        fig(w=1234, cw=1280).save(t / "hero_turnaround_front_native.png")
+        rc, out = run(t, *P); expect("1280 profile: figure with 23 px side margins is rejected", rc == 1 and "within 24px of the canvas edge" in out)
+        fig(offset=200, w=400, cw=1280).save(t / "hero_turnaround_front_native.png")
+        rc, out = run(t, *P); expect("1280 profile: feet 200 px off x=640 are rejected", rc == 1 and "foot" in out)
+        fig(offset=-64, w=400, cw=1280).save(t / "hero_turnaround_front_native.png")
+        rc, out = run(t, *P); expect("1280 profile: feet at x=576 (64 px off, inside the 90 px tolerance) still pass the foot check", "foot" not in out)
     finally:
         shutil.rmtree(t, ignore_errors=True)
     rc, out = run(ROOT / "assets/approved_anime/source/hero")
