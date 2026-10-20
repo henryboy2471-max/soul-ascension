@@ -20,8 +20,11 @@ func _input(event:InputEvent) -> void:
    base=global_position+size/2
  if event is InputEventScreenDrag and event.index==finger:
   update_direction(event.position)
+const DEAD=0.12   # a resting thumb jitters a few pixels: ignore the first 12% of the travel so the hero does not creep, and rescale so full travel is still 1.0
 func update_direction(point:Vector2) -> void:
- direction=((point-base)/60.0).limit_length()
+ var raw=((point-base)/60.0).limit_length()
+ var m=raw.length()
+ direction=Vector2.ZERO if m<=DEAD else raw/m*((m-DEAD)/(1.0-DEAD))
 func _notification(what:int) -> void:
  if what==NOTIFICATION_APPLICATION_FOCUS_OUT:
   finger=-1
