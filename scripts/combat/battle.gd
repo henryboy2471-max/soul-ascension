@@ -670,6 +670,10 @@ func act(kind:String) -> void:
  if energy<cost:
   status.text="Aether recharging…"
   return
+ # a costed skill pressed out of reach costs nothing: no energy, no cooldown, no wasted animation (the free basic attack and HEAVY still swing and miss)
+ if kind in ["pulse","rift"] and hero.position.distance_to(foe.position)>float({"pulse":230,"rift":520}[kind]):
+  status.text="Get closer to use "+kind.to_upper()+"."
+  return
  if kind=="ultimate" and ultimate<100:
   status.text="Land attacks to charge your ultimate."
   return
