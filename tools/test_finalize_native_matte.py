@@ -17,4 +17,8 @@ with tempfile.TemporaryDirectory() as t:
         expect(f"{width}: canvas {im.size}, sole bottom {ys.max() + 1}, foot midpoint {(xs.min() + xs.max()) / 2:.1f}", r.returncode == 0 and im.size == (width, 2304) and ys.max() + 1 == 2176 and abs((xs.min() + xs.max()) / 2 - mid) <= 1.0)
     block(t / "small.png", h=900); r = subprocess.run([sys.executable, TOOL, str(t / "small.png"), str(t / "o2.png"), "--width", "1280"], capture_output=True, text=True)
     expect("a smaller (non-native-height) image is refused, never scaled", r.returncode == 1 and "REFUSED" in r.stdout)
+    block(t / "wide.png", w=1240); r = subprocess.run([sys.executable, TOOL, str(t / "wide.png"), str(t / "o3.png"), "--width", "1280"], capture_output=True, text=True)
+    expect("a figure that leaves under 24 px of margin is refused", r.returncode == 1 and "margin" in r.stdout)
+    block(t / "ok.png", w=1200); r = subprocess.run([sys.executable, TOOL, str(t / "ok.png"), str(t / "o4.png"), "--width", "1280"], capture_output=True, text=True)
+    expect("a figure with at least 24 px of margin is accepted", r.returncode == 0)
 print("RESULT:", "ALL PASS" if not bad else f"{bad} FAILED"); sys.exit(1 if bad else 0)
