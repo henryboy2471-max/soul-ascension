@@ -12,3 +12,15 @@
 - Puzzle screen: `set_anchors_preset` plus an explicit size on a full-rect node logged "non-equal opposite anchors" warnings (21 in the suite); now `set_anchors_and_offsets_preset` like every other full-screen layer. Layout unchanged; relay m3/m4/m5, puzzle logic, layout overflow and QA-gate tests pass and the warnings are gone. Commit `Puzzle screen: ...`.
 - Virtual stick: 12% dead zone with a smooth ramp (full travel still 1.0 at 60 px), so a resting thumb no longer creeps the hero (touch drift on Android). `tests/test_joystick.gd` (11 checks). Touch-using suites (adventure 31, episode3 67, explore motion 20, Ep1 completion 22) pass.
 - Sound boot: footstep variants and ambience loops were synthesised in `Sound._ready` (about 300 ms natively, more in the browser, before the first frame). They are now built one per frame after boot, with an on-demand fallback and `prepare_all()`; `Sound._ready` measures 7.7 ms (was about 330 ms). `tests/test_sound_boot.gd` (8 checks); three older tests call `prepare_all()` first.
+
+## Final verification (build of commit d19e3f3; later commits are docs and .uid files only)
+- Full suite (`tools/run_tests.sh`): discovered 46, ran 46, failing 0.
+- Production "Web" export: pck has no packed QA hook; `tools/test_release_gate.py` passes. Production and Android presets unchanged.
+- Browser (Chromium, software GL, real input): Episode 1 on the production export, keyboard 1280x720: 12/12 (927 s; the run was much slower than the earlier 372 s run on this loaded container, all checks still passed [cause not isolated]); Episode 3 on the QA export, touch 844x390: 20/20 (959 s) and keyboard 667x375: 20/20 (534 s); console audit of boot, Missions and the start of Episodes 1, 2 and 3: no console error, no failed request.
+- QA zip: `soul-ascension-qa-d19e3f3-overnight2.zip` (38 MB; pck byte-identical to the tested export), delivered as a chat attachment, not published anywhere.
+## Not done / remaining
+- No real-device (Chromebook GPU, Android) frame-pacing or touch measurement exists: F3 numbers from the owner are still needed.
+- Episode 2 has no browser playthrough on this code (headless `test_episode2` 38 checks pass).
+- Echo's foot skating and Echo V2 native art are art-blocked (owner decisions: scar, beads, art source, front-margin).
+- Production/Android presets still pack the unreferenced `assets/approved_anime/*` images (about 19.5 MB); excluding them there needs approval.
+- Parallax/particle/lighting polish was not attempted (no verifiable objective defect found, and approved art must not change).
