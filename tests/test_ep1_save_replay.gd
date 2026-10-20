@@ -57,6 +57,7 @@ func run() -> void:
  snd.footstep("wet")
  check(true,"Sound off: effects and footsteps return without error")
  profile.data.settings.sound=true
+ snd.prepare_all()
  snd.loop("city")
  check(snd.loop_player.playing and snd.loops.has("city") and snd.step_clips.has("wet"),"Sound on: ambience loop plays and footstep clips exist")
  snd.stop_loop()

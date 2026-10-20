@@ -211,6 +211,7 @@ func run() -> void:
  # --- sound
  profile.data.settings.sound=true
  var snd=root.get_node("Sound")
+ snd.prepare_all()
  var uniq={}
  for s in snd.STEP_SURFACES:
   var lst=snd.step_clips[s]

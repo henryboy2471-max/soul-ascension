@@ -11,6 +11,7 @@ var music_path=""
 var step_clips:Dictionary={}
 var step_pool:Array=[]
 var step_last:Dictionary={}
+var build_queue:Array=[]
 func _ready() -> void:
  for kind in ["tap","hit","special","win","hurt"]:
   var stream=AudioStreamWAV.new()
@@ -28,23 +29,36 @@ func _ready() -> void:
   stream.data=samples
   clips[kind]=stream
  clips["step"]=make_step()
+ # The footstep variants and the two ambience loops cost about 300 ms to synthesise natively (longer in the browser), so they are built one per frame after boot
+ # (the title screen is up long before they are needed); anything asked for earlier is built on the spot, and prepare_all() finishes the queue immediately.
  for surface in STEP_SURFACES:
   step_clips[surface]=[]
   for v in range(5):
-   step_clips[surface].append(make_footstep(surface,v))
+   build_queue.append(func(): step_clips[surface].append(make_footstep(surface,v)))
+ build_queue.append(func(): ensure_loop("city"))
+ build_queue.append(func(): ensure_loop("realm"))
  for i in range(4):
   var sp=AudioStreamPlayer.new()
   sp.volume_db=-7.0
   add_child(sp)
   step_pool.append(sp)
- loops["city"]=make_loop(false)
- loops["realm"]=make_loop(true)
  loop_player=AudioStreamPlayer.new()
  loop_player.volume_db=-9.0
  add_child(loop_player)
  music_player=AudioStreamPlayer.new()
  music_player.volume_db=MUSIC_DB
  add_child(music_player)
+func _process(_delta:float) -> void:
+ if build_queue.is_empty():
+  set_process(false)
+  return
+ build_queue.pop_front().call()
+func prepare_all() -> void:
+ while not build_queue.is_empty():
+  build_queue.pop_front().call()
+func ensure_loop(kind:String) -> void:
+ if not loops.has(kind):
+  loops[kind]=make_loop(kind=="realm")
 func play(kind:String) -> void:
  if not Profile.data.settings.get("sound",true):
   return
@@ -119,6 +133,7 @@ func loop(kind:String) -> void:
  if loop_kind==kind and loop_player.playing:
   return
  loop_kind=kind
+ ensure_loop(kind)
  loop_player.stream=loops.get(kind)
  loop_player.play()
 # Background music: one quiet looping track per episode theme (MissionDefs.theme), its own on/off switch in Settings ("music", default on). It never plays in battles.
@@ -202,8 +217,12 @@ func footstep(surface:String="wet", loudness:float=1.0) -> void:
  if not Profile.data.settings.get("sound",true) or step_pool.is_empty() or not step_clips.has(surface):
   return
  var list:Array=step_clips[surface]
+ if list.is_empty():
+  list.append(make_footstep(surface,0))   # asked for before the background build reached this surface
  var pick=randi()%list.size()
- if pick==step_last.get(surface,-1):
+ if list.size()<2:
+  pick=0
+ if list.size()>1 and pick==step_last.get(surface,-1):
   pick=(pick+1+randi()%(list.size()-1))%list.size()
  step_last[surface]=pick
  var player:AudioStreamPlayer=null

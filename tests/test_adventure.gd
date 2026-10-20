@@ -72,6 +72,7 @@ func run() -> void:
  check(ep.busy and ep.step==0,"Optional Lantern mural opens a lore scene without advancing the story")
  await skip_scenes(ep,func(): return not ep.busy)
  var snd=root.get_node("Sound")
+ snd.prepare_all()
  check(snd.loops.has("city") and snd.loops.has("realm") and snd.loops.city.data.size()==22050*4*2 and snd.clips.has("step"),"Ambience loops and footstep clip are generated")
  # Talk to Mira
  await create_timer(0.55).timeout
