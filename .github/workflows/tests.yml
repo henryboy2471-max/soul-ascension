@@ -1,0 +1,63 @@
+name: Tests
+
+# Test-only workflow for pull requests and development branches. It never deploys: no Pages permissions, no secrets.
+# Production deployment lives in web-preview.yml and is restricted to main.
+
+on:
+  pull_request:
+  push:
+    branches: ['dev/**', 'episode-*/**', 'chatgpt/**', 'ci/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: "4.4.1"
+
+jobs:
+  suite:
+    runs-on: ubuntu-latest
+    # Verified locally: import ~2.2 min + full test runner ~9 min + pipeline test; GitHub runners may be slower.
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot (editor only, checksum-verified)
+        run: |
+          BASE="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          F="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fsSL --retry 3 -o "$F" "$BASE/$F"
+          curl -fsSL --retry 3 -o SHA512-SUMS.txt "$BASE/SHA512-SUMS.txt"
+          grep " $F\$" SHA512-SUMS.txt | sha512sum -c -
+          unzip -q "$F"
+          sudo mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" /usr/local/bin/godot
+          rm -f "$F" SHA512-SUMS.txt
+          godot --version
+
+      - name: Python test dependencies
+        run: python3 -m pip install --break-system-packages numpy pillow
+
+      - name: Import project
+        run: godot --headless --editor --import --quit
+
+      - name: Run all test suites
+        # Glob discovery of tests/test_*.gd plus tools/test_*.py; fails if any discovered test did not run or failed.
+        run: GODOT=godot tools/run_tests.sh "$RUNNER_TEMP/suite"
+
+      - name: Sprite pipeline test
+        run: |
+          GODOT=godot tools/test_pipeline.sh
+          rm -rf tests/fixtures/_pipeline
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: ${{ runner.temp }}/suite
+          retention-days: 7

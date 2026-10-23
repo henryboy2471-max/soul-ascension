@@ -29,7 +29,8 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Verified locally: import ~2.2 min + full test runner ~9 min + pipeline test; web export time is not measured, so keep headroom.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
@@ -51,31 +52,16 @@ jobs:
       - name: Import project
         run: godot --headless --editor --import --quit
 
-      - name: Run tests
-        run: |
-          godot --headless --script res://tests/test_phase1.gd
-          godot --headless --script res://tests/test_repairs.gd
-          godot --headless --script res://tests/test_adventure.gd
-          godot --headless --script res://tests/test_sprites.gd
-          godot --headless --script res://tests/test_hero_sprites.gd
-          godot --headless --script res://tests/test_mira_sprites.gd
-          godot --headless --script res://tests/test_shade_sprites.gd
-          godot --headless --script res://tests/test_enforcer_sprites.gd
-          godot --headless --script res://tests/test_boss_transform.gd
-          godot --headless --script res://tests/test_ui_polish.gd
-          godot --headless --script res://tests/test_release_candidate.gd
-          godot --headless --script res://tests/test_episode_defs.gd
-          godot --headless --script res://tests/test_episode2.gd
-          godot --headless --script res://tests/test_episode3.gd
-          godot --headless --script res://tests/test_episode4.gd
-          godot --headless --script res://tests/test_cantor_sprites.gd
-          godot --headless --script res://tests/test_explore_motion.gd
-          godot --headless --script res://tests/test_layout_overflow.gd
+      # Python dependencies come before any test: tools/run_tests.sh also runs the tools/test_*.py self-tests.
+      - name: Python test dependencies
+        run: python3 -m pip install --break-system-packages numpy pillow
 
-      - name: Sprite pipeline tests
+      - name: Run all test suites
+        # Glob discovery of tests/test_*.gd plus tools/test_*.py; fails if any discovered test did not run or failed.
+        run: GODOT=godot tools/run_tests.sh "$RUNNER_TEMP/suite"
+
+      - name: Sprite pipeline test
         run: |
-          pip install numpy pillow
-          python3 tools/test_slice_sheet.py
           GODOT=godot tools/test_pipeline.sh
           rm -rf tests/fixtures/_pipeline
 
@@ -100,6 +86,8 @@ jobs:
 
   deploy:
     needs: build
+    # Production deployment is restricted to main, including manual workflow_dispatch runs started from any other branch.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
