@@ -16,28 +16,32 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
 
 env:
   GODOT_VERSION: "4.4.1"
 
 jobs:
   build:
+    # Second guard: development branches never build the Pages artifact (tests.yml covers them).
+    if: github.ref == 'refs/heads/main'
+    # Job-level (not workflow-level) so a newer build can supersede an older build but can never cancel a running deployment.
+    concurrency:
+      group: web-build-${{ github.ref }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Verified locally: import ~2.2 min + full test runner ~9 min + pipeline test; web export time is not measured, so keep headroom.
+    timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Install Godot and web export templates
         run: |
           BASE="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
           curl -fsSL --retry 3 -o godot.zip "$BASE/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
           curl -fsSL --retry 3 -o templates.tpz "$BASE/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          curl -fsSL --retry 3 -o SHA512-SUMS.txt "$BASE/SHA512-SUMS.txt"
+          grep " Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip\$" SHA512-SUMS.txt | sed 's| .*|  godot.zip|' | sha512sum -c -
+          grep " Godot_v${GODOT_VERSION}-stable_export_templates.tpz\$" SHA512-SUMS.txt | sed 's| .*|  templates.tpz|' | sha512sum -c -
           unzip -q godot.zip
           mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" /usr/local/bin/godot 2>/dev/null || sudo mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" /usr/local/bin/godot
           chmod +x /usr/local/bin/godot 2>/dev/null || sudo chmod +x /usr/local/bin/godot
@@ -51,31 +55,18 @@ jobs:
       - name: Import project
         run: godot --headless --editor --import --quit
 
-      - name: Run tests
+      # Python dependencies come before any test: tools/run_tests.sh also runs the tools/test_*.py self-tests.
+      - name: Python test dependencies
         run: |
-          godot --headless --script res://tests/test_phase1.gd
-          godot --headless --script res://tests/test_repairs.gd
-          godot --headless --script res://tests/test_adventure.gd
-          godot --headless --script res://tests/test_sprites.gd
-          godot --headless --script res://tests/test_hero_sprites.gd
-          godot --headless --script res://tests/test_mira_sprites.gd
-          godot --headless --script res://tests/test_shade_sprites.gd
-          godot --headless --script res://tests/test_enforcer_sprites.gd
-          godot --headless --script res://tests/test_boss_transform.gd
-          godot --headless --script res://tests/test_ui_polish.gd
-          godot --headless --script res://tests/test_release_candidate.gd
-          godot --headless --script res://tests/test_episode_defs.gd
-          godot --headless --script res://tests/test_episode2.gd
-          godot --headless --script res://tests/test_episode3.gd
-          godot --headless --script res://tests/test_episode4.gd
-          godot --headless --script res://tests/test_cantor_sprites.gd
-          godot --headless --script res://tests/test_explore_motion.gd
-          godot --headless --script res://tests/test_layout_overflow.gd
+          python3 --version
+          python3 -m pip install --break-system-packages numpy==2.5.3 pillow==12.3.0
 
-      - name: Sprite pipeline tests
+      - name: Run all test suites
+        # Glob discovery of tests/test_*.gd plus tools/test_*.py; fails if any discovered test did not run or failed.
+        run: GODOT=godot tools/run_tests.sh "$RUNNER_TEMP/suite"
+
+      - name: Sprite pipeline test
         run: |
-          pip install numpy pillow
-          python3 tools/test_slice_sheet.py
           GODOT=godot tools/test_pipeline.sh
           rm -rf tests/fixtures/_pipeline
 
@@ -94,16 +85,24 @@ jobs:
           godot --headless --export-release "Web" build/web/index.html
           ls -la build/web
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: build/web
 
   deploy:
     needs: build
+    # Production deployment is restricted to main, including manual workflow_dispatch runs started from any other branch.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
