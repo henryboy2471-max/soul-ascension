@@ -1,0 +1,167 @@
+name: Preview Build Check
+
+# BUILD-ONLY, throwaway preview branch. Never deploys: read-only token, no Pages, no secrets, no environment.
+# Builds the Web export from this branch's commit with review-only art excluded, then verifies the package.
+on:
+  push:
+    branches: [preview/web-build-check]
+
+permissions:
+  contents: read
+
+env:
+  GODOT_VERSION: "4.4.1"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install Godot and web export templates (checksum-verified)
+        run: |
+          BASE="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          curl -fsSL --retry 3 -o godot.zip "$BASE/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fsSL --retry 3 -o templates.tpz "$BASE/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          curl -fsSL --retry 3 -o SHA512-SUMS.txt "$BASE/SHA512-SUMS.txt"
+          grep " Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip\$" SHA512-SUMS.txt | sed 's| .*| godot.zip|' | sha512sum -c -
+          grep " Godot_v${GODOT_VERSION}-stable_export_templates.tpz\$" SHA512-SUMS.txt | sed 's| .*| templates.tpz|' | sha512sum -c -
+          unzip -q godot.zip
+          sudo mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+          TEMPLATES="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p "$TEMPLATES"
+          unzip -q -j templates.tpz 'templates/web_*' 'templates/version.txt' -d "$TEMPLATES"
+          rm -f godot.zip templates.tpz
+          godot --version
+
+      - name: Release gate guard (production preset only, no QA flavor)
+        run: python3 tools/test_release_gate.py
+
+      - name: Exclude review-only art from the Web preset (preview copy only)
+        run: |
+          python3 - <<'PY'
+          s = open("export_presets.cfg").read()
+          a, b = s.split("[preset.1]\n", 1)
+          assert 'name="Web"' in b.split("[preset.2]")[0], "preset.1 is not Web"
+          b = b.replace('exclude_filter="', 'exclude_filter="assets/approved_anime/*,', 1)
+          open("export_presets.cfg", "w").write(a + "[preset.1]\n" + b)
+          PY
+          grep -n 'approved_anime' export_presets.cfg
+
+      - name: Import project
+        run: godot --headless --editor --import --quit
+
+      - name: Lossless Cantor textures (same as the production web build)
+        run: |
+          tools/set_cantor_textures.sh lossless
+          godot --headless --editor --import --quit
+
+      - name: Export web build
+        run: |
+          mkdir -p build/web build-check
+          godot --headless --export-release "Web" build/web/index.html
+          ls -la build/web
+
+      - name: Verify package contents (loads the exported pck with Godot)
+        run: |
+          mkdir -p "$RUNNER_TEMP/chk"
+          echo 'config_version=5' > "$RUNNER_TEMP/chk/project.godot"
+          cat > "$RUNNER_TEMP/chk/check.gd" <<'GD'
+          extends SceneTree
+          var names := []
+          func walk(path: String) -> void:
+          	var da := DirAccess.open(path)
+          	if da == null:
+          		return
+          	da.include_hidden = true
+          	for d in da.get_directories():
+          		walk(path.path_join(d))
+          	for f in da.get_files():
+          		names.append(path.path_join(f))
+          func has_dir(parent: String, n: String) -> bool:
+          	var da := DirAccess.open(parent)
+          	return da != null and da.dir_exists(n)
+          func _init() -> void:
+          	if not ProjectSettings.load_resource_pack(OS.get_environment("PCK")):
+          		print("FAIL: pack did not load")
+          		quit(2)
+          		return
+          	walk("res://")
+          	var bad := []
+          	for p in [["res://assets", "approved_anime"], ["res://assets", "_incoming"], ["res://assets/enemies", "hollow_cantor_v2"], ["res://scripts", "qa"], ["res://", "docs"], ["res://", "tests"], ["res://", "tools"]]:
+          		if has_dir(p[0], p[1]):
+          			bad.append("present: " + p[0] + "/" + p[1])
+          	for p in [["res://assets", "audio"], ["res://scripts", "ui"]]:
+          		if not has_dir(p[0], p[1]):
+          			bad.append("MISSING control dir: " + p[0] + "/" + p[1])
+          	for n in names:
+          		var l: String = n.to_lower()
+          		if "review_only" in l or "reference_only" in l or "preview_only" in l or "approved_anime" in l or "qa_hook" in l:
+          			bad.append("forbidden file: " + n)
+          	print("pack files: ", names.size())
+          	var info := []
+          	for n in names:
+          		var l: String = n.to_lower()
+          		if "ep3" in l or "relay" in l or "demo25d" in l:
+          			info.append(n)
+          	print("INFO episode-3/demo files shipped: ", info.size())
+          	for n in info.slice(0, 40):
+          		print("  ", n)
+          	if bad.is_empty():
+          		print("PACK CHECK PASSED")
+          		quit(0)
+          	else:
+          		for b in bad:
+          			print("FAIL: ", b)
+          		quit(1)
+          GD
+          PCK="$GITHUB_WORKSPACE/build/web/index.pck" godot --headless --path "$RUNNER_TEMP/chk" --script res://check.gd 2>&1 | tee build-check/pack_check.txt
+          grep -q "PACK CHECK PASSED" build-check/pack_check.txt
+          # the QA hook must not be packed as a file (same rule as the production workflow)
+          if grep -a -q -P '(?<!res://)scripts/qa/qa_hook' build/web/index.pck; then echo "QA tooling found"; exit 1; fi
+
+      - name: Package manifest
+        run: |
+          {
+            echo "source_sha=$GITHUB_SHA"
+            echo "ref=$GITHUB_REF"
+            (cd build/web && sha256sum * && du -b *)
+          } | tee build-check/MANIFEST.txt
+
+      - name: Browser smoke test (informational, does not gate the build)
+        continue-on-error: true
+        run: |
+          python3 -m pip install --break-system-packages playwright==1.49.1
+          python3 -m playwright install --with-deps chromium
+          (cd build/web && python3 -m http.server 8000 >/dev/null 2>&1 &)
+          sleep 2
+          python3 - <<'PY' 2>&1 | tee build-check/smoke.txt
+          from playwright.sync_api import sync_playwright
+          errs = []
+          with sync_playwright() as p:
+              b = p.chromium.launch(args=["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"])
+              pg = b.new_page(viewport={"width": 1280, "height": 720})
+              pg.on("console", lambda m: errs.append(m.text) if m.type == "error" else None)
+              pg.on("pageerror", lambda e: errs.append(str(e)))
+              pg.goto("http://localhost:8000/index.html")
+              pg.wait_for_timeout(25000)
+              print("window.__qa:", pg.evaluate("typeof window.__qa"))
+              print("canvas present:", pg.evaluate("!!document.querySelector('canvas')"))
+              pg.screenshot(path="build-check/home_1280x720.png")
+              b.close()
+          print("console errors:", len(errs))
+          for e in errs[:10]:
+              print("  ", e[:200])
+          PY
+
+      - name: Upload build and check results
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: preview-web-build
+          path: |
+            build/web
+            build-check
+          retention-days: 7
