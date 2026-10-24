@@ -2,13 +2,12 @@ name: Android Debug APK
 
 # Builds a debug APK for private device testing and uploads it as a workflow artifact.
 # Never deploys: no Pages permissions, no secrets. Signed only with a throwaway debug keystore generated in the job.
-# workflow_dispatch needs the file on the default branch, so the push trigger is limited to this branch and this file.
+# workflow_dispatch needs the file on the default branch, so pushes to this dedicated branch also run it.
 
 on:
   workflow_dispatch:
   push:
     branches: ['android/ci-debug-apk']
-    paths: ['.github/workflows/android-debug-apk.yml']
 
 permissions:
   contents: read
