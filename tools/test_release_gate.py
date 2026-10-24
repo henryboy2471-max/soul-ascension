@@ -29,8 +29,13 @@ check(len(wf) > 0, "workflow files found")
 for f in wf:
     t = f.read_text()
     check("Web QA" not in t and "web_qa" not in t and "qa_unlock" not in t, f"{f.name} never mentions the QA flavor")
-    for m in re.finditer(r'--export-\w+\s+"([^"]+)"', t):
-        check(m.group(1) in ("Web",), f'{f.name}: export preset "{m.group(1)}" is the production preset')
+    for m in re.finditer(r'--export-(\w+)\s+"([^"]+)"', t):
+        android_debug = f.name == "android-debug-apk.yml" and m.group(1) == "debug" and m.group(2) == "Android"
+        check(m.group(2) in ("Web",) or android_debug, f'{f.name}: export preset "{m.group(2)}" is the production preset or the Android debug build')
+apk = root / ".github/workflows/android-debug-apk.yml"
+if apk.exists():
+    t = apk.read_text()
+    check(not re.search(r"pages:\s*write|id-token:\s*write|deploy-pages|upload-pages-artifact|\$\{\{\s*secrets\.", t), "android-debug-apk.yml has no Pages, deploy or secrets access")
 pages = (root / ".github/workflows/web-preview.yml").read_text()
 check('--export-release "Web"' in pages and "--export-debug" not in pages, 'web-preview.yml exports the production preset with --export-release only')
 check("path: build/web" in pages.replace("'", "").replace('"', "") or "build/web" in pages, "web-preview.yml publishes build/web")
